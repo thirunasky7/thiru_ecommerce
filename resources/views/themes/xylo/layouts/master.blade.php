@@ -5,31 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }}</title>
-    @vite(['resources/views/themes/xylo/sass/app.scss'])
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        @vite(['resources/views/themes/xylo/css/animate.min.css'])
-        @vite(['resources/views/themes/xylo/css/slick.css'])
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-        @vite(['resources/views/themes/xylo/css/style.css'])
-        @vite(['resources/views/themes/xylo/css/custom.css'])
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    
+    <!-- Slick Carousel -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.css">
+    
+    <!-- Custom CSS Files from Public Folder -->
+    <link rel="stylesheet" href="{{ asset('public/css/animate.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('public/css/slick.css') }}">
+    <link rel="stylesheet" href="{{ asset('public/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('public/css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('public/css/app.css') }}">
+    
     @yield('css')
 </head>
 <body>
     @include('themes.xylo.layouts.header')
     @yield('content')
     @include('themes.xylo.layouts.footer')
-    @vite(['resources/views/themes/xylo/js/app.js'])
+    
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    @vite(['resources/views/themes/xylo/js/slick.min.js'])
-    @vite(['resources/views/themes/xylo/js/main.js'])
+    
+    <!-- Slick Carousel JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    
+    <!-- Custom JS Files from Public Folder -->
+    <script src="{{ asset('public/js/main.js') }}"></script>
+    <script src="{{ asset('public/js/app.js') }}"></script>
+    
     @yield('js')
+    
     <script>
         $(document).ready(function () {
+            // Category Slider
             $('.category-slider').slick({
                 slidesToShow: 4,
                 slidesToScroll: 1,
@@ -60,6 +81,8 @@
                     }
                 ]
             });
+            
+            // Banner Slider
             $('.banner-slider').slick({
                 slidesToShow: 1,
                 slidesToScroll: 1,
@@ -71,6 +94,8 @@
                 dots: true,
                 arrows: false,
             });
+            
+            // Product Slider
             $('.product-slider').slick({
                 slidesToShow: 4,
                 slidesToScroll: 1,
@@ -103,6 +128,7 @@
             });
         });
     </script>
+    
     <script>
         /* header script */
         document.addEventListener('DOMContentLoaded', function() {
@@ -118,8 +144,9 @@
             }
         });
     </script>
+    
     <script>
-        /* product seach input */
+        /* product search input */
         $(document).ready(function () {
             $('#search-input').on('keyup', function () {
                 let query = $(this).val();
@@ -157,8 +184,6 @@
                 }
             });
         });
-
-
     </script>
 </body>
 </html>
