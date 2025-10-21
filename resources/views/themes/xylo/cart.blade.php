@@ -41,13 +41,39 @@
     @foreach ($cart as $key => $item)
         @php
             $product = \App\Models\Product::with(['translations', 'thumbnail'])->find($item['product_id']);
-            $variant = isset($item['variant_id'])
-                        ? \App\Models\ProductVariant::with('images')->find($item['variant_id'])
-                        : \App\Models\ProductVariant::where('product_id', $item['product_id'])->where('is_primary', true)->first();
-
+            
+            // Safely get variant with null checks
+            $variant = null;
+            $variantImage = null;
+            $variantName = null;
+            
+            if (isset($item['variant_id'])) {
+                $variant = \App\Models\ProductVariant::with('images')->find($item['variant_id']);
+            } else {
+                $variant = \App\Models\ProductVariant::where('product_id', $item['product_id'])->where('is_primary', true)->first();
+            }
+            
+            // Get image - prioritize variant image, fallback to product thumbnail
+            if ($variant && $variant->images && $variant->images->first()) {
+                $variantImage = Storage::url($variant->images->first()->image_url);
+            } elseif ($product && $product->thumbnail) {
+                $variantImage = Storage::url($product->thumbnail->image_url);
+            } else {
+                $variantImage = 'default.jpg';
+            }
+            
+            // Get name - prioritize variant name, fallback to product name
+            if ($variant && $variant->name) {
+                $variantName = $variant->name;
+            } elseif ($product && $product->translation) {
+                $variantName = $product->translation->name;
+            } else {
+                $variantName = 'Product Not Found';
+            }
+            
             $subtotal = $item['price'] * $item['quantity'];
         @endphp
-        <tr>
+        <tr id="cart-row-{{ $key }}">
             <td>
                 <button class="btn btn-link p-0 bnlink remove-from-cart" data-id="{{ $key }}">
                     <i class="fa-regular fa-circle-xmark"></i>
@@ -55,9 +81,9 @@
             </td>
             <td>
                 <div class="pr-imghead">
-                    <img src="{{ Storage::url(optional($variant->images->first() ?? $product->thumbnail)->image_url ?? 'default.jpg') }}" 
-                         alt="{{ $variant->name ?? $product->translation->name }}">
-                    <p>{{ $variant->name ?? $product->translation->name }}</p>
+                    <img src="{{ $variantImage }}" 
+                         alt="{{ $variantName }}">
+                    <p>{{ $variantName }}</p>
                 </div>
                 
                 <div id="size-color-wrapper">
@@ -105,10 +131,10 @@
                 <strong>{{ $currency->symbol }}{{ number_format($item['price'], 2) }}</strong>
             </td>
             <td>
-                <input type="number" value="{{ $item['quantity'] }}" min="1" data-id="{{ $key }}">
+                <input type="number" value="{{ $item['quantity'] }}" min="1" data-id="{{ $key }}" class="quantity-input">
             </td>
             <td>
-                <strong>{{ $currency->symbol }}{{ number_format($subtotal, 2) }}</strong>
+                <strong class="subtotal" id="subtotal-{{ $key }}">{{ $currency->symbol }}{{ number_format($subtotal, 2) }}</strong>
             </td>
         </tr>
         @php $total += $subtotal; @endphp
@@ -121,7 +147,7 @@
                 @endif
                 <div class="btn-group mt-4">
                     <a href="{{ route('xylo.home') }}" class="btn-light">Continue Shopping</a>
-                    <a href="#" class="read-more update-cart">Update cart</a>
+                    <a href="#" class="read-more update-cart" style="display: none;">Update cart</a>
                 </div>
             </div>
 
@@ -131,7 +157,7 @@
 
                     <div class="row border-bottom pb-2 mb-2 mt-4">
                         <div class="col-6 col-md-4">Subtotal</div>
-                        <div class="col-6 col-md-8 text-end">{{ $currency->symbol }}{{ number_format($total, 2) }}</div>
+                        <div class="col-6 col-md-8 text-end" id="cart-subtotal">{{ $currency->symbol }}{{ number_format($total, 2) }}</div>
                     </div>
 
                     @php
@@ -165,7 +191,7 @@
 
                     <div class="row border-bottom pb-2 mb-2">
                         <div class="col-6 col-md-4">Total</div>
-                        <div class="col-6 col-md-8 text-end"><span>{{ $currency->symbol }}{{ number_format($finalTotal, 2) }}</span></div>
+                        <div class="col-6 col-md-8 text-end"><span id="cart-total">{{ $currency->symbol }}{{ number_format($finalTotal, 2) }}</span></div>
                     </div>
 
                     <div class="mt-4">
@@ -195,60 +221,100 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('.update-cart').click(function(e) {
-            e.preventDefault();
+        // Auto-update cart when quantity changes
+        $('.quantity-input').on('change', function() {
+            let productId = $(this).data('id');
+            let quantity = $(this).val();
+            let price = parseFloat($(this).closest('tr').find('td:nth-child(3) strong').text().replace('{{ $currency->symbol }}', ''));
+            
+            // Update subtotal immediately for better UX
+            let subtotal = price * quantity;
+            $('#subtotal-' + productId).text('{{ $currency->symbol }}' + subtotal.toFixed(2));
+            
+            // Update cart via AJAX
+            updateCartItem(productId, quantity);
+        });
 
-            let cartData = [];
-
-            $('tbody tr').each(function() {
-                let productId = $(this).find('input[type="number"]').data('id');
-                let quantity = $(this).find('input[type="number"]').val();
-
-                cartData.push({
-                    product_id: productId,
-                    quantity: quantity
-                });
-            });
-
+        function updateCartItem(productId, quantity) {
             $.ajax({
                 url: "{{ route('cart.update') }}",
                 type: "POST",
                 data: {
                     _token: "{{ csrf_token() }}",
-                    cart: cartData
+                    cart: [{
+                        product_id: productId,
+                        quantity: parseInt(quantity)
+                    }]
                 },
                 success: function(response) {
                     if (response.success) {
-                        location.reload();
+                        // Update totals
+                        updateCartTotals(response.cart);
+                        toastr.success('Cart updated successfully');
+                    } else {
+                        toastr.error('Failed to update cart');
                     }
+                },
+                error: function() {
+                    toastr.error('Error updating cart');
                 }
             });
-        });
-    });
+        }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll('.remove-from-cart').forEach(button => {
-            button.addEventListener('click', function() {
-                let productId = this.dataset.id;
+        function updateCartTotals(cartData) {
+            let subtotal = 0;
+            
+            // Update each row's subtotal and calculate total
+            $('.quantity-input').each(function() {
+                let productId = $(this).data('id');
+                let quantity = $(this).val();
+                let price = parseFloat($(this).closest('tr').find('td:nth-child(3) strong').text().replace('{{ $currency->symbol }}', ''));
+                let rowSubtotal = price * quantity;
+                
+                subtotal += rowSubtotal;
+            });
 
-                fetch("{{ route('cart.remove') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({ product_id: productId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    toastr.success("{{ session('success') }}", data.message, {
-                        closeButton: true,
-                        progressBar: true,
-                        positionClass: "toast-top-right",
-                        timeOut: 5000
-                    });
-                    location.reload();
-                });
+            // Update displayed totals
+            $('#cart-subtotal').text('{{ $currency->symbol }}' + subtotal.toFixed(2));
+            
+            // Calculate discount if coupon exists
+            let discountAmount = 0;
+            @if($coupon)
+                @if($coupon['type'] === 'percentage')
+                    discountAmount = subtotal * ({{ $coupon['discount'] }} / 100);
+                @else
+                    discountAmount = {{ $coupon['discount'] }};
+                @endif
+            @endif
+            
+            let finalTotal = Math.max(0, subtotal - discountAmount);
+            $('#cart-total').text('{{ $currency->symbol }}' + finalTotal.toFixed(2));
+        }
+
+        // Remove item from cart
+        $('.remove-from-cart').on('click', function(e) {
+            e.preventDefault();
+            let productId = $(this).data('id');
+            
+            $.ajax({
+                url: "{{ route('cart.remove') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    product_id: productId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#cart-row-' + productId).remove();
+                        updateCartTotals(response.cart);
+                        toastr.success(response.message);
+                        
+                        // Reload if cart is empty
+                        if ($('tbody tr').length === 0) {
+                            location.reload();
+                        }
+                    }
+                }
             });
         });
     });
@@ -269,15 +335,24 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(response => response.json())
         .then(data => {
-            toastr.success(data.message, "Applied", {
-                closeButton: true,
-                progressBar: true,
-                positionClass: "toast-top-right",
-                timeOut: 5000
-            });
-            setTimeout(() => {
-                if (data.success) location.reload();
-            }, 1000);
+            if (data.success) {
+                toastr.success(data.message, "Applied", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000
+                });
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                toastr.error(data.message, "Error", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000
+                });
+            }
         });
     });
 
@@ -302,7 +377,6 @@ document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
                 if (data.success) location.reload();
             }, 1000);
-
         });
     });
 });

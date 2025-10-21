@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
-use App\Models\OrderItem;
+use App\Models\OrderDetail as OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
 
 class CheckoutController extends Controller
 {
@@ -39,7 +41,7 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'address' => 'required|string|max:255',
-            'payment_method' => 'required',
+            'payment_method' => 'required|in:card,paypal,cod,bank_transfer,gpay',
         ]);
 
         $cart = Session::get('cart', []);
@@ -76,7 +78,11 @@ class CheckoutController extends Controller
 
         // Clear the session cart
         Session::forget('cart');
+        return view('themes.xylo.payment.success', [
+            'payment' => $request->payment_method,
+            'order' => $order,
+            'message' => 'Order placed successfully!'
+        ]);
 
-        return redirect()->route('thankyou')->with('success', 'Order placed successfully!');
     }
 }

@@ -37,7 +37,7 @@
             <!-- Bottom Bar -->
             <div class="row mt-3">
                 <div class="col-md-3 text-center text-md-start">
-                    <p class="m-0">&copy; 2025 Xylo. All Rights Reserved</p>
+                    <p class="m-0">&copy; 2025 ylo. All Rights Reserved</p>
                 </div>
                 <div class="col-md-7">
                     <img src="assets/images/footerbotom-line.png" alt="" class="w-100">

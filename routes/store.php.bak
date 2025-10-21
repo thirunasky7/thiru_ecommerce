@@ -16,22 +16,8 @@ use App\Http\Controllers\Store\Auth\ResetPasswordController;
 use App\Http\Controllers\Store\WishlistController;
 
 use App\Http\Controllers\Store\CheckoutController;
-use App\Http\Controllers\Store\PaymentController;
-
 
 Route::get('/', [StoreController::class, 'index'])->name('xylo.home');
-Route::get('/home', [StoreController::class, 'index']);
-Route::get('/services', function(){
-    return view('services');
-});
-Route::get('/about-us', function(){
-    return view('about-us');
-});
-
-
-Route::get('/categories', [StoreController::class, 'allcategories'])->name('categories.index');
-Route::get('/products', [StoreController::class, 'allproducts'])->name('products.index');
-
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
 Route::post('/change-currency', [CurrencyController::class, 'changeCurrency'])->name('change.currency');
 
@@ -55,9 +41,7 @@ Route::get('/get-variant-price', [ProductController::class, 'getVariantPrice'])-
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
-Route::post('/payment/initiate/upi', [PaymentController::class, 'initiateUpiPayment'])->name('payment.initiate.upi');
-Route::post('/payment/status', [PaymentController::class, 'checkPaymentStatus'])->name('payment.status');
-Route::get('/order/success', [PaymentController::class, 'success'])->name('order.success');
+
 
 Route::prefix('customer')->name('customer.')->group(function () {
     

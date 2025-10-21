@@ -37,4 +37,21 @@ class StoreController extends Controller
 
         return view('themes.xylo.home', compact('banners', 'categories', 'products',));
     }
+
+    public function allcategories(){
+          $categories = Category::where('status', 1)
+        ->with('translation')
+        ->orderBy('id', 'desc')
+        ->get();
+        return view('themes.xylo.categories', compact('categories'));
+    }
+
+     public function allproducts(){
+        $products = Product::where('status', 1)
+        ->with(['translation', 'thumbnail', 'primaryVariant', 'reviews'])
+        ->withCount('reviews')
+        ->orderBy('id', 'desc')
+        ->get();
+        return view('themes.xylo.products', compact('products',));
+    }
 }
