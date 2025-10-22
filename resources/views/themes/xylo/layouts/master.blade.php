@@ -12,7 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"> 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">   
-    <link rel="stylesheet" href="{{ url('/css/front-style.css')}}">
+    <link rel="stylesheet" href="{{ url('/public/css/front-style.css')}}">
 </head>
 <body>
     @include('themes.xylo.layouts.header')
