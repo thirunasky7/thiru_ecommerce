@@ -223,7 +223,7 @@
                             <h3 class="cart-heading">Payment Method</h3>
                             
                             <!-- UPI Payments (PhonePe & Google Pay) -->
-                            <div class="payment-method" data-method="upi">
+                            <!-- <div class="payment-method" data-method="upi">
                                 <label class="d-flex align-items-center" style="cursor: pointer;">
                                     <input type="radio" name="payment_method" value="upi"
                                            {{ old('payment_method') == 'upi' ? 'checked' : '' }}>
@@ -256,7 +256,6 @@
                                     <div class="qr-code-container">
                                         <h6>Scan QR Code to Pay</h6>
                                         <div class="qr-code" id="qrCodeContainer">
-                                            <!-- QR Code will be generated here -->
                                             <div id="qrCodePlaceholder" style="width: 200px; height: 200px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
                                                 <span class="text-muted">QR Code will be generated</span>
                                             </div>
@@ -274,10 +273,10 @@
                                         </button>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- Credit/Debit Card -->
-                            <div class="payment-method selected" data-method="card">
+                            <!-- <div class="payment-method selected" data-method="card">
                                 <label class="d-flex align-items-center" style="cursor: pointer;">
                                     <input type="radio" name="payment_method" value="card" checked 
                                            {{ old('payment_method', 'card') == 'card' ? 'checked' : '' }}>
@@ -339,10 +338,10 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- PayPal -->
-                            <div class="payment-method" data-method="paypal">
+                            <!-- <div class="payment-method" data-method="paypal">
                                 <label class="d-flex align-items-center" style="cursor: pointer;">
                                     <input type="radio" name="payment_method" value="paypal"
                                            {{ old('payment_method') == 'paypal' ? 'checked' : '' }}>
@@ -355,7 +354,7 @@
                                 <div class="payment-details" id="paypal-details">
                                     <p class="text-muted">You will be redirected to PayPal to complete your payment securely.</p>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- Cash on Delivery -->
                             <div class="payment-method" data-method="cod">
