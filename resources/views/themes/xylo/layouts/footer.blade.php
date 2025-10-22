@@ -1,50 +1,40 @@
-<footer class="xylo-footer">
-        <div class="container py-4">
-            <!-- Top Row -->
-            <div class="row align-items-center py-5">
-                <!-- Left Links -->
-                <div class="col-md-4 d-flex justify-content-center justify-content-md-start mb-2 mb-md-0">
-                    <ul class="footer-links list-unstyled d-flex mb-0">
-                        <li><a href="#">TERMS & CONDITION</a></li>
-                        <li><a href="#">PRIVACY POLICY</a></li>
-                        <li><a href="#">DISCLAIMER</a></li>
+   <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="footer-title">TasteIt</h5>
+                    <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="footer-title">Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Products</a></li>
+                        <li><a href="#">Categories</a></li>
                     </ul>
                 </div>
-
-                <!-- Center Brand -->
-                <div class="col-md-4 text-center mb-2 mb-md-0">
-                    <img src="assets/images/footer-logo.png" alt="">
-                </div>
-
-                <!-- Right Links & Icons -->
-                <div class="col-md-4 d-flex justify-content-center justify-content-md-end">
-                    <ul class="footer-links list-unstyled d-flex mb-0">
-                        <li><a href="#">SIGN UP</a></li>
-                        <li><a href="#">LOGIN</a></li>
-                        <li>
-                            <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="fab fa-instagram"></i></a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="fab fa-youtube"></i></a>
-                        </li>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="footer-title">Customer Service</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Returns & Refunds</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">FAQs</a></li>
                     </ul>
                 </div>
             </div>
-
-            <!-- Bottom Bar -->
-            <div class="row mt-3">
-                <div class="col-md-3 text-center text-md-start">
-                    <p class="m-0">&copy; 2025 ylo. All Rights Reserved</p>
-                </div>
-                <div class="col-md-7">
-                    <img src="assets/images/footerbotom-line.png" alt="" class="w-100">
-                </div>
-                <div class="col-md-2 text-center text-md-end">
-                    <p class="m-0">Are You Interested?</p>
-                </div>
+            <div class="copyright">
+                <p>&copy; {{ date('Y')}} TasteIt. All rights reserved.</p>
             </div>
         </div>
     </footer>
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>

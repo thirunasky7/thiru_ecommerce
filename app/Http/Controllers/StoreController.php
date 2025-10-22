@@ -16,26 +16,25 @@ class StoreController extends Controller
     {
         $locale = app()->getLocale();
 
-        $banners = Banner::where('status', 1)
+        $send_data['banner'] = Banner::where('status', 1)
         ->with('translation')
         ->orderBy('id', 'desc')
-        ->take(3)
-        ->get();
+        ->first();
 
-        $categories = Category::where('status', 1)
+       $send_data['categories'] = Category::where('status', 1)
         ->with('translation')
         ->orderBy('id', 'desc')
         ->take(10)
         ->get();
             
-        $products = Product::where('status', 1)
+        $send_data['products'] = Product::where('status', 1)
         ->with(['translation', 'thumbnail', 'primaryVariant', 'reviews'])
         ->withCount('reviews')
         ->orderBy('id', 'desc')
         ->take(10)
         ->get();
 
-        return view('themes.xylo.home', compact('banners', 'categories', 'products',));
+        return view('themes.xylo.home',$send_data);
     }
 
     public function allcategories(){
