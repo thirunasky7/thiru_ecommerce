@@ -1,19 +1,19 @@
-@extends('themes.xylo.layouts.master')
-@section('css')
+@extends('themes.xylo.partials.app')
 
-@endsection
+@section('title', 'MyStore - Online Shopping')
+
 @section('content')
- @php $currency = activeCurrency(); @endphp
+@php $currency = activeCurrency(); @endphp
     
     <!-- Breadcrumb Section -->
     <section class="banner-area inner-banner pt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="breadcrumbs">
-                        <a href="{{ route('xylo.home') }}">Home</a> 
-                        <i class="fa fa-angle-right"></i> 
-                        <span>Shopping Cart</span>
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap">
+                <div class="w-full">
+                    <div class="breadcrumbs flex items-center space-x-2 text-sm text-gray-600">
+                        <a href="{{ route('xylo.home') }}" class="hover:text-gray-900 transition-colors">Home</a> 
+                        <i class="fa fa-angle-right text-xs"></i> 
+                        <span class="text-gray-900">Shopping Cart</span>
                     </div>
                 </div>
             </div>
@@ -21,28 +21,28 @@
     </section>
 
     <!-- Cart Section -->
-    <div class="cart-page pb-5 pt-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="mb-0">Your Shopping Cart</h2>
-                        <span class="text-muted">{{ count($cart ?? []) }} items</span>
+    <div class="cart-page pb-12 pt-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="w-full lg:w-8/12">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Your Shopping Cart</h2>
+                        <span class="text-gray-500">{{ count($cart ?? []) }} items</span>
                     </div>
 
                     @if(empty($cart))
                         <!-- Empty Cart State -->
-                        <div class="empty-cart">
-                            <i class="fas fa-shopping-cart"></i>
-                            <h3 class="mb-3">Your cart is empty</h3>
-                            <p class="text-muted mb-4">Looks like you haven't added any items to your cart yet.</p>
-                            <a href="{{ route('xylo.home') }}" class="btn-proceed-checkout" style="display: inline-block; width: auto;">
-                                <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+                        <div class="empty-cart text-center py-16 bg-white rounded-lg shadow-sm border border-gray-100">
+                            <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                            <h3 class="text-xl font-semibold text-gray-700 mb-3">Your cart is empty</h3>
+                            <p class="text-gray-500 mb-6 max-w-md mx-auto">Looks like you haven't added any items to your cart yet.</p>
+                            <a href="{{ route('xylo.home') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-shopping-bag mr-2"></i>Start Shopping
                             </a>
                         </div>
                     @else
                         <!-- Cart Items -->
-                        <div class="cart-items">
+                        <div class="cart-items space-y-4">
                             @php $total = 0; @endphp
                             @foreach ($cart as $key => $item)
                                 @php
@@ -81,16 +81,16 @@
                                     $total += $subtotal;
                                 @endphp
 
-                                <div class="cart-item" id="cart-row-{{ $key }}">
-                                    <div class="row align-items-center">
+                                <div class="cart-item bg-white rounded-lg shadow-sm border border-gray-100 p-4" id="cart-row-{{ $key }}">
+                                    <div class="flex flex-col md:flex-row md:items-center gap-4">
                                         <!-- Product Image & Info -->
-                                        <div class="col-md-6">
-                                            <div class="d-flex align-items-center">
+                                        <div class="md:w-6/12">
+                                            <div class="flex items-start space-x-4">
                                                 <img src="{{ $variantImage }}" 
                                                      alt="{{ $variantName }}"
-                                                     class="product-image me-3">
+                                                     class="w-20 h-20 object-cover rounded-md flex-shrink-0">
                                                 <div class="product-info">
-                                                    <h5 class="mb-1">{{ $variantName }}</h5>
+                                                    <h5 class="font-medium text-gray-900 mb-1">{{ $variantName }}</h5>
                                                     
                                                     <!-- Product Attributes -->
                                                     @if (!empty($item['attributes']))
@@ -117,17 +117,17 @@
                                                             @endforeach
 
                                                             @if (!empty($sizes))
-                                                                <div class="mb-1">
+                                                                <div class="mb-1 flex flex-wrap gap-1">
                                                                     @foreach ($sizes as $size)
-                                                                        <span class="size-box">{{ $size }}</span>
+                                                                        <span class="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ $size }}</span>
                                                                     @endforeach
                                                                 </div>
                                                             @endif
 
                                                             @if (!empty($colors))
-                                                                <div>
+                                                                <div class="flex items-center space-x-1">
                                                                     @foreach ($colors as $color)
-                                                                        <span class="color-circle {{ strtolower($color) }}" 
+                                                                        <span class="inline-block w-4 h-4 rounded-full border border-gray-300 bg-{{ strtolower($color) }}-500" 
                                                                               title="{{ $color }}"></span>
                                                                     @endforeach
                                                                 </div>
@@ -139,37 +139,37 @@
                                         </div>
 
                                         <!-- Price -->
-                                        <div class="col-md-2 text-center text-md-start">
-                                            <div class="price-amount">
+                                        <div class="md:w-2/12 text-center md:text-left">
+                                            <div class="price-amount font-medium text-gray-900">
                                                 {{ $currency->symbol }}{{ number_format($item['price'], 2) }}
                                             </div>
                                         </div>
 
                                         <!-- Quantity Control -->
-                                        <div class="col-md-2">
-                                            <div class="quantity-control">
-                                                <button class="quantity-btn decrease" data-id="{{ $key }}">
-                                                    <i class="fas fa-minus"></i>
+                                        <div class="md:w-2/12">
+                                            <div class="quantity-control flex items-center justify-center md:justify-start">
+                                                <button class="quantity-btn decrease w-8 h-8 flex items-center justify-center bg-gray-100 rounded-l-md hover:bg-gray-200 transition-colors" data-id="{{ $key }}">
+                                                    <i class="fas fa-minus text-xs"></i>
                                                 </button>
                                                 <input type="number" 
                                                        value="{{ $item['quantity'] }}" 
                                                        min="1" 
                                                        data-id="{{ $key }}" 
-                                                       class="quantity-input">
-                                                <button class="quantity-btn increase" data-id="{{ $key }}">
-                                                    <i class="fas fa-plus"></i>
+                                                       class="quantity-input w-12 h-8 text-center border-y border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                                <button class="quantity-btn increase w-8 h-8 flex items-center justify-center bg-gray-100 rounded-r-md hover:bg-gray-200 transition-colors" data-id="{{ $key }}">
+                                                    <i class="fas fa-plus text-xs"></i>
                                                 </button>
                                             </div>
                                         </div>
 
                                         <!-- Subtotal & Remove -->
-                                        <div class="col-md-2">
-                                            <div class="d-flex align-items-center justify-content-between">
-                                                <div class="price-amount" id="subtotal-{{ $key }}">
+                                        <div class="md:w-2/12">
+                                            <div class="flex items-center justify-between">
+                                                <div class="price-amount font-medium text-gray-900" id="subtotal-{{ $key }}">
                                                     {{ $currency->symbol }}{{ number_format($subtotal, 2) }}
                                                 </div>
-                                                <button class="remove-btn remove-from-cart" data-id="{{ $key }}">
-                                                    <i class="fas fa-trash"></i>
+                                                <button class="remove-btn remove-from-cart w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-md transition-colors" data-id="{{ $key }}">
+                                                    <i class="fas fa-trash text-sm"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -179,25 +179,34 @@
                         </div>
 
                         <!-- Continue Shopping -->
-                        <div class="d-flex justify-content-between align-items-center mt-4">
-                            <a href="{{ route('xylo.home') }}" class="btn-continue-shopping">
-                                <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                        <div class="flex justify-between items-center mt-8">
+                            <a href="{{ route('xylo.home') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+                                <i class="fas fa-arrow-left mr-2"></i>Continue Shopping
                             </a>
                         </div>
                     @endif
                 </div>
 
                 <!-- Cart Summary -->
-                <div class="col-lg-4 mt-4 mt-lg-0">
-                    <div class="cart-summary">
-                        <h4 class="summary-title">Order Summary</h4>
+                <div class="w-full lg:w-4/12 mt-6 lg:mt-0">
+                    <div class="cart-summary bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h4>
                         
-                        <div class="summary-row">
-                            <span>Subtotal</span>
-                            <span id="cart-subtotal">{{ $currency->symbol }}{{ number_format($total, 2) }}</span>
+                        <div class="summary-row flex justify-between items-center py-3 border-b border-gray-100">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span id="cart-subtotal" class="font-medium text-gray-900">
+                                @if(isset($total))
+                                {{ $currency->symbol }}{{ number_format($total, 2) }}
+                                @else
+                                {{ $currency->symbol }} 0.00
+                                @endif
+                            </span>
                         </div>
 
                         @php
+                          if(!isset($total)){
+                                $total = 0;
+                          }
                             $coupon = session('cart_coupon');
                             $discountAmount = 0;
                             if ($coupon) {
@@ -211,54 +220,54 @@
                         @endphp
 
                         @if($coupon)
-                            <div class="summary-row">
-                                <div class="d-flex align-items-center">
-                                    <span>Discount</span>
-                                    <span class="discount-badge ms-2">{{ $coupon['code'] }}</span>
+                            <div class="summary-row flex justify-between items-center py-3 border-b border-gray-100">
+                                <div class="flex items-center">
+                                    <span class="text-gray-600">Discount</span>
+                                    <span class="discount-badge ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded">{{ $coupon['code'] }}</span>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <span class="text-success">-{{ $currency->symbol }}{{ number_format($discountAmount, 2) }}</span>
-                                    <form id="removeCouponForm" class="ms-2">
+                                <div class="flex items-center">
+                                    <span class="text-green-600 font-medium">-{{ $currency->symbol }}{{ number_format($discountAmount, 2) }}</span>
+                                    <form id="removeCouponForm" class="ml-2">
                                         @csrf
-                                        <button type="submit" class="remove-coupon">
-                                            <i class="fas fa-times"></i>
+                                        <button type="submit" class="remove-coupon w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors">
+                                            <i class="fas fa-times text-sm"></i>
                                         </button>
                                     </form>
                                 </div>
                             </div>
                         @endif
 
-                        <div class="summary-row">
-                            <span>Shipping</span>
-                            <span class="text-muted">Calculated at checkout</span>
+                        <div class="summary-row flex justify-between items-center py-3 border-b border-gray-100">
+                            <span class="text-gray-600">Shipping</span>
+                            <span class="text-gray-500 text-sm">Calculated at checkout</span>
                         </div>
 
-                        <div class="summary-row">
-                            <span>Total</span>
-                            <span id="cart-total">{{ $currency->symbol }}{{ number_format($finalTotal, 2) }}</span>
+                        <div class="summary-row flex justify-between items-center py-3">
+                            <span class="text-gray-600 font-medium">Total</span>
+                            <span id="cart-total" class="text-lg font-bold text-gray-900">{{ $currency->symbol }}{{ number_format($finalTotal, 2) }}</span>
                         </div>
 
-                        <div class="mt-4">
-                            <a href="{{ route('checkout.index') }}" class="btn-proceed-checkout">
-                                <i class="fas fa-lock me-2"></i>Proceed to Checkout
+                        <div class="mt-6">
+                            <a href="{{ route('checkout.index') }}" class="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-lock mr-2"></i>Proceed to Checkout
                             </a>
                         </div>
                     </div>
 
                     <!-- Coupon Section -->
-                    <div class="coupon-section">
-                        <h5 class="summary-title mb-3">Apply Coupon</h5>
+                    <div class="coupon-section mt-6 bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                        <h5 class="text-lg font-semibold text-gray-900 mb-3">Apply Coupon</h5>
                         <form id="applyCouponForm">
                             @csrf
-                            <div class="mb-3">
+                            <div class="mb-4">
                                 <input type="text" 
                                        name="code" 
                                        id="coupon_code" 
                                        placeholder="Enter coupon code" 
-                                       class="form-control">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
                             </div>
-                            <button type="submit" class="btn-apply-coupon">
-                                <i class="fas fa-tag me-2"></i>Apply Coupon
+                            <button type="submit" class="w-full flex items-center justify-center px-4 py-2 bg-gray-800 text-white font-medium rounded-md hover:bg-gray-900 transition-colors">
+                                <i class="fas fa-tag mr-2"></i>Apply Coupon
                             </button>
                         </form>
                     </div>
@@ -558,6 +567,4 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 });
 </script>
-
-
 @endsection
