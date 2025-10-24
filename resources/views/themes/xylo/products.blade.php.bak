@@ -140,7 +140,7 @@
 <body class="bg-gray-50">
    <div class="lg:hidden bg-white shadow-sm py-11 px-4 sticky top-5 z-30">
         <div class="flex justify-between items-center">
-            <h1 class="text-xl font-bold coffee-title"> Products</h1>
+            <h1 class="text-xl font-bold coffee-title">Coffee Products</h1>
             <button id="mobileFilterBtn" class="bg-amber-800 text-white px-4 py-2 rounded-lg flex items-center">
                 <i class="fas fa-filter mr-2"></i> Filters
             </button>
