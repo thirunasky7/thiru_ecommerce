@@ -39,8 +39,8 @@ if (!function_exists('getWebConfig')) {
 
 if (!function_exists('activeCurrency')) {
     function activeCurrency() {
-        return Cache::rememberForever('active_currency_' . session('currency', 'INR'), function () {
-            return Currency::where('code', session('currency', 'INR'))->first();
+        return Cache::rememberForever('active_currency_' . session('currency', 'USD'), function () {
+            return Currency::where('code', session('currency', 'USD'))->first();
         });
     }
 }
