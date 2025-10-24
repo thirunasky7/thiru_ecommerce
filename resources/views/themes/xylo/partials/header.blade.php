@@ -5,7 +5,7 @@
       <button id="menu-btn" class="lg:hidden">
         <i data-feather="menu" class="w-6 h-6"></i>
       </button>
-      <a href="#" class="text-2xl font-bold text-blue-600">MyStore</a>
+      <a href="#" class="text-2xl font-bold text-red-600">MyStore</a>
     </div>
     <div class="hidden lg:flex space-x-6 font-medium">
       <a href="{{ url('/home')}}" class="hover:text-blue-600">Home</a>

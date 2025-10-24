@@ -1,16 +1,75 @@
+  <!-- ✅ MOBILE BOTTOM NAV -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-inner flex justify-around items-center py-2 lg:hidden">
+    <a href="{{ url('/home')}}" class="flex flex-col items-center text-red-600">
+      <i data-feather="home" class="w-5 h-5"></i>
+      <span class="text-xs mt-1">Home</span>
+    </a>
+    <a href="{{ url('/products')}}" class="flex flex-col items-center text-gray-600 hover:text-red-600">
+      <i data-feather="shopping-bag" class="w-5 h-5"></i>
+      <span class="text-xs mt-1">Products</span>
+    </a>
+    <a href="{{ url('/my-orders')}}" class="flex flex-col items-center text-gray-600 hover:text-red-600">
+      <i data-feather="package" class="w-5 h-5"></i>
+      <span class="text-xs mt-1">Orders</span>
+    </a>
+    <a href="{{ url('/accounts')}}" class="flex flex-col items-center text-gray-600 hover:text-red-600">
+      <i data-feather="user" class="w-5 h-5"></i>
+      <span class="text-xs mt-1">Profile</span>
+    </a>
+  </nav>
 <!-- FOOTER -->
 <footer class="bg-gray-800 text-white py-6 mt-10 hidden lg:block">
   <div class="container mx-auto text-center text-sm">
     © {{ date('Y') }} MyStore. All rights reserved.
   </div>
 </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
      <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <!-- Bootstrap JS -->
+     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+ 
+ <script>
+        // Toastr configuration
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "100",
+            "hideDuration": "1000",
+            "timeOut": "1000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        
+        // Example usage
+        function showSuccess(message) {
+            toastr.success(message);
+        }
+        
+        function showError(message) {
+            toastr.error(message);
+        }
+        
+        function showWarning(message) {
+            toastr.warning(message);
+        }
+        
+        function showInfo(message) {
+            toastr.info(message);
+        }
+    </script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Update cart counts in real-time
@@ -81,36 +140,83 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+// Update cart count in header
+function updateCartCount(cart) {
+    let totalCount = 0;
+    if (cart && typeof cart === 'object') {
+        totalCount = Object.values(cart).reduce((sum, item) => sum + (item.quantity || 0), 0);
+    }
+    
+    const cartCountElement = document.getElementById("cart-count");
+    if (cartCountElement) {
+        cartCountElement.textContent = totalCount;
+        cartCountElement.classList.add('scale-125');
+        setTimeout(() => {
+            cartCountElement.classList.remove('scale-125');
+        }, 300);
+    }
+}
 
 function addToCart(productId) {
-
-fetch("{{ route('cart.add') }}", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-    },
-    body: JSON.stringify({
-        product_id: productId,
-        quantity: 1
+  
+    // AJAX call to add to cart
+    fetch("{{ route('cart.add') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: 1
+        })
     })
-})
-.then(response => response.json())
-.then(data => {
-    toastr.success("{{ session('success') }}", data.message, {
-        closeButton: true,
-        progressBar: true,
-        positionClass: "toast-top-right",
-        timeOut: 5000
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            toastr.success(` added to cart!`, 'Success');
+            updateCartCount(data.cart);
+        } else {
+            toastr.error(data.message || 'Failed to add to cart', 'Error');
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        toastr.error('Error adding to cart', 'Network Error');
     });
-    updateCartCount(data.cart);
-})
-.catch(error => console.error("Error:", error));
+}
+
+function addToCart(productId, quantity) {
+  
+    $.ajax({
+        url: "{{ route('cart.add') }}",
+        method: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            product_id: productId,
+            quantity: quantity
+        },
+        success: function (response) {
+            // ✅ Update cart icon count dynamically
+            $('#cart-count').text(response.cart_count);
+
+             toastr.success('Added to cart!');
+        },
+        error: function (xhr) {
+            if (xhr.status === 422) {
+                alert(xhr.responseJSON.message);
+            } else {
+                alert('Something went wrong. Please try again.');
+            }
+        }
+    });
 }
 function updateCartCount(cart) {
   let totalCount = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+    $('#cart-count').text(totalCount);
   document.getElementById("cart-count").textContent = totalCount;
 }
+
 
 </script>
 

@@ -10,7 +10,46 @@
 
   <!-- ✅ Feather Icons -->
   <script src="https://unpkg.com/feather-icons"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        .mobile-product-card {
+            min-height: auto;
+        }
+        .mobile-product-image {
+            height: 180px;
+        }
+        .mobile-product-actions {
+            padding: 0.75rem;
+        }
+        .mobile-add-cart-btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+        }
+    }
+    
+    /* Slick slider customizations */
+    .slick-prev, .slick-next {
+        z-index: 10;
+    }
+    .slick-prev { left: 10px; }
+    .slick-next { right: 10px; }
+    .slick-dots {
+        bottom: -40px;
+    }
+</style>
   <style>
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -26,25 +65,7 @@
 
   @include('themes.xylo.partials.footer')
 
-  <!-- ✅ MOBILE BOTTOM NAV -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-inner flex justify-around items-center py-2 lg:hidden">
-    <a href="#" class="flex flex-col items-center text-blue-600">
-      <i data-feather="home" class="w-5 h-5"></i>
-      <span class="text-xs mt-1">Home</span>
-    </a>
-    <a href="#" class="flex flex-col items-center text-gray-600 hover:text-blue-600">
-      <i data-feather="shopping-bag" class="w-5 h-5"></i>
-      <span class="text-xs mt-1">Products</span>
-    </a>
-    <a href="#" class="flex flex-col items-center text-gray-600 hover:text-blue-600">
-      <i data-feather="package" class="w-5 h-5"></i>
-      <span class="text-xs mt-1">Orders</span>
-    </a>
-    <a href="#" class="flex flex-col items-center text-gray-600 hover:text-blue-600">
-      <i data-feather="user" class="w-5 h-5"></i>
-      <span class="text-xs mt-1">Account</span>
-    </a>
-  </nav>
+
 
   <script>
     feather.replace();

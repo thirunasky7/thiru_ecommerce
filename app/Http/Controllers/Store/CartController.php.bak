@@ -115,8 +115,7 @@ class CartController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Cart updated successfully!',
-            'cart' => $cart,
-            'cart_count' => Session::get('cart_count')
+            'cart' => $cart
         ]);
     }
 

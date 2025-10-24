@@ -166,7 +166,7 @@
                     <button 
                         type="button"
                         class="add-to-cart w-full sm:w-auto px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        onclick="addToCart({{ $product->id }}, '{{ $product->product_type }}')"
+                        onclick="addToCartType({{ $product->id }})"
                         id="add-to-cart-btn"
                     >
                         Add to Cart
@@ -279,108 +279,13 @@
             qtyInput.value = newQty;
         }
 
-        function addToCart(productId, product_type) {
+ function addToCartType(productId) {
     const quantity = parseInt(document.getElementById("qty").value);
-    const attributeInputs = document.querySelectorAll('#product-attributes input[type="radio"]:checked');
-
-    let selectedAttributes = [];
-    attributeInputs.forEach(input => {
-        selectedAttributes.push(parseInt(input.value));
-    });
-
-    // Validate attributes are selected
-    if (selectedAttributes.length === 0) {
-        toastr.error('Please select product options.');
-        return;
-    }
-
-    // Show loading state
-    const addToCartBtn = document.getElementById('add-to-cart-btn');
-    const originalText = addToCartBtn.innerHTML;
-    addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adding...';
-    addToCartBtn.disabled = true;
-
-    fetch("{{ route('cart.add') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-            "Accept": "application/json"
-        },
-        body: JSON.stringify({
-            product_id: productId,
-            quantity: quantity,
-            attribute_value_ids: selectedAttributes,
-            product_type: product_type
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            toastr.success(data.message);
-            updateCartCount(data.cart_count || data.cart);
-            
-            // Refresh cart sidebar/dropdown if exists
-           
-            
-            // Update mini cart if exists
-            updateMiniCart(data.cart_items);
-        } else {
-            toastr.error(data.message || 'Failed to add item to cart.');
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        toastr.error('An error occurred. Please try again.');
-    })
-    .finally(() => {
-        // Reset button state
-        addToCartBtn.innerHTML = originalText;
-        addToCartBtn.disabled = false;
-    });
+    addToCart(productId,quantity);
 }
 
-// Improved cart count update function
-function updateCartCount(cartData) {
-    let totalCount = 0;
-    
-    if (typeof cartData === 'number') {
-        // If it's already a number (cart_count)
-        totalCount = cartData;
-    } else if (cartData && typeof cartData === 'object') {
-        // Handle different cart data structures
-        if (Array.isArray(cartData)) {
-            // If it's an array of cart items
-            totalCount = cartData.reduce((sum, item) => sum + (item.quantity || 0), 0);
-        } else if (cartData.items && Array.isArray(cartData.items)) {
-            // If it's a cart object with items array
-            totalCount = cartData.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-        } else {
-            // If it's a plain object with items
-            totalCount = Object.values(cartData).reduce((sum, item) => sum + (item.quantity || 0), 0);
-        }
-    }
-    
-    // Update all cart count elements
-    const cartCountElements = document.querySelectorAll(".cart-count, #cart-count, [data-cart-count]");
-    
-    cartCountElements.forEach(element => {
-        element.textContent = totalCount;
-        
-        // Add animation effect
-        element.classList.add('scale-125', 'text-blue-600');
-        setTimeout(() => {
-            element.classList.remove('scale-125', 'text-blue-600');
-        }, 300);
-    });
-    
-    console.log('Cart updated. Total items:', totalCount);
-}
+
+
 
 
 // Update mini cart items

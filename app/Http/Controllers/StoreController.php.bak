@@ -38,7 +38,7 @@ class StoreController extends Controller
     }
 
     public function allcategories(){
-        $categories = Category::where('status', 1)
+          $categories = Category::where('status', 1)
         ->with('translation')
         ->orderBy('id', 'desc')
         ->get();
@@ -46,15 +46,11 @@ class StoreController extends Controller
     }
 
      public function allproducts(){
-        $send_data['categories'] = Category::where('status', 1)
-        ->with('translation')
-        ->orderBy('id', 'desc')
-        ->get();
-        $send_data['products'] = Product::where('status', 1)
-        ->with(['translation', 'thumbnail', 'primaryVariant', 'reviews','category'])
+        $products = Product::where('status', 1)
+        ->with(['translation', 'thumbnail', 'primaryVariant', 'reviews'])
         ->withCount('reviews')
         ->orderBy('id', 'desc')
         ->get();
-        return view('themes.xylo.products', $send_data);
+        return view('themes.xylo.products', compact('products',));
     }
 }
