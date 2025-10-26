@@ -54,7 +54,7 @@ class HomeService
                         'discount_price' => $discountPrice,
                         'average_rating' => $averageRating,
                         'review_count' => $reviewCount,
-                        'image' => $productImage,
+                        'image_url' => $productImage,
                     ];
                 })->values(), // reset keys
             ];
