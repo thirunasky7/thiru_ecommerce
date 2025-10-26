@@ -39,7 +39,7 @@ class ProductService
             return [
                 'id' => $product->id,
                 'name' => $productName,
-                'image' => url('/').$productImage,
+                'image' => $productImage,
                 'category' => optional($product->category)->translation->name ?? 'Uncategorized',
                 'original_price' => $originalPrice,
                 'discount_price' => $discountPrice,
