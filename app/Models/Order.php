@@ -30,11 +30,17 @@ class Order extends Model
         'coupon_code',
         'created_at',
         'updated_at',
+        'customer_id'
     ];
 
     // Define the relationship with the Product model (assuming you have a Product model)
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderDetail::class, 'order_id');
     }
 }

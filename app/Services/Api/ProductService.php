@@ -46,7 +46,7 @@ class ProductService
                 'average_rating' => $averageRating,
                 'review_count' => $reviewCount,
                 'is_on_discount' => $discountPrice > 0 && $discountPrice < $originalPrice,
-                'currency_symbol'  =>  '?'
+                'currency_symbol'  =>  '₹'
             ];
         });
     }

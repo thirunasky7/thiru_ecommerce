@@ -26,4 +26,23 @@ class HomeController extends Controller
         }
     }
 
+
+    public function getCategories(){
+         try {
+            $categories = $this->homeService->getCategories();
+            return $this->successResponse($categories, 'Category Products retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Failed to fetch products', 500, $e->getMessage());
+        }
+    }
+
+    public function getBanners(){
+         try {
+            $banners = $this->homeService->getBanners();
+            return $this->successResponse($banners, 'Banners retrieved successfully');
+         } catch (\Exception $e) {
+            return $this->errorResponse('Failed to fetch products', 500, $e->getMessage());
+        }
+    }
+
 }

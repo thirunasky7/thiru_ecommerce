@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\CheckoutController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,3 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
  Route::get('/products', [ProductController::class, 'index']);
  Route::get('/category-products', [HomeController::class, 'categoryProducts']);
+ Route::get('/all-categories', [HomeController::class, 'getCategories']);
+ Route::get('/getbanners', [HomeController::class, 'getBanners']);
+ Route::post('/place-order', [CheckoutController::class, 'storeOrder']);
+ Route::post('/get-my-orders', [CheckoutController::class, 'myOrder']);
