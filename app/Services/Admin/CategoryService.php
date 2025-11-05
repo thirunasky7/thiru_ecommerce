@@ -51,7 +51,7 @@ class CategoryService
         $validator = Validator::make($translations, [
             '*.name' => 'required|string|max:255',
             '*.description' => 'nullable|string',
-            '*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10000', // Validate image
+            '*.image' => 'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:10000', // Validate image
         ], trans('category'));
     
         if ($validator->fails()) {
@@ -85,7 +85,7 @@ class CategoryService
         $validatedData = $request->validate([
             'translations.*.name' => 'required|string|max:255',
             'translations.*.description' => 'nullable|string',
-            'translations.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10000', // Validate image
+            'translations.*.image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:10000', // Validate image
         ]);
     
         return $this->categoryRepository->updateWithTranslations($category, $request->translations);

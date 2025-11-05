@@ -30,7 +30,7 @@ class BannerService
         $request->validate([
             'type' => 'required|in:promotion,sale,seasonal,featured,announcement',
             'languages.*.title' => 'required|string|max:255',
-            'languages.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10000',
+            'languages.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:10000',
         ]);
 
         $banner = $this->bannerRepository->createBanner($request->only('type'));
@@ -57,7 +57,7 @@ class BannerService
     {
         $request->validate([
             'languages.*.title' => 'required|string|max:255',
-            'languages.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10000',
+            'languages.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:10000',
             'type' => 'required|in:promotion,sale,seasonal,featured,announcement',
         ]);
 
