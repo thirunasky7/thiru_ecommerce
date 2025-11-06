@@ -45,7 +45,7 @@ class ProductService
                 'discount_price' => $discountPrice,
                 'average_rating' => $averageRating,
                 'review_count' => $reviewCount,
-                 'is_coming_soon' => $product->is_coming_soon,
+                'is_coming_soon' => ($product->is_coming_soon == 0) ? true :false ,
                 'is_on_discount' => $discountPrice > 0 && $discountPrice < $originalPrice,
                 'currency_symbol'  =>  '₹'
             ];
