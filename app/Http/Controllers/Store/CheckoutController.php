@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
+use App\Models\Customer;
 
 class CheckoutController extends Controller
 {
@@ -38,51 +39,66 @@ class CheckoutController extends Controller
 
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'address' => 'required|string|max:255',
-            'payment_method' => 'required|in:card,paypal,cod,bank_transfer,gpay',
-        ]);
+        {
+            $request->validate([
+                'full_name' => 'required|string|max:255',
+                'phone' => 'required|string|max:15',
+                'address' => 'required|string|max:255',
+                'payment_method' => 'required|in:card,paypal,cod,bank_transfer,gpay',
+            ]);
 
-        $cart = Session::get('cart', []);
+            // Get Cart Data
+            $cart = Session::get('cart', []);
 
-        if (empty($cart)) {
-            return redirect()->back()->with('error', 'Cart is empty!');
-        }
+            if (empty($cart)) {
+                return redirect()->back()->with('error', 'Cart is empty!');
+            }
 
-        // Calculate total
-        $total = collect($cart)->sum(function ($item) {
-            return $item['price'] * $item['quantity'];
-        });
+            $customer = Customer::updateOrCreate(
+                ['phone' => $request->phone],
+                [
+                    'name' => $request->full_name,
+                    'address' => $request->address,
+                ]
+            );
+            $subtotal = collect($cart)->sum(function ($item) {
+                return $item['price'] * $item['quantity'];
+            });
 
-        // Save Order
-        $order = Order::create([
-            'user_id' => Auth::id(),
-            'address' => $request->address,
-            'payment_method' => $request->payment_method,
-            'total' => $total,
-            'status' => 'pending',
-        ]);
+            $shipping = 0; // you can change dynamically
+            $tax = 0;
 
-        // Save Order Items
-        foreach ($cart as $item) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product_id'],
-                'variant_id' => $item['variant_id'] ?? null,
-                'quantity' => $item['quantity'],
-                'price' => $item['price'],
-                'attributes' => json_encode($item['attributes']),
+            $total = $subtotal + $shipping + $tax;
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'customer_id' => $customer->id,
+                'address' => $request->address,
+                'payment_method' => $request->payment_method,
+                'status' => 'pending',
+                'total_amount' => $total
+            ]);
+
+            // ? Create Order Items
+            foreach ($cart as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'variant_id' => $item['variant_id'] ?? null,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'attributes' => json_encode($item['attributes'] ?? []),
+                ]);
+            }
+
+            // ? Clear Cart
+            Session::forget('cart');
+
+            // ? Return Success View
+            return view('themes.xylo.payment.success', [
+                'payment' => $request->payment_method,
+                'order' => $order,
+                'message' => 'Order placed successfully!'
             ]);
         }
 
-        // Clear the session cart
-        Session::forget('cart');
-        return view('themes.xylo.payment.success', [
-            'payment' => $request->payment_method,
-            'order' => $order,
-            'message' => 'Order placed successfully!'
-        ]);
-
-    }
 }

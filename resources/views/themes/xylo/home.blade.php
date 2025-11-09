@@ -1,48 +1,49 @@
 @extends('themes.xylo.partials.app')
 
-@section('title', 'MyStore - Online Shopping')
-
+@section('title', 'Thaiyur Shop - Online Shopping')
+<style>
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+.slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+        .active-slide {
+            display: block;
+            opacity: 1;
+        }
+</style>
 @section('content')
 @php $currency = activeCurrency(); @endphp
 
 <!-- Mobile Header Banner -->
-<section class="bg-green-600 text-white py-8 md:py-16">
-    <div class="container mx-auto flex flex-col lg:flex-row items-center px-4 md:px-6">
-        <div class="lg:w-1/2 space-y-3 md:space-y-4 text-center lg:text-left">
-            <span class="bg-white text-orange-600 px-3 py-1 rounded-full text-xs md:text-sm font-semibold inline-block">
-                {{ $banner->translation ? $banner->translation->title : $banner->title }}
-            </span>
-            <h1 class="text-2xl md:text-4xl lg:text-5xl font-bold leading-tight">
-                {{ $banner->translation ? ($banner->translation->description ?? 'Taste Your Favorite foods and snacks') : '' }}
-            </h1>
-            @if($banner->translation && $banner->translation->subtitle)
-            <p class="text-sm md:text-lg text-orange-100">{{ $banner->translation->subtitle }}</p>
-            @endif
-            <div class="space-x-2 md:space-x-3 pt-3 md:pt-4 flex flex-col sm:flex-row gap-2 justify-center lg:justify-start">
-                <a href="#" class="bg-red-600 text-white-600 font-semibold px-4 py-2 md:px-5 md:py-2 rounded-full hover:bg-orange-100 text-sm md:text-base text-center">
-                    Shop Now
-                </a>
+<section class="bg-white-600 text-white py-8 md:py-16">
+    <div class="relative w-full " id="bannerCarousel">
+        @foreach ($banners as $index => $banner)
+            <div class="slide {{ $index === 0 ? 'active-slide' : '' }}">
+                <img src="{{ $banner['image_url'] }}" alt="{{ $banner['name'] }}" class="w-full h-64 sm:h-96 object-cover">
+                <div class="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-center text-white">
+                    <h2 class="text-3xl sm:text-5xl font-bold mb-3">{{ $banner['name']??'' }}</h2>
+                </div>
             </div>
-        </div>
+        @endforeach
 
-        <div class="lg:w-1/2 mt-6 lg:mt-0 text-center">
-            @php
-                $bannerImage = $banner->translation->image_url ?? $banner->image_url ?? null;
-                $bannerAlt = $banner->translation ? $banner->translation->title : $banner->title;
-                $placeholderUrl = 'https://via.placeholder.com/800x600/007bff/ffffff?text=' . urlencode($bannerAlt);
-            @endphp
-            <img src="{{ $bannerImage ? Storage::url($bannerImage) : $placeholderUrl }}" 
-                 alt="{{ $bannerAlt }}" 
-                 class="mx-auto rounded-xl shadow-lg max-h-[300px] md:max-h-[400px] w-full object-cover"
-                 onerror="this.src='{{ $placeholderUrl }}'">
-        </div>
+        <!-- Navigation Arrows -->
+        <button onclick="moveSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black transition">‹</button>
+        <button onclick="moveSlide(1)" class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black transition">›</button>
     </div>
 </section>
 
 <!-- 🔸 Shop by Category -->
 <section class="container mx-auto py-8 md:py-12 px-4">
     <h2 class="text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-gray-800">Shop By Category</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 md:gap-6">
         @foreach($categories as $category)
             @php
                 $categoryName = $category->translation->name ?? $category->name ?? 'Category';
@@ -158,96 +159,176 @@
     </div>
 
     <!-- Desktop Grid -->
-    <div class="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        @foreach ($products as $product)
-            @php
-                $productImage = optional($product->thumbnail)->image_url ?? null;
-                $productName = $product->translation->name ?? $product->name ?? 'Product';
-                $primaryVariant = $product->primaryVariant;
-                $originalPrice = $primaryVariant->converted_price ?? 0;
-                $discountPrice = $primaryVariant->converted_discount_price ?? 0;
-                $averageRating = round($product->reviews_avg_rating ?? 4.5, 1);
-                $reviewCount = $product->reviews_count ?? 0;
-            @endphp
+  <div class="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+    @foreach ($products as $product)
+        @php
+            $productImage = optional($product->thumbnail)->image_url ?? null;
+            $productName = $product->translation->name ?? $product->name ?? 'Product';
+            $primaryVariant = $product->primaryVariant;
+            $originalPrice = $primaryVariant->converted_price ?? 0;
+            $discountPrice = $primaryVariant->converted_discount_price ?? 0;
+            $averageRating = round($product->reviews_avg_rating ?? 4.5, 1);
+            $reviewCount = $product->reviews_count ?? 0;
+        @endphp
 
-            <div class="relative bg-white rounded-xl shadow-md hover:shadow-lg overflow-hidden group transition-all duration-300">
-                <!-- Product Image -->
-                <div class="relative overflow-hidden">
-                    <img src="{{ $productImage ? Storage::url($productImage) : '' . urlencode($productName) }}"
-                         alt="{{ $productName }}" 
-                         class="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300">
-                    <!-- Wishlist Button -->
-                    <button class="wishlist-btn absolute top-3 right-3 w-10 h-10 bg-white-600 bg-opacity-90 hover:bg-opacity-100 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 shadow-md hover:shadow-lg transition-all duration-200 z-10"
-                            onclick="showWishlistMessage()">
-                        <i class="fa-regular fa-heart"></i>
-                    </button>
+        <div class="relative bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition-all duration-300">
+            
+            <!-- Product Image (Reduced height) -->
+            <div class="relative overflow-hidden">
+                <img src="{{ $productImage ? Storage::url($productImage) : '' . urlencode($productName) }}"
+                     alt="{{ $productName }}" 
+                     class="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300">
+                
+                <!-- Wishlist Button -->
+                <button class="wishlist-btn absolute top-2 right-2 w-8 h-8 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 shadow-sm hover:shadow transition-all duration-200 z-10"
+                        onclick="showWishlistMessage()">
+                    <i class="fa-regular fa-heart text-sm"></i>
+                </button>
 
-                    <!-- Discount Badge -->
-                    @if($discountPrice && $originalPrice > $discountPrice)
-                        @php
-                            $discountPercent = round((($originalPrice - $discountPrice) / $originalPrice) * 100);
-                        @endphp
-                        <span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                            -{{ $discountPercent }}%
-                        </span>
-                    @endif
+                <!-- Discount Badge -->
+                @if($discountPrice && $originalPrice > $discountPrice)
+                    @php
+                        $discountPercent = round((($originalPrice - $discountPrice) / $originalPrice) * 100);
+                    @endphp
+                    <span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                        -{{ $discountPercent }}%
+                    </span>
+                @endif
+            </div>
 
-                    <!-- Quick Add to Cart Overlay -->
-                    <!-- <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <button onclick="addToCart({{ $product->id }}, '{{ addslashes($productName) }}')" 
-                                class="bg-white text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-orange-500 hover:text-white transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-lg text-sm">
-                            Quick Add
-                        </button>
-                    </div> -->
+            <!-- Product Info (Reduced padding & spacing) -->
+            <div class="p-3">
+                <a href="{{ url('/product/'.$product->slug)}}" 
+                   class="block font-medium text-gray-800 hover:text-orange-600 transition-colors duration-200 mb-1 line-clamp-2 text-sm h-10">
+                    {{ $productName }}
+                </a>
+
+                <!-- Ratings (smaller) -->
+                <div class="flex items-center mb-2">
+                    <div class="flex space-x-0.5">
+                        @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= floor($averageRating))
+                                <i class="fas fa-star text-yellow-400 text-xs"></i>
+                            @elseif ($i - 0.5 == $averageRating)
+                                <i class="fas fa-star-half-alt text-yellow-400 text-xs"></i>
+                            @else
+                                <i class="far fa-star text-yellow-400 text-xs"></i>
+                            @endif
+                        @endfor
+                    </div>
+                    <span class="text-gray-500 text-[11px] ml-1">({{ $reviewCount }})</span>
                 </div>
 
-                <!-- Product Info -->
-                <div class="p-4">
-                    <!-- Product Name -->
-                    <a href="{{ url('/product/'.$product->slug)}}" 
-                       class="block font-medium text-gray-800 hover:text-orange-600 transition-colors duration-200 mb-2 line-clamp-2 h-12">
-                        {{ $productName }}
-                    </a>
-
-                    <!-- Star Ratings -->
-                    <div class="flex items-center mb-3">
-                        <div class="flex space-x-1">
-                            @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <= floor($averageRating))
-                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                @elseif ($i - 0.5 == $averageRating)
-                                    <i class="fas fa-star-half-alt text-yellow-400 text-sm"></i>
-                                @else
-                                    <i class="far fa-star text-yellow-400 text-sm"></i>
-                                @endif
-                            @endfor
-                        </div>
-                        <span class="text-gray-500 text-xs ml-2">({{ $reviewCount }})</span>
+                <!-- Price + Add Button -->
+                <div class="flex justify-between items-center">
+                    <div class="flex flex-col leading-tight">
+                        @if($discountPrice && $originalPrice > $discountPrice)
+                            <span class="text-gray-400 line-through text-xs">{{ $currency->symbol }}{{ number_format($originalPrice, 2) }}</span>
+                            <span class="text-red-600 font-semibold text-sm">{{ $currency->symbol }}{{ number_format($discountPrice, 2) }}</span>
+                        @else
+                            <span class="text-gray-800 font-semibold text-sm">{{ $currency->symbol }}{{ number_format($originalPrice, 2) }}</span>
+                        @endif
                     </div>
 
-                    <!-- Price and Add to Cart -->
-                    <div class="flex justify-between items-center mt-4">
-                        <div class="flex flex-col">
-                            @if($discountPrice && $originalPrice > $discountPrice)
-                                <span class="text-gray-400 line-through text-sm">{{ $currency->symbol }}{{ number_format($originalPrice, 2) }}</span>
-                                <span class="text-red-600 font-semibold text-lg">{{ $currency->symbol }}{{ number_format($discountPrice, 2) }}</span>
-                            @else
-                                <span class="text-gray-800 font-semibold text-lg">{{ $currency->symbol }}{{ number_format($originalPrice, 2) }}</span>
-                            @endif
-                        </div>
-                        
-                        <!-- Add to Cart Button -->
-                        <button onclick="addToCart({{ $product->id }})" 
-                                class="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 flex items-center space-x-2 font-medium text-sm">
-                            <i class="fas fa-shopping-cart text-xs"></i>
-                            <span>Add</span>
-                        </button>
-                    </div>
+                    <button onclick="addToCart({{ $product->id }})" 
+                            class="bg-red-500 text-white px-2.5 py-1.5 rounded-md hover:bg-red-600 transition-colors duration-200 flex items-center space-x-1 text-xs font-medium">
+                        <i class="fas fa-shopping-cart text-[10px]"></i>
+                        <span>Add</span>
+                    </button>
                 </div>
             </div>
-        @endforeach
-    </div>
+        </div>
+    @endforeach
+</div>
+
 </section>
+
+<div class="container mx-auto px-4 py-8 space-y-10">
+
+    @foreach ($categoryProducts as $category)
+        @php
+            $products = collect($category['products'])->take(20);
+        @endphp
+
+        <section>
+            <!-- 🏷️ Category Title -->
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">
+                    {{ $category['category_name'] }}
+                </h2>
+                <a href="{{ url('/category/' . Str::slug($category['category_name'])) }}" 
+                   class="text-sm text-red-500 hover:text-red-600 font-medium">
+                   View All →
+                </a>
+            </div>
+
+            <!-- 🛒 Horizontal Scroll Product Row -->
+            <div class="flex space-x-4 overflow-x-auto scrollbar-hide pb-2">
+                @foreach ($products as $product)
+                    <div class="min-w-[160px] sm:min-w-[180px] lg:min-w-[200px] bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 flex-shrink-0">
+                        
+                        <!-- Product Image -->
+                        <div class="relative">
+                            <img src="{{ $product['image'] ?? asset('images/no-image.png') }}"
+                                 alt="{{ $product['name'] }}"
+                                 class="w-full h-36 object-cover rounded-t-lg">
+
+                            @if($product['discount_price'] && $product['original_price'] > $product['discount_price'])
+                                @php
+                                    $discountPercent = round((($product['original_price'] - $product['discount_price']) / $product['original_price']) * 100);
+                                @endphp
+                                <span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-semibold">
+                                    -{{ $discountPercent }}%
+                                </span>
+                            @endif
+                        </div>
+
+                        <!-- Product Info -->
+                        <div class="p-2.5">
+                            <a href="{{ url('/product/' . $product['id']) }}" 
+                               class="block text-[13px] font-medium text-gray-800 hover:text-orange-600 line-clamp-2 h-10 mb-1">
+                                {{ $product['name'] }}
+                            </a>
+
+                            <!-- Ratings -->
+                            <div class="flex items-center mb-2">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    @if ($i <= floor($product['average_rating']))
+                                        <i class="fas fa-star text-yellow-400 text-[10px]"></i>
+                                    @elseif ($i - 0.5 == $product['average_rating'])
+                                        <i class="fas fa-star-half-alt text-yellow-400 text-[10px]"></i>
+                                    @else
+                                        <i class="far fa-star text-yellow-400 text-[10px]"></i>
+                                    @endif
+                                @endfor
+                                <span class="text-gray-500 text-[10px] ml-1">({{ $product['review_count'] }})</span>
+                            </div>
+
+                            <!-- Price + Add Button -->
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    @if($product['discount_price'] && $product['original_price'] > $product['discount_price'])
+                                        <span class="block text-gray-400 line-through text-[11px]">₹{{ number_format($product['original_price'], 2) }}</span>
+                                        <span class="text-red-600 font-semibold text-[13px]">₹{{ number_format($product['discount_price'], 2) }}</span>
+                                    @else
+                                        <span class="text-gray-800 font-semibold text-[13px]">₹{{ number_format($product['original_price'], 2) }}</span>
+                                    @endif
+                                </div>
+
+                                <button onclick="addToCart({{ $product['id'] }})" 
+                                        class="bg-red-500 text-white px-2 py-1 text-[11px] rounded hover:bg-red-600 transition">
+                                    <i class="fas fa-shopping-cart text-[9px]"></i>
+                                    <span class="text-xs">Add</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endforeach
+
+</div>
 
 <!-- 🔸 Why Choose Us -->
 <section class="bg-green-600 text-white py-8 md:py-12">
@@ -325,4 +406,22 @@ function showWishlistMessage() {
 
 
 </script>
+
+    <script>
+        let currentIndex = 0;
+        const slides = document.querySelectorAll('#bannerCarousel .slide');
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active-slide'));
+            slides[index].classList.add('active-slide');
+        }
+
+        function moveSlide(step) {
+            currentIndex = (currentIndex + step + slides.length) % slides.length;
+            showSlide(currentIndex);
+        }
+
+        // Auto slide every 4 seconds
+        setInterval(() => moveSlide(1), 4000);
+    </script
 @endsection

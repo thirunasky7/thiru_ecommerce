@@ -1,6 +1,8 @@
+
 @extends('admin.layouts.admin')
 
 @section('css')
+    <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 @endsection
 
@@ -15,13 +17,13 @@
                 {{ session('success') }}
             </div>
         @endif
+       
 
         <table id="orders-table" class="table table-bordered mt-4">
             <thead>
                 <tr>
                     <th>Order ID</th>
                     <th>Order Date</th>
-                    <th>Payment Type</th>
                     <th>Status</th>
                     <th>Total Price</th>
                     <th>Actions</th>

@@ -34,7 +34,7 @@
       <a href="{{ url('/home')}}" class="hover:text-blue-600">Home</a>
       <a href="{{ url('/products')}}" class="hover:text-blue-600">Products</a>
       <a href="{{ url('/about-us')}}" class="hover:text-blue-600">About Us</a>
-      <a href="{{ url('/services')}}}" class="hover:text-blue-600">Services</a>
+      <a href="{{ url('/services')}}" class="hover:text-blue-600">Services</a>
     </nav>
   </div>
 </header>

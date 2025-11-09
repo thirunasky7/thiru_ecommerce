@@ -30,8 +30,7 @@ class Order extends Model
         'coupon_code',
         'created_at',
         'updated_at',
-        'customer_id',
-        'total_amount'
+        'customer_id'
     ];
 
     // Define the relationship with the Product model (assuming you have a Product model)

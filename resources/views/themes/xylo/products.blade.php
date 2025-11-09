@@ -137,7 +137,9 @@
 @section('content')
 @php $currency = activeCurrency(); @endphp
 
-<body class="bg-gray-50">
+<body class="bg-gray-50 mt-10">
+<section class="container mx-auto py-8 md:py-12 px-4">
+
    <div class="lg:hidden bg-white shadow-sm py-11 px-4 sticky top-5 z-30">
         <div class="flex justify-between items-center">
             <h1 class="text-xl font-bold coffee-title"> Products</h1>
@@ -249,7 +251,7 @@
                 </div>
                 
                 <!-- Products Grid -->
-                <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach($products as $product)
                         @php
                             $productName = $product->translation->name ?? $product->name ?? 'Product';
@@ -289,7 +291,7 @@
                                 <div class="flex justify-between items-center">
                                     <span class="text-xl font-bold text-amber-800">{{ $currency->symbol }}{{ number_format($productPrice, 2) }}</span>
                                     <button class="add-to-cart-btn px-4 py-2 rounded-lg text-sm font-medium" onclick="addToCart({{$product->id }})" >
-                                        <i class="fas fa-shopping-cart mr-1"></i> Add to Cart
+                                        <i class="fas fa-shopping-cart mr-1"></i> Add
                                     </button>
                                 </div>
                             </div>
@@ -392,7 +394,7 @@
             </button>
         </div>
     </div>
-
+</section>
     <script>
         // State
         let selectedCategories = [];

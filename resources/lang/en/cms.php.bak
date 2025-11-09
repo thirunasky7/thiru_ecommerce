@@ -34,7 +34,6 @@ return [
             'title' => 'Products',
             'add_new' => 'Add New',
             'list' => 'List',
-           
         ],
         'attributes' => [
             'title' => 'Attributes',
@@ -219,16 +218,6 @@ return [
         'confirm_delete' => 'Confirm Delete',
         'delete' => 'Delete',
         'cancel' => 'Cancel',
-         'product_type' => 'Product Type',
-        'simple_product' => 'Simple Product',
-        'variable_product' => 'Variable Product',
-        'product_details' => 'Product Details',
-        'variant' => 'Variant',
-        'remove_variant' => 'Remove Variant',
-        'select_size' => 'Select Size',
-        'select_color' => 'Select Color',
-        'dimensions' => 'Dimensions',
-        'language_code' => 'Language Code',
     ],
 
         'brands' => [

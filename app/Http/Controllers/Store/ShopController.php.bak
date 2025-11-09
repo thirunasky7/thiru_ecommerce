@@ -7,21 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
-use App\Services\Api\HomeService;
-use App\Traits\ApiResponseTrait;
 
 class ShopController extends Controller
 {
-    use ApiResponseTrait;
-
-    protected $homeService;
-
-    public function __construct(HomeService $homeService)
-    {
-        $this->homeService = $homeService;
-    }
-
-
     public function index(Request $request)
     {
         $locale = app()->getLocale();
@@ -57,11 +45,11 @@ class ShopController extends Controller
 
         $categories = Category::with('translation')->get();
         $brands = Brand::with('translations')->get();
-        $categoryProducts = $this->homeService->categoryProducts();
+
         if ($request->ajax()) {
             return view('themes.xylo.partials.product-list', compact('products'))->render();
         }        
 
-        return view('themes.xylo.shop', compact('products', 'categories', 'brands','categoryProducts'));
+        return view('themes.xylo.shop', compact('products', 'categories', 'brands'));
     }
 }

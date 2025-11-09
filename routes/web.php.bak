@@ -18,20 +18,8 @@ use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\AttributeController;
 
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
 
-/* require base_path('routes/store.php'); */
-
-Route::get('/login', function () {
+Route::get('/admin/login', function () {
     return view('admin.auth.login');
 });
 
@@ -65,12 +53,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::resource('menus.items', MenuItemController::class)->shallow();
     Route::get('menus-items', [MenuItemController::class, 'index'])->name('menus.item.index');
     Route::post('menus-items/getdata', [MenuItemController::class, 'getData'])->name('menus.item.getData');
-
+    Route::delete('/products/delete-image/{image}', [ProductController::class, 'deleteImage'])
+    ->name('products.delete-image');
 
 
 });
-
-Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 
 Route::post('/categories/data', [CategoryController::class, 'getCategories'])->name('categories.data');
 Route::post('/admin/categories/update-status', [CategoryController::class, 'updateCategoryStatus'])->name('admin.categories.updateStatus');
