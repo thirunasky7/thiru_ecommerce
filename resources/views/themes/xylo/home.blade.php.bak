@@ -27,7 +27,7 @@
     <div class="relative w-full " id="bannerCarousel">
         @foreach ($banners as $index => $banner)
             <div class="slide {{ $index === 0 ? 'active-slide' : '' }}">
-                <img src="{{ asset($banner['image_url']) }}" alt="{{ $banner['name'] }}" class="w-full h-64 sm:h-96 object-cover">
+                <img src="{{ asset('public/storage/'.$banner['image_url']) }}" alt="{{ $banner['name'] }}" class="w-full h-64 sm:h-96 object-cover">
                 <div class="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-center text-white">
                     <!-- <h2 class="text-3xl sm:text-5xl font-bold mb-3">{{ $banner['name']??'' }}</h2> -->
                 </div>
@@ -50,7 +50,7 @@
                 $categoryImage = $category->translation->image_url ?? $category->image_url ?? null;
             @endphp
             <div class="bg-white rounded-lg md:rounded-xl shadow hover:shadow-md overflow-hidden transition-all duration-300">
-                <img src="{{ $categoryImage ? asset($categoryImage) : 'https://via.placeholder.com/200x200/6c757d/ffffff?text=' . urlencode($categoryName) }}"
+                <img src="{{ $categoryImage ? asset('public/storage/'.$categoryImage) : 'https://via.placeholder.com/200x200/6c757d/ffffff?text=' . urlencode($categoryName) }}"
                      alt="{{ $categoryName }}" class="w-full h-28 md:h-40 object-cover">
                 <div class="p-3 md:p-4 text-center">
                     <h5 class="font-medium text-gray-700 text-sm md:text-base">{{ Str::limit($categoryName, 20) }}</h5>
@@ -89,7 +89,7 @@
                 <div class="bg-white rounded-xl shadow-md hover:shadow-lg overflow-hidden mobile-product-card">
                     <!-- Product Image -->
                     <div class="relative overflow-hidden">
-                        <img src="{{ $productImage ? Storage::url($productImage) : 'https://via.placeholder.com/300x300?text=' . urlencode($productName) }}"
+                        <img src="{{ $productImage ? asset('public/storage/'.$productImage) : 'https://via.placeholder.com/300x300?text=' . urlencode($productName) }}"
                              alt="{{ $productName }}" 
                              class="w-full mobile-product-image object-cover">
                         
