@@ -175,7 +175,7 @@
             
             <!-- Product Image (Reduced height) -->
             <div class="relative overflow-hidden">
-                <img src="{{ $productImage ? asset($productImage) : '' . urlencode($productName) }}"
+                <img src="{{ $productImage ? asset('public/'.$productImage) : '' . urlencode($productName) }}"
                      alt="{{ $productName }}" 
                      class="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300">
                 
