@@ -29,7 +29,7 @@
             <div class="slide {{ $index === 0 ? 'active-slide' : '' }}">
                 <img src="{{ asset($banner['image_url']) }}" alt="{{ $banner['name'] }}" class="w-full h-64 sm:h-96 object-cover">
                 <div class="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-center text-white">
-                    <h2 class="text-3xl sm:text-5xl font-bold mb-3">{{ $banner['name']??'' }}</h2>
+                    <!-- <h2 class="text-3xl sm:text-5xl font-bold mb-3">{{ $banner['name']??'' }}</h2> -->
                 </div>
             </div>
         @endforeach
@@ -50,7 +50,7 @@
                 $categoryImage = $category->translation->image_url ?? $category->image_url ?? null;
             @endphp
             <div class="bg-white rounded-lg md:rounded-xl shadow hover:shadow-md overflow-hidden transition-all duration-300">
-                <img src="{{ $categoryImage ? Storage::url($categoryImage) : 'https://via.placeholder.com/200x200/6c757d/ffffff?text=' . urlencode($categoryName) }}"
+                <img src="{{ $categoryImage ? asset($categoryImage) : 'https://via.placeholder.com/200x200/6c757d/ffffff?text=' . urlencode($categoryName) }}"
                      alt="{{ $categoryName }}" class="w-full h-28 md:h-40 object-cover">
                 <div class="p-3 md:p-4 text-center">
                     <h5 class="font-medium text-gray-700 text-sm md:text-base">{{ Str::limit($categoryName, 20) }}</h5>
@@ -175,7 +175,7 @@
             
             <!-- Product Image (Reduced height) -->
             <div class="relative overflow-hidden">
-                <img src="{{ $productImage ? Storage::url($productImage) : '' . urlencode($productName) }}"
+                <img src="{{ $productImage ? asset('public/'.$productImage) : '' . urlencode($productName) }}"
                      alt="{{ $productName }}" 
                      class="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300">
                 
