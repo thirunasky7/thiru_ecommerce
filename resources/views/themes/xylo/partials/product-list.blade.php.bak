@@ -2,7 +2,7 @@
 <div class="col-6 col-md-4">
     <div class="product-card">
         <div class="product-img">
-            <img src="{{ Storage::url(optional($product->thumbnail)->image_url ?? 'default.jpg') }}" 
+            <img src="{{ asset('public/'.optional($product->thumbnail)->image_url ?? 'default.jpg') }}" 
                  alt="{{ $product->translation->title ?? 'Product Name Not Available' }}">
             <button class="wishlist-btn"><i class="fa-solid fa-heart"></i></button>
         </div>

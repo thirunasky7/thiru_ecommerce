@@ -28,7 +28,7 @@
         @foreach ($banners as $index => $banner)
             <div class="slide {{ $index === 0 ? 'active-slide' : '' }}">
                 <img src="{{ asset('public'.$banner['image_url']) }}" alt="{{ $banner['name'] }}" class="w-full h-64 sm:h-96 object-cover">
-                <div class="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-center text-white">
+                <div class="absolute inset-0  flex flex-col justify-center items-center text-center text-white">
                     <!-- <h2 class="text-3xl sm:text-5xl font-bold mb-3">{{ $banner['name']??'' }}</h2> -->
                 </div>
             </div>
@@ -89,7 +89,7 @@
                 <div class="bg-white rounded-xl shadow-md hover:shadow-lg overflow-hidden mobile-product-card">
                     <!-- Product Image -->
                     <div class="relative overflow-hidden">
-                        <img src="{{ $productImage ? asset('public/storage/'.$productImage) : 'https://via.placeholder.com/300x300?text=' . urlencode($productName) }}"
+                        <img src="{{ $productImage ? asset('/public/storage/'.$productImage) : 'https://via.placeholder.com/300x300?text=' . urlencode($productName) }}"
                              alt="{{ $productName }}" 
                              class="w-full mobile-product-image object-cover">
                         
@@ -175,7 +175,7 @@
             
             <!-- Product Image (Reduced height) -->
             <div class="relative overflow-hidden">
-                <img src="{{ $productImage ? asset('public/'.$productImage) : '' . urlencode($productName) }}"
+                <img src="{{ $productImage ? asset('public/storage/'.$productImage) : '' . urlencode($productName) }}"
                      alt="{{ $productName }}" 
                      class="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300">
                 
