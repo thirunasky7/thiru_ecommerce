@@ -83,7 +83,7 @@ class ProductController extends Controller
     }
 
 
-  public function store(Request $request)
+    public function store(Request $request)
 {    
     $defaultLang = config('app.locale');
 
@@ -92,20 +92,9 @@ class ProductController extends Controller
         'category_id' => 'required|exists:categories,id',
         'brand_id' => 'nullable|exists:brands,id',
         'product_type' => 'required|in:simple,variable',
-        'is_food_menu' => 'required|in:yes,no',
         'translations.' . $defaultLang . '.name' => 'required|string|max:255',
         'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
     ];
-
-    // Add food menu validation rules if is_food_menu is "yes"
-    if ($request->is_food_menu === 'yes') {
-        $validationRules = array_merge($validationRules, [
-            'available_from_date' => 'required|date',
-            'available_to_date' => 'required|date|after_or_equal:available_from_date',
-            'available_from_time' => 'required|date_format:H:i',
-            'available_to_time' => 'required|date_format:H:i|after:available_from_time',
-        ]);
-    }
 
     // Add validation rules based on product type
     if ($request->product_type === 'simple') {
@@ -146,29 +135,14 @@ class ProductController extends Controller
             $slug = $this->generateUniqueSlug($defaultName);
 
             // 1. Create product
-            $productData = [
+            $product = Product::create([
                 'shop_id' => 1, // You might want to get this from auth or session
                 'vendor_id' => 1, // You might want to get this from auth or session
                 'slug' => $slug,
                 'category_id' => $request->category_id,
                 'brand_id' => $request->brand_id,
                 'product_type' => $request->product_type,
-                'is_food_menu' => $request->is_food_menu,
-                'is_coming_soon' =>$request->is_coming_soon
-            ];
-
-            // Add food menu fields if applicable
-            if ($request->is_food_menu === 'yes') {
-                $productData = array_merge($productData, [
-                    'available_from_date' => $request->available_from_date,
-                    'available_to_date' => $request->available_to_date,
-                    'available_from_time' => $request->available_from_time,
-                    'available_to_time' => $request->available_to_time,
-                    'is_food_menu' => $request->is_food_menu,
-                ]);
-            }
-
-            $product = Product::create($productData);
+            ]);
 
             // 2. Store translations
             foreach ($request->translations as $lang => $data) {
@@ -331,33 +305,33 @@ class ProductController extends Controller
 
 
    public function edit($id)
-{
-    $product = Product::with([
-        'translations', 
-        'variants.translations',
-        'variants.attributeValues',
-        'images'
-    ])->findOrFail($id);
+    {
+        $product = Product::with([
+            'translations', 
+            'variants.translations',
+            'variants.attributeValues',
+            'images'
+        ])->findOrFail($id);
 
-    $activeLanguages = Language::where('active', 1)->get();
-    $categories = Category::all();
-    $brands = Brand::all();
-    
-    $sizes = Attribute::where('name', 'Size')->first()?->values ?? collect();
-    $colors = Attribute::where('name', 'Color')->first()?->values ?? collect();
+        $activeLanguages = Language::where('active', 1)->get();
+        $categories = Category::all();
+        $brands = Brand::all();
+        
+        $sizes = Attribute::where('name', 'Size')->first()?->values ?? collect();
+        $colors = Attribute::where('name', 'Color')->first()?->values ?? collect();
 
-    return view('admin.products.edit', compact(
-        'product', 
-        'activeLanguages', 
-        'categories', 
-        'brands', 
-        'sizes', 
-        'colors'
-    ));
-}
+        return view('admin.products.edit', compact(
+            'product', 
+            'activeLanguages', 
+            'categories', 
+            'brands', 
+            'sizes', 
+            'colors'
+        ));
+    }
 
   
- public function update(Request $request, $id)
+    public function update(Request $request, $id)
 {                  
     $product = Product::findOrFail($id);
     $defaultLang = config('app.locale');
@@ -367,20 +341,9 @@ class ProductController extends Controller
         'category_id' => 'required|exists:categories,id',
         'brand_id' => 'nullable|exists:brands,id',
         'product_type' => 'required|in:simple,variable',
-        'is_food_menu' => 'required|in:yes,no',
         'translations.' . $defaultLang . '.name' => 'required|string|max:255',
         'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
     ];
-
-    // Add food menu validation rules if is_food_menu is "yes"
-    if ($request->is_food_menu === 'yes') {
-        $validationRules = array_merge($validationRules, [
-            'available_from_date' => 'required|date',
-            'available_to_date' => 'required|date|after_or_equal:available_from_date',
-            'available_from_time' => 'required|date_format:H:i',
-            'available_to_time' => 'required|date_format:H:i|after:available_from_time',
-        ]);
-    }
 
     // Add validation rules based on product type
     if ($request->product_type === 'simple') {
@@ -420,34 +383,13 @@ class ProductController extends Controller
             $defaultName = $request->translations[$defaultLang]['name'] ?? 'product';
             $slug = $this->generateUniqueSlug($defaultName, $product->id);
 
-            // Update product data
-            $productData = [
+            // Update product
+            $product->update([
                 'slug' => $slug,
                 'category_id' => $request->category_id,
                 'brand_id' => $request->brand_id,
                 'product_type' => $request->product_type,
-                'is_food_menu' => $request->is_food_menu,
-                'is_coming_soon' =>$request->is_coming_soon
-            ];
-
-            // Add or clear food menu fields based on selection
-            if ($request->is_food_menu === 'yes') {
-                $productData = array_merge($productData, [
-                    'available_from_date' => $request->available_from_date,
-                    'available_to_date' => $request->available_to_date,
-                    'available_from_time' => $request->available_from_time,
-                    'available_to_time' => $request->available_to_time,
-                ]);
-            } else {
-                $productData = array_merge($productData, [
-                    'available_from_date' => null,
-                    'available_to_date' => null,
-                    'available_from_time' => null,
-                    'available_to_time' => null,
-                ]);
-            }
-
-            $product->update($productData);
+            ]);
 
             // Update translations
             foreach ($request->translations as $lang => $data) {

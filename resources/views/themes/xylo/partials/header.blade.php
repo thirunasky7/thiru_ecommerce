@@ -16,8 +16,8 @@
       <a href="{{ url('/services')}}" class="hover:text-blue-600">Services</a>
     </div>
     <div class="flex items-center space-x-4">
-      <i data-feather="search" class="w-5 h-5 cursor-pointer"></i>
-      <i data-feather="heart" class="w-5 h-5 cursor-pointer"></i>
+      <!-- <i data-feather="search" class="w-5 h-5 cursor-pointer"></i>
+      <i data-feather="heart" class="w-5 h-5 cursor-pointer"></i> -->
       <a href="{{ route('cart.view') }}" class="relative inline-block text-gray-800 me-3">
         <!-- Cart Icon -->
         <i data-feather="shopping-cart" class="w-6 h-6 cursor-pointer"></i>

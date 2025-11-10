@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;            // ? Add this line
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User; 
 
 class LoginController extends Controller
 {
@@ -46,5 +50,38 @@ class LoginController extends Controller
     public function showLoginForm()
     {
         return view('admin.auth.login');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        $admin = User::where('email', $credentials['email'])->first();
+
+       
+
+        if ($admin) {
+            // Check bcrypt
+            if (Hash::check($credentials['password'], $admin->password)) {
+                Auth::guard('web')->login($admin);
+                $request->session()->regenerate();
+                return redirect()->to('/admin/dashboard');
+            }
+
+            // Optional: handle MD5 legacy hashes
+            if ($admin->password === md5($credentials['password'])) {
+                $admin->password = Hash::make($credentials['password']);
+                $admin->save();
+
+                Auth::guard('admin')->login($admin);
+                $request->session()->regenerate();
+                return redirect()->intended('/admin/dashboard');
+            }
+        }
+
+        return back()->withErrors(['email' => 'Invalid credentials']);
     }
 }
