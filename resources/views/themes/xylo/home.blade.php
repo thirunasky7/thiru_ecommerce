@@ -27,7 +27,7 @@
     <div class="relative w-full " id="bannerCarousel">
         @foreach ($banners as $index => $banner)
             <div class="slide {{ $index === 0 ? 'active-slide' : '' }}">
-                <img src="{{ $banner['image_url'] }}" alt="{{ $banner['name'] }}" class="w-full h-64 sm:h-96 object-cover">
+                <img src="{{ asset($banner['image_url']) }}" alt="{{ $banner['name'] }}" class="w-full h-64 sm:h-96 object-cover">
                 <div class="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-center text-white">
                     <h2 class="text-3xl sm:text-5xl font-bold mb-3">{{ $banner['name']??'' }}</h2>
                 </div>
