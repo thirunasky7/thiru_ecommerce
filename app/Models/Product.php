@@ -12,9 +12,17 @@ class Product extends Model
 
     protected $fillable = [
         'category_id', 'seller_id', 'shop_id','price', 'stock', 'status', 'slug', 'currency', 'SKU',
-        'weight', 'dimensions', 'product_type',  'image_url', 'vendor_id','is_coming_soon'
-        
+        'weight', 'dimensions', 'product_type',  'image_url', 'vendor_id','is_coming_soon','is_food_menu', 'available_from_date', 'available_to_date',
+    'available_from_time', 'available_to_time'
     ]; 
+
+    protected $casts = [
+        'available_from_date' => 'date',
+        'available_to_date' => 'date',
+        'available_from_time' => 'datetime',
+        'available_to_time' => 'datetime',
+        // ... your other casts ...
+    ];
 
     /**
      * Get the translations for the product.

@@ -10,8 +10,20 @@ use App\Models\Product;
 use App\Models\Menu;
 use App\Models\brand;
 
+use App\Services\Api\HomeService;
+use App\Traits\ApiResponseTrait;
+
 class StoreController extends Controller
 {
+    use ApiResponseTrait;
+
+    protected $homeService;
+
+    public function __construct(HomeService $homeService)
+    {
+        $this->homeService = $homeService;
+    }
+
     public function index()
     {
         $locale = app()->getLocale();
@@ -33,6 +45,10 @@ class StoreController extends Controller
         ->orderBy('id', 'desc')
         ->take(10)
         ->get();
+        
+        $send_data['categoryProducts'] = $this->homeService->categoryProducts();
+        $send_data['banners'] = $this->homeService->getBanners();
+
 
         return view('themes.xylo.home',$send_data);
     }

@@ -58,6 +58,8 @@ Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.s
 Route::post('/payment/initiate/upi', [PaymentController::class, 'initiateUpiPayment'])->name('payment.initiate.upi');
 Route::post('/payment/status', [PaymentController::class, 'checkPaymentStatus'])->name('payment.status');
 Route::get('/order/success', [PaymentController::class, 'success'])->name('order.success');
+Route::post('/validate-customer', [ProductController::class, 'validateCustomer'])->name('validate-customer');
+Route::post('/submit-review', [ProductController::class, 'submitReview'])->name('submit-review');
 
 Route::prefix('customer')->name('customer.')->group(function () {
     

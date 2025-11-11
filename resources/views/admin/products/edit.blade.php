@@ -135,18 +135,19 @@
                        value="{{ old('available_to_date', $product->available_to_date ? \Carbon\Carbon::parse($product->available_to_date)->format('Y-m-d') : '') }}">
             </div>
         </div>
-        <div class="row mt-2">
-            <div class="col-md-6">
-                <label class="form-label">{{ __('cms.products.available_from_time') }} *</label>
-                <input type="time" name="available_from_time" class="form-control" 
-                       value="{{ old('available_from_time', $product->available_from_time ? \Carbon\Carbon::parse($product->available_from_time)->format('H:i') : '') }}">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">{{ __('cms.products.available_to_time') }} *</label>
-                <input type="time" name="available_to_time" class="form-control" 
-                       value="{{ old('available_to_time', $product->available_to_time ? \Carbon\Carbon::parse($product->available_to_time)->format('H:i') : '') }}">
-            </div>
+       <div class="row mt-3">
+        <div class="col-md-6">
+            <label class="form-label">{{ __('cms.products.available_from_time') }} *</label>
+            <select name="available_from_time" id="available_from_time" class="form-control">
+            </select>
         </div>
+
+        <div class="col-md-6">
+            <label class="form-label">{{ __('cms.products.available_to_time') }} *</label>
+            <select name="available_to_time" id="available_to_time" class="form-control">
+            </select>
+        </div>
+    </div>
     </div>
 </div>
 
@@ -723,5 +724,75 @@ $('#productForm').on('submit', function(e) {
             });
     });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const fromSelect = document.getElementById("available_from_time");
+    const toSelect = document.getElementById("available_to_time");
+
+    // Raw Laravel values
+    let oldFrom = "{{ old('available_from_time', $product->available_from_time ?? '') }}";
+    let oldTo = "{{ old('available_to_time', $product->available_to_time ?? '') }}";
+
+    // ✅ Clean up to ensure only HH:MM remains
+    function cleanTime(value) {
+        if (!value) return "";
+        const match = value.match(/(\d{2}:\d{2})/);
+        return match ? match[1] : "";
+    }
+
+    oldFrom = cleanTime(oldFrom);
+    oldTo = cleanTime(oldTo);
+
+    // Time range
+    const startHour = 5;
+    const startMinute = 30;
+    const endHour = 22;
+    const intervalMinutes = 15;
+
+    function generateTimes() {
+        const times = [];
+        let hour = startHour;
+        let minute = startMinute;
+
+        while (hour < endHour || (hour === endHour && minute === 0)) {
+            const hh = String(hour).padStart(2, "0");
+            const mm = String(minute).padStart(2, "0");
+            times.push(`${hh}:${mm}`);
+            minute += intervalMinutes;
+            if (minute >= 60) {
+                minute = 0;
+                hour++;
+            }
+        }
+        return times;
+    }
+
+    const allTimes = generateTimes();
+
+    // Populate dropdown
+    function populateDropdown(select, times, selectedValue = "") {
+        select.innerHTML = `<option value="">Select Time</option>`;
+        times.forEach(t => {
+            const option = document.createElement("option");
+            option.value = t;
+            option.textContent = t;
+            if (t === selectedValue) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+    }
+
+    // Populate both dropdowns with all times (no restriction)
+    populateDropdown(fromSelect, allTimes, oldFrom);
+    populateDropdown(toSelect, allTimes, oldTo);
+
+    // Keep dropdowns independent
+    fromSelect.addEventListener("change", function() {
+        // Optional: handle future logic if needed
+    });
+});
+</script>
+
 
 @endsection

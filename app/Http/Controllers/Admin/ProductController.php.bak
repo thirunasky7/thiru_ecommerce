@@ -94,7 +94,7 @@ class ProductController extends Controller
         'product_type' => 'required|in:simple,variable',
         'is_food_menu' => 'required|in:yes,no',
         'translations.' . $defaultLang . '.name' => 'required|string|max:255',
-        'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5048',
     ];
 
     // Add food menu validation rules if is_food_menu is "yes"
@@ -369,7 +369,7 @@ class ProductController extends Controller
         'product_type' => 'required|in:simple,variable',
         'is_food_menu' => 'required|in:yes,no',
         'translations.' . $defaultLang . '.name' => 'required|string|max:255',
-        'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5048',
     ];
 
     // Add food menu validation rules if is_food_menu is "yes"

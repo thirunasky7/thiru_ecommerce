@@ -103,7 +103,7 @@ class ProductController extends Controller
             'available_from_date' => 'required|date',
             'available_to_date' => 'required|date|after_or_equal:available_from_date',
             'available_from_time' => 'required|date_format:H:i',
-            'available_to_time' => 'required|date_format:H:i|after:available_from_time',
+            'available_to_time' => 'required|date_format:H:i',
         ]);
     }
 
@@ -378,7 +378,7 @@ class ProductController extends Controller
             'available_from_date' => 'required|date',
             'available_to_date' => 'required|date|after_or_equal:available_from_date',
             'available_from_time' => 'required|date_format:H:i',
-            'available_to_time' => 'required|date_format:H:i|after:available_from_time',
+            'available_to_time' => 'required|date_format:H:i',
         ]);
     }
 

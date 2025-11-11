@@ -229,6 +229,16 @@ return [
         'select_color' => 'Select Color',
         'dimensions' => 'Dimensions',
         'language_code' => 'Language Code',
+         'select_category' =>'Select Category',
+        'food_menu_settings' => 'Food Menu Settings',
+        'is_food_menu' => 'Is Food Menu Item?',
+        'yes' => 'Yes',
+        'no' => 'No',
+        'available_from_date' => 'Available From Date',
+        'available_to_date' => 'Available To Date',
+        'available_from_time' => 'Available From Time',
+        'available_to_time' => 'Available To Time',
+        'is_coming_soon' => 'Is this Future Product?'
     ],
 
         'brands' => [

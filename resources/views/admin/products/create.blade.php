@@ -110,21 +110,31 @@
         <div class="row mt-3">
             <div class="col-md-6">
                 <label class="form-label">{{ __('cms.products.available_from_date') }} *</label>
-                <input type="date" name="available_from_date" class="form-control" value="{{ old('available_from_date') }}">
+                <input type="date" name="available_from_date" class="form-control" 
+                       value="{{ old('available_from_date') }}">
             </div>
             <div class="col-md-6">
                 <label class="form-label">{{ __('cms.products.available_to_date') }} *</label>
-                <input type="date" name="available_to_date" class="form-control" value="{{ old('available_to_date') }}">
+                <input type="date" name="available_to_date" class="form-control" 
+                       value="{{ old('available_to_date') }}">
             </div>
         </div>
-        <div class="row mt-2">
+        <div class="row mt-3">
             <div class="col-md-6">
                 <label class="form-label">{{ __('cms.products.available_from_time') }} *</label>
-                <input type="time" name="available_from_time" class="form-control" value="{{ old('available_from_time') }}">
+                <!-- <input type="date" name="available_from_date" class="form-control" value="{{ old('available_from_date') }}"> -->
+                <select name="available_from_time" id="available_from_time" class="form-control"  min="05:30"
+            max="22:00"
+            step="900">
+                </select>
             </div>
             <div class="col-md-6">
                 <label class="form-label">{{ __('cms.products.available_to_time') }} *</label>
-                <input type="time" name="available_to_time" class="form-control" value="{{ old('available_to_time') }}">
+                <!-- <input type="date" name="available_to_date" class="form-control" value="{{ old('available_to_date') }}"> -->
+                <select name="available_to_time"  min="05:30"
+            max="22:00"
+            step="900" step="900" id="available_to_time" class="form-control">
+            </select>
             </div>
         </div>
     </div>
@@ -523,4 +533,38 @@ $(document).ready(function () {
             });
     });
 </script>
+<script>
+    // Generate 30-minute interval time options from 05:30 AM to 10:00 PM
+    function generateTimeOptions(selectId, selectedValue = null) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = ''; // clear old options
+
+        const startMinutes = 5 * 60 + 30; // 5:30 AM = 330 minutes
+        const endMinutes = 22 * 60;       // 10:00 PM = 1320 minutes
+        const interval = 30;              // 30-minute step
+
+        for (let minutes = startMinutes; minutes <= endMinutes; minutes += interval) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            const timeValue = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+
+            const option = document.createElement('option');
+            option.value = timeValue;
+            option.textContent = timeValue;
+
+            if (selectedValue && selectedValue === timeValue) {
+                option.selected = true;
+            }
+
+            select.appendChild(option);
+        }
+    }
+
+    // Initialize time options on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        generateTimeOptions('available_from_time', '{{ old('available_from_time') }}');
+        generateTimeOptions('available_to_time', '{{ old('available_to_time') }}');
+    });
+</script>
+
 @endsection

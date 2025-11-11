@@ -55,6 +55,7 @@ class ShopController extends Controller
             })
             ->paginate(12);
 
+         
         $categories = Category::with('translation')->get();
         $brands = Brand::with('translations')->get();
         $categoryProducts = $this->homeService->categoryProducts();

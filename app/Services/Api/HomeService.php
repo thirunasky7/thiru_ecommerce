@@ -11,59 +11,116 @@ class HomeService
     /**
      * Get categories that have products
      */
-    public function categoryProducts()
-    {
-        // ✅ Load only categories that have at least one product
-        $categories = Category::whereHas('products')
-            ->with([
-                'translation',
-                'products.translation',
-                'products.thumbnail',
-                'products.primaryVariant',
-                'products.reviews'
-            ])
-            ->get();
+   public function categoryProducts()
+{
+    // ✅ Load only categories that have at least one product
+    $categories = Category::whereHas('products')
+        ->with([
+            'translation',
+            'products.translation',
+            'products.thumbnail',
+            'products.primaryVariant',
+            'products.reviews'
+        ])
+        ->get();
 
-        $data = $categories->map(function ($category) {
-            // Skip if product collection is empty (double safety)
-            if ($category->products->isEmpty()) {
-                return null;
-            }
+    $data = $categories->map(function ($category) {
+        // Skip if product collection is empty (double safety)
+        if ($category->products->isEmpty()) {
+            return null;
+        }
 
-            return [
-                'category_name' => optional($category->translation)->name ?? $category->name ?? 'Unnamed Category',
-                'products' => $category->products->map(function ($product) {
+        return [
+            'category_name' => optional($category->translation)->name ?? $category->name ?? 'Unnamed Category',
+            'products' => $category->products->map(function ($product) {
+                
+                // Handle image
+                $productImage = optional($product->thumbnail)->image_url ?? null;
+                $productImage = $productImage ? Storage::url($productImage) : null;
+
+                // Handle name
+                $productName = optional($product->translation)->name ?? $product->name ?? 'Product';
+
+                // Pricing and ratings
+                $primaryVariant = $product->primaryVariant;
+                $originalPrice  = $primaryVariant->converted_price ?? 0;
+                $discountPrice  = $primaryVariant->converted_discount_price ?? 0;
+                $averageRating  = round($product->reviews_avg_rating ?? 4.5, 1);
+                $reviewCount    = $product->reviews_count ?? 0;
+
+                // Food menu availability check
+                $isFoodMenu = $product->is_food_menu === 'yes';
+                $isAvailable = true;
+                $availabilityMessage = '';
+                
+                if ($isFoodMenu) {
+                    $currentDate = now()->format('Y-m-d');
+                    $currentTime = now()->format('H:i:s');
                     
-                    // Handle image
-                    $productImage = optional($product->thumbnail)->image_url ?? null;
-                    $productImage = $productImage ? Storage::url($productImage) : null;
+                    $availableFromDate = $product->available_from_date;
+                    $availableToDate = $product->available_to_date;
+                    $availableFromTime = $product->available_from_time;
+                    $availableToTime = $product->available_to_time;
+                    
+                    // Check date availability
+                    $isDateAvailable = true;
+                    if ($availableFromDate && $availableToDate) {
+                        $isDateAvailable = $currentDate >= $availableFromDate && $currentDate <= $availableToDate;
+                    }
+                    
+                    // Check time availability
+                    $isTimeAvailable = true;
+                    if ($availableFromTime && $availableToTime) {
+                        $isTimeAvailable = $currentTime >= $availableFromTime && $currentTime <= $availableToTime;
+                    }
+                    
+                    $isAvailable = $isDateAvailable && $isTimeAvailable;
+                    
+                    if (!$isAvailable) {
+                        $availabilityMessage = "Not available for now";
+                    }
+                }
 
-                    // Handle name
-                    $productName = optional($product->translation)->name ?? $product->name ?? 'Product';
+                return [
+                    'id' => $product->id,
+                    'name' => $productName,
+                    'original_price' => $originalPrice,
+                    'discount_price' => $discountPrice,
+                    'average_rating' => $averageRating,
+                    'review_count' => $reviewCount,
+                    'is_coming_soon' => ($product->is_coming_soon == 1) ? true : false,
+                    'image' => $productImage,
+                    // Food menu availability fields
+                    'is_food_menu' => $isFoodMenu,
+                    'is_available' => $isAvailable,
+                    'availability_message' => $availabilityMessage,
+                    'available_from_date' => $product->available_from_date,
+                    'available_to_date' => $product->available_to_date,
+                    'available_from_time' => $product->available_from_time,
+                    'available_to_time' => $product->available_to_time,
+                    // Additional availability details for frontend
+                    'availability_details' => [
+                        'is_food_menu' => $isFoodMenu,
+                        'is_available' => $isAvailable,
+                        'message' => $availabilityMessage,
+                        'current_date' => now()->format('Y-m-d'),
+                        'current_time' => now()->format('H:i:s'),
+                        'date_range' => [
+                            'from' => $product->available_from_date,
+                            'to' => $product->available_to_date
+                        ],
+                        'time_range' => [
+                            'from' => $product->available_from_time,
+                            'to' => $product->available_to_time
+                        ]
+                    ]
+                ];
+            })->values(), // reset keys
+        ];
+    })->filter()->values(); // remove nulls & reindex
 
-                    // Pricing and ratings
-                    $primaryVariant = $product->primaryVariant;
-                    $originalPrice  = $primaryVariant->converted_price ?? 0;
-                    $discountPrice  = $primaryVariant->converted_discount_price ?? 0;
-                    $averageRating  = round($product->reviews_avg_rating ?? 4.5, 1);
-                    $reviewCount    = $product->reviews_count ?? 0;
-
-                    return [
-                        'id' => $product->id,
-                        'name' => $productName,
-                        'original_price' => $originalPrice,
-                        'discount_price' => $discountPrice,
-                        'average_rating' => $averageRating,
-                        'review_count' => $reviewCount,
-                        'is_coming_soon' => ($product->is_coming_soon == 1) ? true :false ,
-                        'image' => $productImage,
-                    ];
-                })->values(), // reset keys
-            ];
-        })->filter()->values(); // remove nulls & reindex
-
-        return $data;
-    }
+    return $data;
+}
 
     /**
      * Get all active categories

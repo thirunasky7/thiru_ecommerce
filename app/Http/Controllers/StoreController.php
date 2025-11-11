@@ -45,10 +45,11 @@ class StoreController extends Controller
         ->orderBy('id', 'desc')
         ->take(10)
         ->get();
+      
         
         $send_data['categoryProducts'] = $this->homeService->categoryProducts();
         $send_data['banners'] = $this->homeService->getBanners();
-
+ 
 
         return view('themes.xylo.home',$send_data);
     }

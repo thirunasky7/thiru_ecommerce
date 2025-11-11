@@ -55,7 +55,7 @@ class HomeService
                         'discount_price' => $discountPrice,
                         'average_rating' => $averageRating,
                         'review_count' => $reviewCount,
-                        'is_coming_soon' => ($product->is_coming_soon == 0) ? true :false ,
+                        'is_coming_soon' => ($product->is_coming_soon == 1) ? true :false ,
                         'image' => $productImage,
                     ];
                 })->values(), // reset keys
