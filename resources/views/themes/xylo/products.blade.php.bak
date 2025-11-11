@@ -329,7 +329,7 @@
                         </div>
                     @endif
                                 <a href="{{ $isAvailable ? url('/product/' . $product['slug']) : 'javascript:void(0)' }}">
-                                    <img src="{{ Storage::url($productImage) }}" alt="{{ $productName }}" class="w-full h-48 object-cover">
+                                    <img src="{{ $productImage ? asset('/public/storage/'.$productImage) : 'https://via.placeholder.com/300x300?text=' . urlencode($productName) }" alt="{{ $productName }}" class="w-full h-48 object-cover">
                                  </a>
                                  <div class="absolute top-4 right-4 bg-amber-800 text-white text-xs font-semibold px-2 py-1 rounded-full">
                                     {{ $categoryName }}
