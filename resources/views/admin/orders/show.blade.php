@@ -14,7 +14,7 @@
         <h6 class="mt-4">Order Items:</h6>
         <ul>
             @foreach ($order->items as $item)
-                <li>{{ $item->product->name }} × {{ $item->quantity }}</li>
+                <li>{{ optional($item->product->translation)->name ??$item->product->name ?? 'Product' }} × {{ $item->quantity }}</li>
             @endforeach
         </ul>
     </div>

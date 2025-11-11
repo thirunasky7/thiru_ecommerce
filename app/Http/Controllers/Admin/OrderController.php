@@ -46,6 +46,10 @@ class OrderController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function show($id){
+        $order = Order::findOrFail($id);
+        return view('admin.orders.show', compact('order'));
+    }
 
     public function destroy($id)
     {

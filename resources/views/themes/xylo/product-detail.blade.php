@@ -1,27 +1,84 @@
 @extends('themes.xylo.partials.app')
 
-@section('title', 'MyStore - Online Shopping')
+@section('title', 'Thaiyur Shop, Kelambakam - Online Shopping')
+
+@php
+    $productImage = optional($product->thumbnail)->image_url ?? null;
+    $imageUrl = $productImage ? asset('public/storage/'.$productImage) : asset('public/images/default-product.jpg');
+    $currency = activeCurrency();
+    $averageRating = round($product->averageRating(), 1);
+    $price = $product->primaryVariant->converted_discount_price ?? $product->primaryVariant->converted_price ?? 0;
+    $availability = $inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
+@endphp
+
+<title>{{ $product->translation->name }}</title>
+<meta name="description" content="{{ strip_tags($product->translation->description) }}">
+<meta name="keywords" content="{{ $product->translation->tags }}">
+<link rel="canonical" href="{{ url()->current() }}">
+<meta property="og:title" content="{{ $product->translation->name }}">
+<meta property="og:description" content="{{ strip_tags($product->translation->short_description) }}">
+<meta property="og:image" content="{{ $imageUrl }}">
+<meta name="twitter:card" content="summary_large_image">
+
+{{-- ? Product Structured Data (JSON-LD for Google) --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ $product->translation->name }}",
+  "image": [
+    @foreach ($product->images as $img)
+      "{{ asset('public/storage/'.$img->image_url) }}"@if(!$loop->last),@endif
+    @endforeach
+  ],
+  "description": "{{ strip_tags($product->translation->short_description) }}",
+  "sku": "{{ $product->sku ?? 'SKU-'.$product->id }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ $product->brand->name ?? 'Thaiyur Shop' }}"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ url()->current() }}",
+    "priceCurrency": "{{ $currency->code ?? 'INR' }}",
+    "price": "{{ number_format($price, 2, '.', '') }}",
+    "itemCondition": "https://schema.org/NewCondition",
+    "availability": "{{ $availability }}"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ $averageRating }}",
+    "reviewCount": "{{ $product->reviews_count }}"
+  },
+  "review": [
+    @foreach($product->reviews as $review)
+    {
+      "@type": "Review",
+      "author": {
+        "@type": "Person",
+        "name": "{{ $review->customer->name ?? 'Anonymous' }}"
+      },
+      "datePublished": "{{ $review->created_at->toDateString() }}",
+      "reviewBody": "{{ strip_tags($review->comment) }}",
+      "name": "{{ $review->title ?? 'Customer Review' }}",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "{{ $review->rating }}",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    }@if(!$loop->last),@endif
+    @endforeach
+  ]
+}
+</script>
+
 
 @section('content')
 @php $currency = activeCurrency(); @endphp
 
-<section class="banner-area inner-banner pt-5 animate__animated animate__fadeIn productinnerbanner">
-    <div class="container mx-auto px-4 h-full">
-        <div class="flex flex-wrap">       
-            <div class="w-full md:w-4/12">
-                <div class="breadcrumbs flex items-center space-x-2 text-sm text-gray-600 flex-wrap">
-                    <a href="#" class="hover:text-gray-900 transition-colors">Home Page</a> 
-                    <i class="fa fa-angle-right text-xs"></i> 
-                    <a href="#" class="hover:text-gray-900 transition-colors">Headphone</a> 
-                    <i class="fa fa-angle-right text-xs"></i> 
-                    <span class="text-gray-900">Espresso decaffeinato</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-<div class="main-detail py-8 md:py-12 ">
+<div class="main-detail py-8 md:py-12" style="margin-top:80px">
     <div class="container mx-auto px-4">
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
             <!-- Product Images -->

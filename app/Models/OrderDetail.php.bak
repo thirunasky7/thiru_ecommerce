@@ -17,20 +17,6 @@ class OrderDetail extends Model
     {
         return $this->belongsTo(Product::class);
     }
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
-
-    
-
-    /**
-     * Relationship with ProductVariant
-     */
-    public function variant()
-    {
-        return $this->belongsTo(ProductVariant::class, 'variant_id');
-    }
 }
 
 ?>
