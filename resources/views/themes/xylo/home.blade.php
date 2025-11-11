@@ -68,7 +68,7 @@
 </section>
 
 <!-- 🔸 Shop by Category -->
-<section class="container mx-auto py-8 md:py-12 px-4">
+<!-- <section class="container mx-auto py-8 md:py-12 px-4">
     <h2 class="text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-gray-800">Shop By Category</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 md:gap-6">
         @foreach($categories as $category)
@@ -81,14 +81,14 @@
                      alt="{{ $categoryName }}" class="w-full h-28 md:h-40 object-cover">
                 <div class="p-3 md:p-4 text-center">
                     <h5 class="font-medium text-gray-700 text-sm md:text-base">{{ Str::limit($categoryName, 20) }}</h5>
-                    <a href="#" class="inline-block mt-1 md:mt-2 text-white  bg-red-600 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs md:text-sm hover:bg-red-600 hover:text-white transition">
+                    <a href="{{ url('/category/products/' .$category['slug']) }}" class="inline-block mt-1 md:mt-2 text-white  bg-red-600 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs md:text-sm hover:bg-red-600 hover:text-white transition">
                         Shop Now
                     </a>
                 </div>
             </div>
         @endforeach
     </div>
-</section>
+</section> -->
 
 <!-- 🔸 Featured Products Carousel -->
 <section class="container mx-auto py-8 md:py-12 px-4">
@@ -272,18 +272,20 @@
 
         <div class="relative product-card-container">
             <div class="relative bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition-all duration-300 {{ !$isAvailable ? 'product-unavailable' : '' }}">
-                @if(!$isAvailable)
-                    <div class="unavailable-overlay">
-                        {{ $availabilityMessage }}
-                    </div>
-                @endif
+                    @if(!$isAvailable)
+                        <div class="unavailable-overlay">
+                            {{ $availabilityMessage }}
+                        </div>
+                    @endif
                 
                 <!-- Product Image (Reduced height) -->
                 <div class="relative overflow-hidden">
-                    <img src="{{ $productImage ?  asset('/public/storage/'.$productImage) : '' . urlencode($productName) }}"
+                      <a href="{{ $isAvailable ? url('/product/' . $product['slug']) : 'javascript:void(0)' }}" 
+                                   class="{{ !$isAvailable ? 'pointer-events-none cursor-default' : '' }}">
+                             <img src="{{ $productImage ?  asset('/public/storage/'.$productImage) : '' . urlencode($productName) }}"
                          alt="{{ $productName }}" 
                          class="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300">
-                    
+                    </a>
                     <!-- Wishlist Button -->
                     <!-- <button class="wishlist-btn absolute top-2 right-2 w-8 h-8 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 shadow-sm hover:shadow transition-all duration-200 z-10"
                             onclick="showWishlistMessage()">
@@ -362,7 +364,7 @@
                 <h2 class="text-xl font-semibold text-gray-800">
                     {{ $category['category_name'] }}
                 </h2>
-                <a href="{{ url('/category/' . Str::slug($category['category_name'])) }}" 
+                <a href="{{ url('/products') }}" 
                    class="text-sm text-red-500 hover:text-red-600 font-medium">
                    View All →
                 </a>
@@ -395,10 +397,12 @@
                             
                             <!-- Product Image -->
                             <div class="relative">
+                                  <a href="{{ $isAvailable ? url('/product/' . $product['slug']) : 'javascript:void(0)' }}" 
+                                   class="{{ !$isAvailable ? 'pointer-events-none cursor-default' : '' }}">
                                 <img src="{{ asset('/public/'.$product['image']) ?? asset('public/images/no-image.png') }}"
                                      alt="{{ $product['name'] }}"
                                      class="w-full h-36 object-cover rounded-t-lg {{ !$isAvailable ? 'filter blur-[1px]' : '' }}">
-
+                                </a>
                                 @if($product['discount_price'] && $product['original_price'] > $product['discount_price'] && $isAvailable)
                                     @php
                                         $discountPercent = round((($product['original_price'] - $product['discount_price']) / $product['original_price']) * 100);

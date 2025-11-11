@@ -418,7 +418,7 @@
 
                             <!-- Product Info -->
                             <div class="p-2.5 {{ !$isAvailable ? 'opacity-70' : '' }}">
-                                <a href="{{ $isAvailable ? url('/product/' . $product['id']) : 'javascript:void(0)' }}" 
+                                <a href="{{ $isAvailable ? url('/product/' . $product['slug']) : 'javascript:void(0)' }}" 
                                    class="block text-[13px] font-medium text-gray-800 hover:text-orange-600 line-clamp-2 h-10 mb-1 {{ !$isAvailable ? 'pointer-events-none cursor-default' : '' }}">
                                     {{ $product['name'] }}
                                 </a>

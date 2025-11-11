@@ -9,6 +9,7 @@ use App\Models\ProductVariant;
 use App\Models\ProductImage;
 use App\Models\ProductReview;
 use App\Models\Customer;
+use App\Models\Category;
 
 class ProductController extends Controller
 {
@@ -166,5 +167,28 @@ public function submitReview(Request $request)
     }
 }
 
+
+public function categoryProducts($slug = null)
+{
+    $categories = Category::where('status',1)->with('products')->get();
+
+    $query = Product::with(['translation', 'thumbnail', 'category.translation', 'reviews']);
+
+    // If a category slug is provided, filter products
+    if ($slug) {
+        $category = Category::where('slug', $slug)->first();
+        if ($category) {
+            $query->where('category_id', $category->id);
+        }
+    }
+
+    $products = $query->where('status', 1)->get();
+
+    return view('themes.xylo.products', [
+        'categories' => $categories,
+        'products' => $products,
+        'selectedCategorySlug' => $slug, // pass slug to blade
+    ]);
+}
 
 }

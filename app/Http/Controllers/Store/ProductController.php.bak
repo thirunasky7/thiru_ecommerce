@@ -150,7 +150,7 @@ public function submitReview(Request $request)
             'rating' => $request->rating,
             'review' => $request->comment,
             'title' => $request->title,
-            'status' => 'approved' // or 'pending' for moderation
+            'is_approved' => 1 // or 'pending' for moderation
         ]);
 
         return response()->json([

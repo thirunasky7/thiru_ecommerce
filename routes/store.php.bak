@@ -28,6 +28,9 @@ Route::get('/about-us', function(){
     return view('about-us');
 });
 
+Route::get('/contact-us', function(){
+    return view('contact-us');
+});
 
 Route::get('/categories', [StoreController::class, 'allcategories'])->name('categories.index');
 Route::get('/products', [StoreController::class, 'allproducts'])->name('products.index');

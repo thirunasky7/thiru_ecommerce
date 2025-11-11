@@ -207,7 +207,7 @@
                     <div class="border-b border-gray-200 pb-6">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <h3 class="font-semibold text-gray-900">{{ $review->user_name }}</h3>
+                                <h3 class="font-semibold text-gray-900">{{ $review->customer->name ?? '' }}</h3>
                                 <div class="flex items-center space-x-1 mt-1">
                                     @for ($i = 1; $i <= 5; $i++)
                                         @if ($i <= $review->rating)
