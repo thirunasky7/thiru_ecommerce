@@ -98,6 +98,7 @@ class HomeService
                     'available_to_date' => $product->available_to_date,
                     'available_from_time' => $product->available_from_time,
                     'available_to_time' => $product->available_to_time,
+                    'slug' => $product->slug,
                     // Additional availability details for frontend
                     'availability_details' => [
                         'is_food_menu' => $isFoodMenu,
