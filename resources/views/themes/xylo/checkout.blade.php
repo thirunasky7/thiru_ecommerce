@@ -194,7 +194,7 @@
                         @endphp
                         <div class="summary-item flex items-center justify-between">
                             <div class="flex items-center space-x-3">
-                                <img src="{{ $variant && $variant->images && $variant->images->first() ? asset('/public'.$variant->images->first()->image_url)) : ($product && $product->thumbnail ? asset('/public'.$product->thumbnail->image_url) : 'https://via.placeholder.com/60x60') }}" 
+                                <img src="{{ $variant && $variant->images && $variant->images->first() ? asset('/public'.$variant->images->first()->image_url) : ($product && $product->thumbnail ? asset('/public'.$product->thumbnail->image_url) : 'https://via.placeholder.com/60x60') }}" 
                                     class="w-14 h-14 rounded object-cover">
                                 <div>
                                     <p class="font-medium text-gray-800 text-sm">{{ $product->translation->name ?? 'Product' }}</p>
