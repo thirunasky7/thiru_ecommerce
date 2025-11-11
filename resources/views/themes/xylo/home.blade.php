@@ -77,7 +77,7 @@
                 $categoryImage = $category->translation->image_url ?? $category->image_url ?? null;
             @endphp
             <div class="bg-white rounded-lg md:rounded-xl shadow hover:shadow-md overflow-hidden transition-all duration-300">
-                <img src="{{ $categoryImage ? asset('public/'.$categoryImage) : 'https://via.placeholder.com/200x200/6c757d/ffffff?text=' . urlencode($categoryName) }}"
+                <img src="{{ $categoryImage ?  asset('/public/storage/'.$categoryImage) : 'https://via.placeholder.com/200x200/6c757d/ffffff?text=' . urlencode($categoryName) }}"
                      alt="{{ $categoryName }}" class="w-full h-28 md:h-40 object-cover">
                 <div class="p-3 md:p-4 text-center">
                     <h5 class="font-medium text-gray-700 text-sm md:text-base">{{ Str::limit($categoryName, 20) }}</h5>
@@ -280,7 +280,7 @@
                 
                 <!-- Product Image (Reduced height) -->
                 <div class="relative overflow-hidden">
-                    <img src="{{ $productImage ? asset('public/storage/'.$productImage) : '' . urlencode($productName) }}"
+                    <img src="{{ $productImage ?  asset('/public/storage/'.$productImage) : '' . urlencode($productName) }}"
                          alt="{{ $productName }}" 
                          class="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300">
                     
@@ -395,7 +395,7 @@
                             
                             <!-- Product Image -->
                             <div class="relative">
-                                <img src="{{ $product['image'] ?? asset('images/no-image.png') }}"
+                                <img src="{{ $product['image'] ?? asset('public/images/no-image.png') }}"
                                      alt="{{ $product['name'] }}"
                                      class="w-full h-36 object-cover rounded-t-lg {{ !$isAvailable ? 'filter blur-[1px]' : '' }}">
 

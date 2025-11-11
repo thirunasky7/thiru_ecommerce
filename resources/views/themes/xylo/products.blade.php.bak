@@ -127,6 +127,33 @@
         color: #666;
     }
     
+    /* Food menu availability styles */
+    .product-unavailable {
+        position: relative;
+        filter: blur(0.5px);
+        opacity: 0.8;
+        pointer-events: none;
+    }
+    
+    .unavailable-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: bold;
+        z-index: 10;
+        text-align: center;
+        font-size: 14px;
+    }
+    
+    .product-card-container {
+        position: relative;
+    }
+    
     @media (max-width: 768px) {
         .filter-sidebar {
             display: none;
@@ -137,10 +164,12 @@
 @section('content')
 @php $currency = activeCurrency(); @endphp
 
-<body class="bg-gray-50">
+<body class="bg-gray-50 mt-10">
+<section class="container mx-auto py-8 md:py-12 px-4">
+
    <div class="lg:hidden bg-white shadow-sm py-11 px-4 sticky top-5 z-30">
         <div class="flex justify-between items-center">
-            <h1 class="text-xl font-bold coffee-title">Coffee Products</h1>
+            <h1 class="text-xl font-bold coffee-title"> Products</h1>
             <button id="mobileFilterBtn" class="bg-amber-800 text-white px-4 py-2 rounded-lg flex items-center">
                 <i class="fas fa-filter mr-2"></i> Filters
             </button>
@@ -249,7 +278,7 @@
                 </div>
                 
                 <!-- Products Grid -->
-                <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach($products as $product)
                         @php
                             $productName = $product->translation->name ?? $product->name ?? 'Product';
@@ -260,37 +289,93 @@
                             $categoryId = $product->category->id ?? 0;
                             $rating = $product->reviews->avg('rating') ?? 0;
                             $reviewCount = $product->reviews_count ?? 0;
+                            
+                            // Food menu availability check
+                            $isFoodMenu = $product->is_food_menu === 'yes';
+                            $isAvailable = true;
+                            $availabilityMessage = '';
+                            
+                            if ($isFoodMenu) {
+                                $currentDate = now()->format('Y-m-d');
+                                $currentTime = now()->format('H:i:s');
+                                
+                                $availableFromDate = $product->available_from_date;
+                                $availableToDate = $product->available_to_date;
+                                $availableFromTime = $product->available_from_time;
+                                $availableToTime = $product->available_to_time;
+                                
+                                // Check date availability
+                                $isDateAvailable = true;
+                                if ($availableFromDate && $availableToDate) {
+                                    $isDateAvailable = $currentDate >= $availableFromDate && $currentDate <= $availableToDate;
+                                }
+                                
+                                // Check time availability
+                                $isTimeAvailable = true;
+                                if ($availableFromTime && $availableToTime) {
+                                    $isTimeAvailable = $currentTime >= $availableFromTime && $currentTime <= $availableToTime;
+                                }
+                                
+                                $isAvailable = $isDateAvailable && $isTimeAvailable;
+                                
+                                if (!$isAvailable) {
+                                    $availabilityMessage = "Not available for now";
+                                }
+                            }
+                            
+                            // Additional check for coming soon products
+                            $isComingSoon = $product->is_coming_soon ?? false;
+                            if ($isComingSoon) {
+                                $isAvailable = false;
+                                $availabilityMessage = "Coming Soon";
+                            }
                         @endphp
-                        <div class="product-card" data-category="{{ $categoryId }}" data-price="{{ $productPrice }}" data-rating="{{ $rating }}" data-date="{{ $product->created_at }}">
-                            <div class="relative overflow-hidden">
-                                <a href="{{ url('/product/'.$product->slug)}}">
-                                    <img src="{{ Storage::url($productImage) }}" alt="{{ $productName }}" class="w-full h-48 object-cover">
-                                 </a>
-                                 <div class="absolute top-4 right-4 bg-amber-800 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                                    {{ $categoryName }}
-                                </div>
-                            </div>
-                            <div class="p-5">
-                               <a href="{{ url('/product/'.$product->slug)}}">
-                                 <h3 class="text-lg font-semibold coffee-title mb-2">{{ $productName }}</h3>
-                                </a>
-                                <div class="flex items-center mb-3">
-                                    <div class="flex text-amber-500 mr-2">
-                                        @for($i = 1; $i <= 5; $i++)
-                                            @if($i <= floor($rating))
-                                                <i class="fas fa-star"></i>
-                                            @else
-                                                <i class="far fa-star"></i>
-                                            @endif
-                                        @endfor
+                        <div class="product-card-container">
+                            <div class="product-card {{ !$isAvailable ? 'product-unavailable' : '' }}" data-category="{{ $categoryId }}" data-price="{{ $productPrice }}" data-rating="{{ $rating }}" data-date="{{ $product->created_at }}">
+                                @if(!$isAvailable)
+                                    <div class="unavailable-overlay">
+                                        {{ $availabilityMessage }}
                                     </div>
-                                    <span class="text-gray-600 text-sm">({{ $reviewCount }})</span>
+                                @endif
+                                
+                                <div class="relative overflow-hidden">
+                                    <a href="{{ $isAvailable ? url('/product/'.$product->slug) : 'javascript:void(0)' }}">
+                                        <img src="{{ Storage::url($productImage) }}" alt="{{ $productName }}" class="w-full h-48 object-cover {{ !$isAvailable ? 'filter blur-[0.5px]' : '' }}">
+                                    </a>
+                                    <div class="absolute top-4 right-4 bg-amber-800 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                                        {{ $categoryName }}
+                                    </div>
+                                    
+                                    <!-- Coming Soon Badge -->
+                                    @if($isComingSoon && !$isAvailable)
+                                        <div class="absolute top-4 left-4 bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                                            Coming Soon
+                                        </div>
+                                    @endif
                                 </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xl font-bold text-amber-800">{{ $currency->symbol }}{{ number_format($productPrice, 2) }}</span>
-                                    <button class="add-to-cart-btn px-4 py-2 rounded-lg text-sm font-medium" onclick="addToCart({{$product->id }})" >
-                                        <i class="fas fa-shopping-cart mr-1"></i> Add to Cart
-                                    </button>
+                                <div class="p-5 {{ !$isAvailable ? 'opacity-80' : '' }}">
+                                    <a href="{{ $isAvailable ? url('/product/'.$product->slug) : 'javascript:void(0)' }}">
+                                        <h3 class="text-lg font-semibold coffee-title mb-2 {{ !$isAvailable ? 'pointer-events-none cursor-default' : '' }}">{{ $productName }}</h3>
+                                    </a>
+                                    <div class="flex items-center mb-3">
+                                        <div class="flex text-amber-500 mr-2">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                @if($i <= floor($rating))
+                                                    <i class="fas fa-star"></i>
+                                                @else
+                                                    <i class="far fa-star"></i>
+                                                @endif
+                                            @endfor
+                                        </div>
+                                        <span class="text-gray-600 text-sm">({{ $reviewCount }})</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xl font-bold text-amber-800 {{ !$isAvailable ? 'opacity-70' : '' }}">{{ $currency->symbol }}{{ number_format($productPrice, 2) }}</span>
+                                        <button class="add-to-cart-btn px-4 py-2 rounded-lg text-sm font-medium {{ !$isAvailable ? 'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400' : '' }}" 
+                                                onclick="{{ $isAvailable ? 'addToCart(' . $product->id . ')' : 'showUnavailableMessage()' }}">
+                                            <i class="fas fa-shopping-cart mr-1"></i> Add
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -392,7 +477,7 @@
             </button>
         </div>
     </div>
-
+</section>
     <script>
         // State
         let selectedCategories = [];
@@ -410,6 +495,11 @@
         const clearFiltersBtn = document.getElementById('clearFilters');
         const sortSelect = document.getElementById('sortSelect');
         const applyMobileFiltersBtn = document.getElementById('applyMobileFilters');
+
+        // Unavailable product message function
+        function showUnavailableMessage() {
+            toastr.warning('This product is not available at the moment.', 'Product Unavailable');
+        }
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
@@ -433,10 +523,10 @@
                 const ratingMatch = selectedRating === 0 || rating >= selectedRating;
                 
                 if (categoryMatch && ratingMatch) {
-                    card.style.display = 'block';
+                    card.parentElement.style.display = 'block';
                     visibleCount++;
                 } else {
-                    card.style.display = 'none';
+                    card.parentElement.style.display = 'none';
                 }
             });
 
@@ -454,24 +544,27 @@
         // Sort products
         function sortProducts() {
             const productsGrid = document.getElementById('productsGrid');
-            const productCards = Array.from(productsGrid.querySelectorAll('.product-card'));
+            const productCardContainers = Array.from(productsGrid.querySelectorAll('.product-card-container'));
             
-            productCards.sort((a, b) => {
+            productCardContainers.sort((a, b) => {
+                const aCard = a.querySelector('.product-card');
+                const bCard = b.querySelector('.product-card');
+                
                 switch(sortBy) {
                     case 'price_low':
-                        return parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price'));
+                        return parseFloat(aCard.getAttribute('data-price')) - parseFloat(bCard.getAttribute('data-price'));
                     case 'price_high':
-                        return parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute('data-price'));
+                        return parseFloat(bCard.getAttribute('data-price')) - parseFloat(aCard.getAttribute('data-price'));
                     case 'rating':
-                        return parseFloat(b.getAttribute('data-rating')) - parseFloat(a.getAttribute('data-rating'));
+                        return parseFloat(bCard.getAttribute('data-rating')) - parseFloat(aCard.getAttribute('data-rating'));
                     case 'newest':
                     default:
-                        return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+                        return new Date(bCard.getAttribute('data-date')) - new Date(aCard.getAttribute('data-date'));
                 }
             });
             
             // Re-append sorted products
-            productCards.forEach(card => productsGrid.appendChild(card));
+            productCardContainers.forEach(container => productsGrid.appendChild(container));
         }
 
         // Update active filters display
