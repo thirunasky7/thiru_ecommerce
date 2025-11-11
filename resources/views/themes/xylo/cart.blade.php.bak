@@ -121,7 +121,7 @@
                                         <!-- Product Image & Info -->
                                         <div class="flex-1 mb-4 md:mb-0">
                                             <div class="flex items-start">
-                                                <img src="{{ asset('/public/'.$variantImage) }}" 
+                                                <img src="{{ $variantImage }}" 
                                                      alt="{{ $variantName }}"
                                                      class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg mr-4">
                                                 <div class="flex-1">

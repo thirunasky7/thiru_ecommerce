@@ -29,7 +29,7 @@
                 <div class="product-slider">
                     @foreach ($product->images as $image)
                         <div>
-                            <img src="{{ Storage::url($image['image_url']) }}" 
+                            <img src="{{  asset('/public'.$image['image_url']) }}" 
                                  alt="{{ $image['name'] }}" 
                                  class="w-full h-auto rounded-lg shadow-sm" />
                         </div>

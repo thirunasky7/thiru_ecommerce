@@ -395,7 +395,7 @@
                             
                             <!-- Product Image -->
                             <div class="relative">
-                                <img src="{{ asset('/public/storage/'.$product['image']) ?? asset('public/images/no-image.png') }}"
+                                <img src="{{ asset('/public/'.$product['image']) ?? asset('public/images/no-image.png') }}"
                                      alt="{{ $product['name'] }}"
                                      class="w-full h-36 object-cover rounded-t-lg {{ !$isAvailable ? 'filter blur-[1px]' : '' }}">
 

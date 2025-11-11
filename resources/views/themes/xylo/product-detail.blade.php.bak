@@ -73,11 +73,20 @@
                 </div>
 
                
-
+          @php
+            $primaryVariant = $product->primaryVariant;
+            $originalPrice = $primaryVariant->converted_price ?? 0;
+            $discountPrice = $primaryVariant->converted_discount_price ?? 0;
+         @endphp
                 <!-- Price -->
                 <h2 class="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
-                    <span id="currency-symbol">{{ $currency->symbol }}</span>
-                    <span id="variant-price">{{ $product->primaryVariant->converted_price ?? 'N/A' }}</span>
+                        @if($discountPrice && $originalPrice > $discountPrice)
+                            <span class="text-gray-400 line-through text-xs">{{ $currency->symbol }}{{ number_format($originalPrice, 2) }}</span>
+                            <span class="text-red-600 font-semibold text-sm">{{ $currency->symbol }}{{ number_format($discountPrice, 2) }}</span>
+                        @else
+                            <span class="text-gray-800 font-semibold text-sm">{{ $currency->symbol }}{{ number_format($originalPrice, 2) }}</span>
+                        @endif
+                  
                 </h2>
                 
 

@@ -1,57 +1,71 @@
 @extends('themes.xylo.partials.app')
 
-@section('title', 'MyStore - Online Shopping')
+@section('title', 'Checkout - MyStore')
 
-@section('content')
 @section('css')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"> 
 <style>
-    .error {
-        color: #dc2626;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
+    /* --- GENERAL --- */
+    .error { color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem; }
+
+    /* --- PAYMENT CARDS --- */
     .payment-method {
         border: 2px solid #e5e7eb;
         border-radius: 0.75rem;
         padding: 1rem;
         margin-bottom: 1rem;
-        cursor: pointer;
         transition: all 0.3s ease;
+        background-color: #fff;
+        cursor: pointer;
     }
     .payment-method:hover {
-        border-color: #3b82f6;
+        border-color: #2563eb;
+        background-color: #f9fafb;
     }
     .payment-method.selected {
-        border-color: #3b82f6;
+        border-color: #2563eb;
         background-color: #f8fafc;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
     }
     .payment-icon {
-        width: 2.5rem;
-        height: 2.5rem;
-        margin-right: 0.75rem;
+        width: 2.5rem; height: 2.5rem; margin-right: 0.75rem;
     }
     .payment-details {
         display: none;
-        margin-top: 1rem;
-        padding: 1rem;
-        background-color: #f8fafc;
+        margin-top: 0.75rem;
+        padding: 0.75rem 1rem;
+        background-color: #f9fafb;
         border-radius: 0.5rem;
     }
-    .payment-details.active {
-        display: block;
+    .payment-details.active { display: block; }
+    .radio-visible {
+        width: 1.2rem; height: 1.2rem; accent-color: #2563eb; margin-right: 0.75rem;
     }
+
+    /* --- ORDER SUMMARY --- */
+    .order-summary {
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        padding: 1.5rem;
+    }
+    .summary-item {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 0.75rem 0;
+    }
+    .summary-item:last-child { border-bottom: none; }
 </style>
 @endsection
 
+@section('content')
+
 @php $currency = activeCurrency(); @endphp
 
-<!-- Breadcrumb Section -->
 <section class="bg-white py-4 border-b">
     <div class="container mx-auto px-4">
         <div class="breadcrumbs text-sm text-gray-600">
-            <a href="{{ route('xylo.home') }}" class="hover:text-blue-600">Home</a> 
-            <i class="fa fa-angle-right mx-2"></i> 
+            <a href="{{ route('xylo.home') }}" class="hover:text-blue-600">Home</a>
+            <i class="fa fa-angle-right mx-2"></i>
             <span class="text-gray-900 font-medium">Checkout</span>
         </div>
     </div>
@@ -60,74 +74,33 @@
 <div class="py-6">
     <div class="container mx-auto px-4">
         <div class="flex flex-col lg:flex-row gap-6">
+
             <!-- Checkout Form -->
             <div class="w-full lg:w-7/12">
                 <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm">
                     @csrf
 
-                    <!-- Shipping Information -->
-                    <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-                        <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4">Shipping Information</h3>
+                    <!-- Shipping Info -->
+                    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Shipping Information</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                                <input type="text" 
-                                       class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('first_name') border-red-500 @enderror" 
-                                       name="first_name" 
-                                       placeholder="First Name" 
-                                       value="{{ old('first_name') }}">
-                                @error('first_name')
-                                    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                                @enderror
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                <input type="text" name="full_name" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="First Name" value="{{ old('first_name') }}">
                             </div>
+
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                                <input type="text" 
-                                       class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('last_name') border-red-500 @enderror" 
-                                       name="last_name" 
-                                       placeholder="Last Name" 
-                                       value="{{ old('last_name') }}">
-                                @error('last_name')
-                                    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                                @enderror
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                <input type="text" name="phone" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Phone" value="{{ old('phone') }}" required>
                             </div>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                            <input type="text" 
-                                   class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('address') border-red-500 @enderror" 
-                                   name="address" 
-                                   placeholder="Full Address" 
-                                   value="{{ old('address') }}">
-                            @error('address')
-                                <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                            @enderror
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Suite/Floor</label>
-                                <input type="text" 
-                                       class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('suite_floor') border-red-500 @enderror" 
-                                       name="suite_floor" 
-                                       placeholder="Suit/Floor" 
-                                       value="{{ old('suite_floor') }}">
-                                @error('suite_floor')
-                                    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                                <input type="text" 
-                                       class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('city') border-red-500 @enderror" 
-                                       name="city" 
-                                       placeholder="City" 
-                                       value="{{ old('city') }}">
-                                @error('city')
-                                    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                            <input type="text" name="address" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                   placeholder="Full Address" value="{{ old('address') }}">
                         </div>
 
                         <div class="mt-4">
@@ -138,170 +111,136 @@
                         </div>
                     </div>
 
-                    <!-- Contact Information -->
-                    <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-                        <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4">Contact Information</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input type="email" 
-                                       class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('email') border-red-500 @enderror" 
-                                       name="email" 
-                                       placeholder="Email" 
-                                       value="{{ old('email', auth()->user()->email ?? '') }}">
-                                @error('email')
-                                    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                <input type="text" 
-                                       class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('phone') border-red-500 @enderror" 
-                                       name="phone" 
-                                       placeholder="Phone" 
-                                       value="{{ old('phone') }}" required>
-                                @error('phone')
-                                    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Payment Section -->
+                    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Payment Method</h3>
 
-                    <!-- Payment Method -->
-                    <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                        <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4">Payment Method</h3>
-                        
-                        <!-- Cash on Delivery -->
+                        <!-- COD -->
                         <div class="payment-method selected" data-method="cod">
                             <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="payment_method" value="cod" checked 
-                                       class="hidden" {{ old('payment_method') == 'cod' ? 'checked' : '' }}>
+                                <input type="radio" name="payment_method" value="cod" checked class="radio-visible">
                                 <i class="fas fa-money-bill-wave payment-icon text-green-600"></i>
                                 <div>
-                                    <strong class="text-gray-900 text-sm sm:text-base">Pay on Delivery</strong>
-                                    <p class="text-gray-600 text-xs sm:text-sm mt-1">Pay when you receive your order</p>
+                                    <strong class="text-gray-900">Cash on Delivery</strong>
+                                    <p class="text-gray-600 text-sm">Pay when your order arrives.</p>
                                 </div>
                             </label>
                             <div class="payment-details active" id="cod-details">
-                                <p class="text-gray-600 text-sm">Pay with cash when your order is delivered.</p>
-                                <div class="bg-blue-50 p-3 rounded-lg mt-2">
-                                    <small class="text-blue-700 text-xs">
-                                        <i class="fas fa-info-circle mr-1"></i>
-                                        Additional cash handling fee may apply.
-                                    </small>
+                                <p class="text-gray-600 text-sm">Pay with cash once the package is delivered to you.</p>
+                            </div>
+                        </div>
+
+                        <!-- UPI -->
+                        <div class="payment-method" data-method="upi">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="payment_method" value="upi" class="radio-visible">
+                                <i class="fas fa-mobile-alt payment-icon text-purple-600"></i>
+                                <div>
+                                    <strong class="text-gray-900">UPI (Google Pay / PhonePe / Paytm)</strong>
+                                    <p class="text-gray-600 text-sm">Instant secure UPI payment.</p>
+                                </div>
+                            </label>
+                            <div class="payment-details" id="upi-details">
+                                <input type="text" name="upi_id" placeholder="Enter your UPI ID" 
+                                       class="w-full mt-2 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">Example: yourname@okaxis</p>
+                            </div>
+                        </div>
+
+                        <!-- CARD -->
+                        <div class="payment-method" data-method="card">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="payment_method" value="card" class="radio-visible">
+                                <i class="fas fa-credit-card payment-icon text-blue-600"></i>
+                                <div>
+                                    <strong class="text-gray-900">Credit / Debit Card</strong>
+                                    <p class="text-gray-600 text-sm">Pay securely with your card.</p>
+                                </div>
+                            </label>
+                            <div class="payment-details" id="card-details">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                                    <input type="text" placeholder="Card Number" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <input type="text" placeholder="Name on Card" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <input type="text" placeholder="MM/YY" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <input type="text" placeholder="CVV" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="mt-6">
-                        <button type="submit" 
-                                class="w-full bg-red-600 text-white py-3 sm:py-4 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
-                                id="submitBtn">
-                            <span id="submitText" class="text-sm sm:text-base">Place Order (Cash on Delivery)</span>
-                            <div id="loadingSpinner" class="hidden ml-2">
-                                <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                            </div>
-                        </button>
-                    </div>
+                    <!-- Submit -->
+                    <button type="submit" id="submitBtn"
+                        class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center justify-center">
+                        <span id="submitText">Place Order (Cash on Delivery)</span>
+                        <div id="loadingSpinner" class="hidden ml-2">
+                            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        </div>
+                    </button>
                 </form>
             </div>
 
-            <!-- Order Summary -->
+            <!-- Order Summary (on same page) -->
             <div class="w-full lg:w-5/12">
-                <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 sticky top-4">
-                    <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Order Summary</h3>
+                <div class="order-summary sticky top-4">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Order Summary</h3>
 
-                    <!-- Cart Items -->
-                    <div class="space-y-3 sm:space-y-4 mb-4 sm:mb-6" id="cart-items-container">
-                        @php $subtotal = 0; @endphp
-                        @foreach($cart as $key => $item)
-                            @php
-                                $product = \App\Models\Product::with(['translations', 'thumbnail'])->find($item['product_id']);
-                                $variant = \App\Models\ProductVariant::with('images')->find($item['variant_id'] ?? null);
-                                
-                                $itemSubtotal = $item['price'] * $item['quantity'];
-                                $subtotal += $itemSubtotal;
-                            @endphp
-                            <div class="flex items-center justify-between py-2 sm:py-3 border-b border-gray-200" data-cart-key="{{ $key }}">
-                                <div class="flex items-center space-x-2 sm:space-x-3">
-                                    <img src="{{ $variant && $variant->images && $variant->images->first() ? Storage::url($variant->images->first()->image_url) : ($product && $product->thumbnail ? Storage::url($product->thumbnail->image_url) : 'https://via.placeholder.com/60x60') }}" 
-                                         alt="Product" 
-                                         class="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg">
-                                    <div>
-                                        <h4 class="font-medium text-gray-900 text-sm sm:text-base">{{ $product->translation->name ?? 'Product' }}</h4>
-                                        <p class="text-gray-600 text-xs sm:text-sm">{{ $currency->symbol }}{{ number_format($item['price'], 2) }} × {{ $item['quantity'] }}</p>
-                                        <p class="text-gray-900 text-sm font-medium">Subtotal: {{ $currency->symbol }}{{ number_format($itemSubtotal, 2) }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <!-- Order Totals -->
-                    <div class="space-y-2 sm:space-y-3">
-                        <div class="flex justify-between items-center py-2">
-                            <span class="text-gray-600 text-sm sm:text-base">Subtotal</span>
-                            <span class="font-medium text-gray-900 text-sm sm:text-base" id="cart-subtotal">
-                                {{ $currency->symbol }}{{ number_format($subtotal, 2) }}
-                            </span>
-                        </div>
-                        
+                    @php $subtotal = 0; @endphp
+                    @foreach($cart as $key => $item)
                         @php
-                            $coupon = session('cart_coupon');
-                            $discountAmount = 0;
-                            if ($coupon) {
-                                if ($coupon['type'] === 'percentage') {
-                                    $discountAmount = $subtotal * ($coupon['discount'] / 100);
-                                } else {
-                                    $discountAmount = $coupon['discount'];
-                                }
-                            }
-                            $total = max(0, $subtotal - $discountAmount);
+                            $product = \App\Models\Product::with(['translations','thumbnail'])->find($item['product_id']);
+                            $variant = \App\Models\ProductVariant::with('images')->find($item['variant_id'] ?? null);
+                            $itemSubtotal = $item['price'] * $item['quantity'];
+                            $subtotal += $itemSubtotal;
                         @endphp
-
-                        @if($coupon)
-                            <div class="flex justify-between items-center py-2">
-                                <div class="flex items-center">
-                                    <span class="text-gray-600 text-sm sm:text-base">Discount</span>
-                                    <span class="discount-badge ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">{{ $coupon['code'] }}</span>
+                        <div class="summary-item flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <img src="{{ $variant && $variant->images && $variant->images->first() ? Storage::url($variant->images->first()->image_url) : ($product && $product->thumbnail ? Storage::url($product->thumbnail->image_url) : 'https://via.placeholder.com/60x60') }}" 
+                                    class="w-14 h-14 rounded object-cover">
+                                <div>
+                                    <p class="font-medium text-gray-800 text-sm">{{ $product->translation->name ?? 'Product' }}</p>
+                                    <p class="text-gray-600 text-xs">{{ $currency->symbol }}{{ number_format($item['price'],2) }} × {{ $item['quantity'] }}</p>
                                 </div>
-                                <span class="text-green-600 font-medium text-sm sm:text-base">-{{ $currency->symbol }}{{ number_format($discountAmount, 2) }}</span>
                             </div>
-                        @endif
-
-                        <div class="flex justify-between items-center py-2">
-                            <span class="text-gray-600 text-sm sm:text-base">Shipping</span>
-                            <span class="text-gray-500 text-xs sm:text-sm">Calculated at checkout</span>
+                            <p class="font-semibold text-gray-900 text-sm">{{ $currency->symbol }}{{ number_format($itemSubtotal, 2) }}</p>
                         </div>
-                        
-                        <div class="flex justify-between items-center py-2 border-t border-gray-200 pt-3">
-                            <span class="text-base sm:text-lg font-bold text-gray-900">Total</span>
-                            <span class="text-base sm:text-lg font-bold text-gray-900" id="cart-total">
-                                {{ $currency->symbol }}{{ number_format($total, 2) }}
-                            </span>
+                    @endforeach
+
+                    @php
+                        $coupon = session('cart_coupon');
+                        $discountAmount = 0;
+                        if ($coupon) {
+                            $discountAmount = $coupon['type'] === 'percentage'
+                                ? $subtotal * ($coupon['discount'] / 100)
+                                : $coupon['discount'];
+                        }
+                        $total = max(0, $subtotal - $discountAmount);
+                    @endphp
+
+                    <div class="mt-4 text-sm">
+                        <div class="flex justify-between mb-2"><span class="text-gray-600">Subtotal</span> <span>{{ $currency->symbol }}{{ number_format($subtotal, 2) }}</span></div>
+                        @if($coupon)
+                        <div class="flex justify-between mb-2"><span class="text-green-600">Discount ({{ $coupon['code'] }})</span> <span>-{{ $currency->symbol }}{{ number_format($discountAmount, 2) }}</span></div>
+                        @endif
+                        <div class="flex justify-between mb-2"><span class="text-gray-600">Shipping</span> <span>Calculated at checkout</span></div>
+                        <hr class="my-2">
+                        <div class="flex justify-between font-bold text-gray-900 text-base">
+                            <span>Total</span>
+                            <span>{{ $currency->symbol }}{{ number_format($total, 2) }}</span>
                         </div>
                     </div>
 
-                    <!-- Coupon Section -->
-                    <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
-                        <h5 class="font-semibold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">Apply Coupon</h5>
-                        <form id="applyCouponForm" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <!-- Coupon Apply -->
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <form id="applyCouponForm" class="flex gap-2">
                             @csrf
-                            <input type="text" 
-                                   name="code" 
-                                   id="coupon_code" 
-                                   placeholder="Enter coupon code" 
-                                   class="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
-                            <button type="submit" 
-                                    class="px-4 py-2 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-900 transition-colors text-sm">
-                                Apply
-                            </button>
+                            <input type="text" name="code" id="coupon_code" placeholder="Enter coupon code"
+                                class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                            <button type="submit" class="bg-gray-800 text-white px-4 rounded-lg text-sm hover:bg-gray-900">Apply</button>
                         </form>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -309,146 +248,34 @@
 
 @section('js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script>
-    $(document).ready(function() {
-        // Toastr configuration
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "newestOnTop": true,
-            "progressBar": true,
-            "positionClass": "toast-top-right",
-            "preventDuplicates": true,
-            "onclick": null,
-            "showDuration": "300",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
-
-        // Payment method selection
-        $('.payment-method').click(function() {
-            $('.payment-method').removeClass('selected');
-            $(this).addClass('selected');
-            
-            $(this).find('input[type="radio"]').prop('checked', true);
-            
-            $('.payment-details').removeClass('active');
-            const method = $(this).data('method');
-            $(`#${method}-details`).addClass('active');
-            
-            updateSubmitButtonText(method);
-        });
-
-        function updateSubmitButtonText(method) {
-            const buttonText = $('#submitText');
-            switch(method) {
-                case 'cod':
-                    buttonText.text('Place Order (Cash on Delivery)');
-                    break;
-                default:
-                    buttonText.text('Place Order');
-            }
-        }
-
-        // Apply coupon
-        $('#applyCouponForm').submit(function(e) {
-            e.preventDefault();
-            const code = $('#coupon_code').val().trim();
-            
-            if (!code) {
-                toastr.error('Please enter a coupon code');
-                return;
-            }
-
-            $.ajax({
-                url: "{{ route('cart.applyCoupon') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    code: code
-                },
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success(response.message);
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000);
-                    } else {
-                        toastr.error(response.message);
-                    }
-                },
-                error: function() {
-                    toastr.error('Error applying coupon');
-                }
-            });
-        });
-
-        // Form validation
-        $('#checkoutForm').validate({
-            rules: {
-                first_name: { required: true, minlength: 2 },
-                last_name: { required: true, minlength: 2 },
-                address: { required: true },
-                email: { required: true, email: true },
-                phone: { required: true, digits: true },
-                payment_method: { required: true }
-            },
-            messages: {
-                first_name: {
-                    required: "Please enter your first name",
-                    minlength: "First name must be at least 2 characters long"
-                },
-                last_name: {
-                    required: "Please enter your last name",
-                    minlength: "Last name must be at least 2 characters long"
-                },
-                email: {
-                    required: "Please enter your email address",
-                    email: "Please enter a valid email address"
-                },
-                phone: {
-                    required: "Please enter your phone number",
-                    digits: "Please enter only digits"
-                },
-                payment_method: {
-                    required: "Please select a payment method"
-                }
-            },
-            errorElement: 'div',
-            errorClass: 'text-red-500 text-sm mt-1',
-            highlight: function(element) {
-                $(element).addClass('border-red-500').removeClass('border-gray-300');
-            },
-            unhighlight: function(element) {
-                $(element).removeClass('border-red-500').addClass('border-gray-300');
-            },
-            submitHandler: function(form) {
-                $('#submitBtn').prop('disabled', true);
-                $('#loadingSpinner').removeClass('hidden');
-                form.submit();
-            }
-        });
-
-        // Show server-side validation errors
-        @if($errors->any())
-            @foreach($errors->all() as $error)
-                toastr.error('{{ $error }}', 'Validation Error');
-            @endforeach
-        @endif
-
-        @if(session('success'))
-            toastr.success('{{ session('success') }}', 'Success');
-        @endif
-
-        @if(session('error'))
-            toastr.error('{{ session('error') }}', 'Error');
-        @endif
+$(document).ready(function(){
+    // Payment selection
+    $('.payment-method').click(function(){
+        $('.payment-method').removeClass('selected');
+        $(this).addClass('selected');
+        $(this).find('input[type="radio"]').prop('checked', true);
+        $('.payment-details').removeClass('active');
+        const method = $(this).data('method');
+        $(`#${method}-details`).addClass('active');
+        updateButtonText(method);
     });
+
+    function updateButtonText(method) {
+        const map = { cod: 'Place Order (Cash on Delivery)', upi: 'Pay Now (UPI)', card: 'Pay Securely (Card)' };
+        $('#submitText').text(map[method] || 'Place Order');
+    }
+
+    // Apply coupon
+    $('#applyCouponForm').on('submit', function(e){
+        e.preventDefault();
+        const code = $('#coupon_code').val().trim();
+        if (!code) return toastr.error('Enter coupon code');
+        $.post("{{ route('cart.applyCoupon') }}", { _token: "{{ csrf_token() }}", code }, function(res){
+            if (res.success) { toastr.success(res.message); setTimeout(()=>location.reload(), 800); }
+            else toastr.error(res.message);
+        }).fail(()=>toastr.error('Error applying coupon'));
+    });
+});
 </script>
 @endsection
