@@ -395,7 +395,7 @@
                             
                             <!-- Product Image -->
                             <div class="relative">
-                                <img src="{{ $product['image'] ?? asset('public/images/no-image.png') }}"
+                                <img src="{{ asset('/public/storage/'.$product['image']) ?? asset('public/images/no-image.png') }}"
                                      alt="{{ $product['name'] }}"
                                      class="w-full h-36 object-cover rounded-t-lg {{ !$isAvailable ? 'filter blur-[1px]' : '' }}">
 
@@ -459,7 +459,7 @@
                                 @if($isFoodMenu && !$isAvailable)
                                     <div class="mt-2 text-[10px] text-gray-500 border-t pt-1">
                                         @if($product['available_from_date'] && $product['available_to_date'])
-                                            <div>Available: {{ \Carbon\Carbon::parse($product['available_from_date'])->format('M d') }} - {{ \Carbon\Carbon::parse($product['available_to_date'])->format('M d') }}</div>
+                                            <div>Order Available: {{ \Carbon\Carbon::parse($product['available_from_date'])->format('M d') }} - {{ \Carbon\Carbon::parse($product['available_to_date'])->format('M d') }}</div>
                                         @endif
                                         @if($product['available_from_time'] && $product['available_to_time'])
                                             <div>Time: {{ \Carbon\Carbon::parse($product['available_from_time'])->format('g:i A') }} - {{ \Carbon\Carbon::parse($product['available_to_time'])->format('g:i A') }}</div>
