@@ -93,62 +93,7 @@
                 <!-- Description -->
                 <p class="text-gray-600 mb-6 leading-relaxed">{{ $product->translation->short_description }}</p>
 
-                <!-- Product Attributes -->
-                <div id="product-attributes" class="product-options space-y-6">
-                    @php
-                        $groupedAttributes = $product->attributeValues->groupBy(fn($item) => $item->attribute->id);
-                    @endphp
-
-                    @foreach ($groupedAttributes as $attributeId => $values)
-                        <div class="attribute-options">
-                            <h3 class="font-semibold text-gray-900 mb-3">{{ $values->first()->attribute->name }}</h3>
-                            <div class="{{ strtolower($values->first()->attribute->name) }}-wrapper flex flex-wrap gap-3">
-                                @foreach ($values as $index => $value)
-                                    @php
-                                        $inputId = strtolower($values->first()->attribute->name) . '-' . $index;
-                                        $isColor = strtolower($values->first()->attribute->name) === 'color';
-                                        $isSize = strtolower($values->first()->attribute->name) === 'size';
-                                    @endphp
-                                    
-                                    <div class="relative">
-                                        <input 
-                                            type="radio" 
-                                            name="attribute_{{ $attributeId }}" 
-                                            id="{{ $inputId }}"
-                                            value="{{ $value->id }}"
-                                            {{ $index === 0 ? 'checked' : '' }}
-                                            class="absolute opacity-0 -z-10"
-                                            data-attribute-id="{{ $attributeId }}"
-                                        >
-                                        <label 
-                                            for="{{ $inputId }}" 
-                                            class="cursor-pointer transition-all duration-200 ease-in-out
-                                                @if($isColor)
-                                                    color-circle w-10 h-10 rounded-full border-2 border-gray-300 hover:border-gray-400 flex items-center justify-center
-                                                    {{ strtolower($value->translated_value) }}
-                                                @elseif($isSize)
-                                                    size-box px-4 py-3 border border-gray-300 rounded-md hover:border-gray-400 hover:bg-gray-50
-                                                    text-sm font-medium min-w-12 text-center
-                                                @else
-                                                    px-4 py-3 border border-gray-300 rounded-md hover:border-gray-400 hover:bg-gray-50
-                                                    text-sm font-medium min-w-12 text-center
-                                                @endif
-                                                peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200"
-                                        >
-                                            @if($isSize)
-                                                {{ $value->translated_value }}
-                                            @elseif($isColor)
-                                                <!-- Color circle content -->
-                                            @else
-                                                {{ $value->translated_value }}
-                                            @endif
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
+              
 
                 <!-- Quantity Selector and Cart Button -->
                 <div class="cart-actions mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
