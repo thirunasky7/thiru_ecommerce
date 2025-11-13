@@ -10,8 +10,7 @@
         <p><strong>Payment Type:</strong> {{ ucfirst($order->payment_method) }}</p>
         <p><strong>Status:</strong> {{ ucfirst($order->status) }}</p>
         <p><strong>Total:</strong> ₹{{ number_format($order->total_amount, 2) }}</p>
-        <p><strong>Customer Name:</strong> {{$order->customer->name ?? 'N/A'  }}</p>
-        <p><strong>Address:</strong> {{$order->customer->address ?? 'N/A'  }}</p>
+
         <h6 class="mt-4">Order Items:</h6>
         <ul>
             @foreach ($order->items as $item)

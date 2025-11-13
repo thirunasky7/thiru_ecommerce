@@ -64,12 +64,11 @@ class StoreController extends Controller
 
  public function allProducts(Request $request)
 {
-    $query = Product::with(['translation', 'thumbnail', 'primaryVariant', 'reviews', 'category'])
-        ->where('status', 1);
+    $query = Product::with(['translation', 'thumbnail', 'primaryVariant', 'reviews', 'category']);
 
     // Handle single category filter from query string (legacy support)
     if ($request->has('category')) {
-        $category = Category::where('slug', $request->category)->first();
+        $category = Category::where('status',1)->where('slug', $request->category)->first();
         if ($category) {
             $query->where('category_id', $category->id);
         }
@@ -78,7 +77,7 @@ class StoreController extends Controller
     // Handle multiple category filters by slugs
     if ($request->has('categories')) {
         $categorySlugs = explode(',', $request->categories);
-        $categoryIds = Category::whereIn('slug', $categorySlugs)->pluck('id')->toArray();
+        $categoryIds = Category::where('status',1)->whereIn('slug', $categorySlugs)->pluck('id')->toArray();
         
         if (!empty($categoryIds)) {
             $query->whereIn('category_id', $categoryIds);
@@ -114,7 +113,7 @@ class StoreController extends Controller
     }
 
     $send_data['categories'] = Category::where('status', 1)->with('translation')->get();
-    $send_data['products'] = $query->get();
+    $send_data['products'] = $query->where('status', 1)->get();
     
     // Pass current filter values to view
     $send_data['currentFilters'] = [

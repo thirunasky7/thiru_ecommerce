@@ -104,6 +104,8 @@ class ProductController extends Controller
             'available_to_date' => 'required|date|after_or_equal:available_from_date',
             'available_from_time' => 'required|date_format:H:i',
             'available_to_time' => 'required|date_format:H:i',
+            'delivery_to_date' => 'required',
+            'delivery_to_time' => 'required'
         ]);
     }
 
@@ -159,11 +161,13 @@ class ProductController extends Controller
 
             // Add food menu fields if applicable
             if ($request->is_food_menu === 'yes') {
+                $available_from_datetime = $request->available_from_date . ' ' . $request->available_from_time;
+                $available_to_datetime = $request->available_to_date . ' ' . $request->available_to_time;
+                $delivery_to_datetime = $request->delivery_to_date . ' ' . $request->delivery_to_time;
                 $productData = array_merge($productData, [
-                    'available_from_date' => $request->available_from_date,
-                    'available_to_date' => $request->available_to_date,
-                    'available_from_time' => $request->available_from_time,
-                    'available_to_time' => $request->available_to_time,
+                    'booking_from_datetime' => $available_from_datetime,
+                    'booking_to_datetime' => $available_to_datetime,
+                    'delivery_to_datetime' => $delivery_to_datetime,
                     'is_food_menu' => $request->is_food_menu,
                 ]);
             }
@@ -379,6 +383,8 @@ class ProductController extends Controller
             'available_to_date' => 'required|date|after_or_equal:available_from_date',
             'available_from_time' => 'required|date_format:H:i',
             'available_to_time' => 'required|date_format:H:i',
+            'delivery_to_date' => 'required',
+            'delivery_to_time' => 'required'
         ]);
     }
 
@@ -432,11 +438,14 @@ class ProductController extends Controller
 
             // Add or clear food menu fields based on selection
             if ($request->is_food_menu === 'yes') {
+                $available_from_datetime = $request->available_from_date . ' ' . $request->available_from_time;
+                $available_to_datetime = $request->available_to_date . ' ' . $request->available_to_time;
+                $delivery_to_datetime = $request->delivery_to_date . ' ' . $request->delivery_to_time;
                 $productData = array_merge($productData, [
-                    'available_from_date' => $request->available_from_date,
-                    'available_to_date' => $request->available_to_date,
-                    'available_from_time' => $request->available_from_time,
-                    'available_to_time' => $request->available_to_time,
+                    'booking_from_datetime' => $available_from_datetime,
+                    'booking_to_datetime' => $available_to_datetime,
+                    'delivery_to_datetime' => $delivery_to_datetime,
+                    'is_food_menu' => $request->is_food_menu,
                 ]);
             } else {
                 $productData = array_merge($productData, [

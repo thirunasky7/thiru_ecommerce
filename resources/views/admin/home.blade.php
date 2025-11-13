@@ -251,7 +251,7 @@
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="stat-card sales">
-                <div class="stat-number">${{ number_format($totalSales, 2) }}</div>
+                <div class="stat-number">₹{{ number_format($totalSales, 2) }}</div>
                 <div class="stat-label">Total Sales</div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i> {{ $salesGrowth }}% from last month
@@ -278,7 +278,7 @@
         </div>
         <div class="col-md-3">
             <div class="stat-card revenue">
-                <div class="stat-number">${{ number_format($averageOrderValue, 2) }}</div>
+                <div class="stat-number">₹{{ number_format($averageOrderValue, 2) }}</div>
                 <div class="stat-label">Average Order Value</div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i> 5.2% from last month
@@ -323,6 +323,7 @@
                         <thead>
                             <tr>
                                 <th>Order ID</th>
+                                <th>Customer ID</th>
                                 <th>Customer</th>
                                 <th>Date</th>
                                 <th>Amount</th>
@@ -334,6 +335,7 @@
                             @foreach($recentOrders as $order)
                             <tr>
                                 <td>#{{ $order->id }}</td>
+                                <td> {{ $order->customer->unique_id }}</td>
                                 <td>
                                     @if($order->customer_id)
                                         {{ $order->customer->name ?? 'N/A' }}
@@ -342,7 +344,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $order->created_at->format('M d, Y') }}</td>
-                                <td>${{ number_format($order->total_amount, 2) }}</td>
+                                <td>₹{{ number_format($order->total_amount, 2) }}</td>
                                 <td>
                                     <span class="order-status status-{{ $order->status }}">
                                         {{ ucfirst($order->status) }}
@@ -375,7 +377,7 @@
                         </div>
                         <div class="ms-3 flex-grow-1">
                             <h6 class="mb-1">{{ $product->name }}</h6>
-                            <small class="text-muted">{{ $product->total_sold }} sold • ${{ number_format($product->total_revenue, 2) }}</small>
+                            <small class="text-muted">{{ $product->total_sold }} sold • ₹{{ number_format($product->total_revenue, 2) }}</small>
                         </div>
                     </div>
                     @endforeach

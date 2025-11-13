@@ -236,10 +236,11 @@ return [
         'is_food_menu' => 'Is Food Menu Item?',
         'yes' => 'Yes',
         'no' => 'No',
-        'available_from_date' => 'Available From Date',
-        'available_to_date' => 'Available To Date',
-        'available_from_time' => 'Available Order Time From ',
-        'available_to_time' => 'Available Order To Time',
+        'available_from_date' => 'Pre Order From Date',
+        'available_to_date' => 'Pre Order To Date',
+        'available_from_time' => 'Order Time From ',
+        'available_to_time' => 'Order To Time',
+        'deliver_at' => 'Deliver At',
         'is_coming_soon' => 'Is this Future Product?'
     ],
 

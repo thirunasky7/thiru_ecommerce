@@ -32,6 +32,7 @@ class HomeService
 
         return [
             'category_name' => optional($category->translation)->name ?? $category->name ?? 'Unnamed Category',
+            'slug' => $category->slug,
             'products' => $category->products->map(function ($product) {
                 
                 // Handle image

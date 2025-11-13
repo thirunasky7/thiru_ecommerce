@@ -20,6 +20,7 @@ use App\Http\Controllers\Store\PaymentController;
 use App\Http\Controllers\OrderHistoryController;
 
 
+
 Route::get('/', [StoreController::class, 'index'])->name('xylo.home');
 Route::get('/home', [StoreController::class, 'index']);
 Route::get('/services', function(){

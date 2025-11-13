@@ -230,14 +230,16 @@ return [
         'dimensions' => 'Dimensions',
         'language_code' => 'Language Code',
          'select_category' =>'Select Category',
+        'choose_new_files' => 'Choose File',
+        'existing_images' => 'Existing File',
         'food_menu_settings' => 'Food Menu Settings',
         'is_food_menu' => 'Is Food Menu Item?',
         'yes' => 'Yes',
         'no' => 'No',
         'available_from_date' => 'Available From Date',
         'available_to_date' => 'Available To Date',
-        'available_from_time' => 'Available From Time',
-        'available_to_time' => 'Available To Time',
+        'available_from_time' => 'Available Order Time From ',
+        'available_to_time' => 'Available Order To Time',
         'is_coming_soon' => 'Is this Future Product?'
     ],
 

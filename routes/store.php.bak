@@ -17,6 +17,7 @@ use App\Http\Controllers\Store\WishlistController;
 
 use App\Http\Controllers\Store\CheckoutController;
 use App\Http\Controllers\Store\PaymentController;
+use App\Http\Controllers\OrderHistoryController;
 
 
 Route::get('/', [StoreController::class, 'index'])->name('xylo.home');
@@ -34,6 +35,9 @@ Route::get('/contact-us', function(){
 
 Route::get('/categories', [StoreController::class, 'allcategories'])->name('categories.index');
 Route::get('/products', [StoreController::class, 'allproducts'])->name('products.index');
+Route::get('/category/products/{slug}', function ($slug) {
+    return redirect()->route('products.index', ['category' => $slug]);
+});
 
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
 Route::post('/change-currency', [CurrencyController::class, 'changeCurrency'])->name('change.currency');
@@ -63,6 +67,11 @@ Route::post('/payment/status', [PaymentController::class, 'checkPaymentStatus'])
 Route::get('/order/success', [PaymentController::class, 'success'])->name('order.success');
 Route::post('/validate-customer', [ProductController::class, 'validateCustomer'])->name('validate-customer');
 Route::post('/submit-review', [ProductController::class, 'submitReview'])->name('submit-review');
+
+// routes/web.php
+Route::get('/track-orders', [OrderHistoryController::class, 'showForm'])->name('orders.form');
+Route::post('/track-orders', [OrderHistoryController::class, 'fetchOrders'])->name('orders.fetch');
+
 
 Route::prefix('customer')->name('customer.')->group(function () {
     

@@ -18,6 +18,7 @@ class Customer extends Authenticatable
         'password',
         'phone',
         'address',
+        'unique_id',
         'status',
     ];
 

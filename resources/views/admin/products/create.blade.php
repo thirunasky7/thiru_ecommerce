@@ -108,35 +108,63 @@
     <!-- Food Menu Fields (Hidden by default) -->
     <div id="food-menu-fields" style="display: none;">
         <div class="row mt-3">
-            <div class="col-md-6">
-                <label class="form-label">{{ __('cms.products.available_from_date') }} *</label>
-                <input type="date" name="available_from_date" class="form-control" 
-                       value="{{ old('available_from_date') }}">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">{{ __('cms.products.available_to_date') }} *</label>
-                <input type="date" name="available_to_date" class="form-control" 
-                       value="{{ old('available_to_date') }}">
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <label class="form-label">{{ __('cms.products.available_from_time') }} *</label>
-                <!-- <input type="date" name="available_from_date" class="form-control" value="{{ old('available_from_date') }}"> -->
-                <select name="available_from_time" id="available_from_time" class="form-control"  min="05:30"
-            max="22:00"
-            step="900">
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">{{ __('cms.products.available_to_time') }} *</label>
-                <!-- <input type="date" name="available_to_date" class="form-control" value="{{ old('available_to_date') }}"> -->
-                <select name="available_to_time"  min="05:30"
-            max="22:00"
-            step="900" step="900" id="available_to_time" class="form-control">
+    <div class="col-md-6">
+    <label class="form-label">Available From *</label>
+    <input type="date" name="available_from_date" class="form-control mb-2"
+           value="{{ old('available_from_date') }}">
+    
+    <select name="available_from_time" class="form-control">
+        @for($h = 0; $h < 24; $h++)
+            @foreach(['00', '30'] as $m)
+                @php
+                    $timeValue = sprintf('%02d:%s', $h, $m);
+                @endphp
+                <option value="{{ $timeValue }}">{{ $timeValue }}</option>
+            @endforeach
+        @endfor
+    </select>
+</div>
+
+    <div class="col-md-6">
+         <label class="form-label">Available To *</label>
+            <input type="date" name="available_to_date" class="form-control mb-2"
+                value="{{ old('available_to_date') }}">
+            
+            <select name="available_to_time" class="form-control">
+                @for($h = 0; $h < 24; $h++)
+                    @foreach(['00', '30'] as $m)
+                        @php
+                            $timeValue = sprintf('%02d:%s', $h, $m);
+                        @endphp
+                        <option value="{{ $timeValue }}">{{ $timeValue }}</option>
+                    @endforeach
+                @endfor
             </select>
             </div>
-        </div>
+</div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label class="form-label">{{ __('cms.products.deliver_at') }} *</label>
+                <input 
+                    type="date" 
+                    name="delivery_to_date" 
+                    class="form-control" 
+                    value="{{ old('delivery_to_date') }}"
+                >
+                <select name="delivery_to_time" class="form-control">
+                @for($h = 0; $h < 24; $h++)
+                    @foreach(['00', '30'] as $m)
+                        @php
+                            $timeValue = sprintf('%02d:%s', $h, $m);
+                        @endphp
+                        <option value="{{ $timeValue }}">{{ $timeValue }}</option>
+                    @endforeach
+                @endfor
+            </select>
+
+    </div>
+</div>
+
     </div>
 </div>
 
@@ -310,7 +338,9 @@
 @endsection
 
 @section('js')
+
 <script>
+    
     let variantIndex = 0;
 
     // Product type toggle

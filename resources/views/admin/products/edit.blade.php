@@ -123,31 +123,94 @@
 
     <!-- Food Menu Fields (Conditional) -->
     <div id="food-menu-fields" style="display: {{ old('is_food_menu', $product->is_food_menu) === 'yes' ? 'block' : 'none' }};">
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <label class="form-label">{{ __('cms.products.available_from_date') }} *</label>
-                <input type="date" name="available_from_date" class="form-control" 
-                       value="{{ old('available_from_date', $product->available_from_date ? \Carbon\Carbon::parse($product->available_from_date)->format('Y-m-d') : '') }}">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">{{ __('cms.products.available_to_date') }} *</label>
-                <input type="date" name="available_to_date" class="form-control" 
-                       value="{{ old('available_to_date', $product->available_to_date ? \Carbon\Carbon::parse($product->available_to_date)->format('Y-m-d') : '') }}">
-            </div>
-        </div>
-       <div class="row mt-3">
-        <div class="col-md-6">
-            <label class="form-label">{{ __('cms.products.available_from_time') }} *</label>
-            <select name="available_from_time" id="available_from_time" class="form-control">
-            </select>
-        </div>
+       <div class="col-md-6">
+    <label class="form-label">Available From *</label>
 
-        <div class="col-md-6">
-            <label class="form-label">{{ __('cms.products.available_to_time') }} *</label>
-            <select name="available_to_time" id="available_to_time" class="form-control">
-            </select>
-        </div>
+    {{-- Date Field --}}
+    <input 
+        type="date" 
+        name="available_from_date" 
+        class="form-control mb-2"
+        value="{{ old('available_from_date', isset($product->booking_from_datetime) ? \Carbon\Carbon::parse($product->booking_from_datetime)->format('Y-m-d') : '') }}"
+    >
+
+    {{-- Time Dropdown (30-minute interval) --}}
+    <select name="available_from_time" class="form-control">
+        @for($h = 0; $h < 24; $h++)
+            @foreach(['00', '30'] as $m)
+                @php
+                    $timeValue = sprintf('%02d:%s', $h, $m);
+                    $selectedTime = isset($product->booking_from_datetime) 
+                        ? \Carbon\Carbon::parse($product->booking_from_datetime)->format('H:i') 
+                        : '';
+                @endphp
+                <option value="{{ $timeValue }}" {{ old('available_from_time', $selectedTime) == $timeValue ? 'selected' : '' }}>
+                    {{ $timeValue }}
+                </option>
+            @endforeach
+        @endfor
+    </select>
+</div>
+
+<div class="col-md-6">
+    <label class="form-label">Available To *</label>
+
+    {{-- Date Field --}}
+    <input 
+        type="date" 
+        name="available_to_date" 
+        class="form-control mb-2"
+        value="{{ old('available_to_date', isset($product->booking_to_datetime) ? \Carbon\Carbon::parse($product->booking_to_datetime)->format('Y-m-d') : '') }}"
+    >
+
+    {{-- Time Dropdown (30-minute interval) --}}
+    <select name="available_to_time" class="form-control">
+        @for($h = 0; $h < 24; $h++)
+            @foreach(['00', '30'] as $m)
+                @php
+                    $timeValue = sprintf('%02d:%s', $h, $m);
+                    $selectedTime = isset($product->booking_to_datetime) 
+                        ? \Carbon\Carbon::parse($product->booking_to_datetime)->format('H:i') 
+                        : '';
+                @endphp
+                <option value="{{ $timeValue }}" {{ old('available_to_time', $selectedTime) == $timeValue ? 'selected' : '' }}>
+                    {{ $timeValue }}
+                </option>
+            @endforeach
+        @endfor
+    </select>
+</div>
+
     </div>
+<div class="col-md-6">
+    <label class="form-label">{{ __('cms.products.deliver_at') }} *</label>
+
+    {{-- 📅 Date Input --}}
+    <input 
+        type="date" 
+        name="delivery_to_date" 
+        class="form-control mb-2"
+        value="{{ old('delivery_to_date', isset($product) && $product->delivery_to_datetime ? \Carbon\Carbon::parse($product->delivery_to_datetime)->format('Y-m-d') : '') }}"
+    >
+
+    {{-- ⏰ Time Dropdown (30-min interval) --}}
+    <select name="delivery_to_time" class="form-control">
+        @for($h = 0; $h < 24; $h++)
+            @foreach(['00', '30'] as $m)
+                @php
+                    $timeValue = sprintf('%02d:%s', $h, $m);
+                    $selectedTime = old('delivery_to_time', isset($product) && $product->delivery_to_datetime ? \Carbon\Carbon::parse($product->delivery_to_datetime)->format('H:i') : '');
+                @endphp
+                <option value="{{ $timeValue }}" {{ $timeValue === $selectedTime ? 'selected' : '' }}>
+                    {{ $timeValue }}
+                </option>
+            @endforeach
+        @endfor
+    </select>
+</div>
+
+</div>
+
     </div>
 </div>
 

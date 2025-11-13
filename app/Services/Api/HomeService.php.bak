@@ -14,7 +14,7 @@ class HomeService
    public function categoryProducts()
 {
     // ✅ Load only categories that have at least one product
-    $categories = Category::whereHas('products')
+    $categories = Category::where('status', 1)->whereHas('products')
         ->with([
             'translation',
             'products.translation',

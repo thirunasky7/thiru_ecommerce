@@ -30,7 +30,7 @@ class HomeController extends Controller
     public function index()
     {
       // Total Sales
-    $totalSales = Order::where('status', 'completed')->sum('total_amount');
+    $totalSales = Order::where('status', 'delivered')->sum('total_amount');
     
     // Total Orders
     $totalOrders = Order::count();
@@ -69,7 +69,7 @@ class HomeController extends Controller
     
     // Recent Orders with safe customer relationship
     $recentOrders = Order::with(['customer' => function($query) {
-        $query->select('id', 'name', 'email');
+        $query->select('id', 'name', 'email','unique_id');
     }])->latest()->take(10)->get();
     
     // Top Selling Products - Handle translation properly
