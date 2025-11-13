@@ -9,38 +9,8 @@
                 $averageRating = round($product->reviews_avg_rating ?? 4.5, 1);
                 $reviewCount = $product->reviews_count ?? 0;
                 
-                // Check food menu availability
-                $isFoodMenu = $product->is_food_menu === 'yes';
-                $isAvailable = true;
-                $availabilityMessage = '';
-                
-                if ($isFoodMenu) {
-                    $currentDate = now()->format('Y-m-d');
-                    $currentTime = now()->format('H:i:s');
-                    
-                    $availableFromDate = $product->available_from_date;
-                    $availableToDate = $product->available_to_date;
-                    $availableFromTime = $product->available_from_time;
-                    $availableToTime = $product->available_to_time;
-                    
-                    // Check date availability
-                    $isDateAvailable = true;
-                    if ($availableFromDate && $availableToDate) {
-                        $isDateAvailable = $currentDate >= $availableFromDate && $currentDate <= $availableToDate;
-                    }
-                    
-                    // Check time availability
-                    $isTimeAvailable = true;
-                    if ($availableFromTime && $availableToTime) {
-                        $isTimeAvailable = $currentTime >= $availableFromTime && $currentTime <= $availableToTime;
-                    }
-                    
-                    $isAvailable = $isDateAvailable && $isTimeAvailable;
-                    
-                    if (!$isAvailable) {
-                        $availabilityMessage = "Not available for now";
-                    }
-                }
+                 $isAvailable = is_food_menu_available($product);
+        $availabilityMessage = get_food_menu_availability_message($product);
             @endphp
 
             <div class="px-2 mt-2 product-card-container">

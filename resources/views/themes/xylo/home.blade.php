@@ -112,37 +112,12 @@
                 $reviewCount = $product->reviews_count ?? 0;
                 
                 // Check food menu availability
-                $isFoodMenu = $product->is_food_menu === 'yes';
-                $isAvailable = true;
-                $availabilityMessage = '';
-                
-                if ($isFoodMenu) {
-                    $currentDate = now()->format('Y-m-d');
-                    $currentTime = now()->format('H:i:s');
-                    
-                    $availableFromDate = $product->available_from_date;
-                    $availableToDate = $product->available_to_date;
-                    $availableFromTime = $product->available_from_time;
-                    $availableToTime = $product->available_to_time;
-                    
-                    // Check date availability
-                    $isDateAvailable = true;
-                    if ($availableFromDate && $availableToDate) {
-                        $isDateAvailable = $currentDate >= $availableFromDate && $currentDate <= $availableToDate;
-                    }
-                    
-                    // Check time availability
-                    $isTimeAvailable = true;
-                    if ($availableFromTime && $availableToTime) {
-                        $isTimeAvailable = $currentTime >= $availableFromTime && $currentTime <= $availableToTime;
-                    }
-                    
-                    $isAvailable = $isDateAvailable && $isTimeAvailable;
-                    
-                    if (!$isAvailable) {
-                        $availabilityMessage = "Not available for now";
-                    }
-                }
+              $isFoodMenu = $product->is_food_menu === 'yes';
+            $isAvailable = true;
+            $availabilityMessage = '';
+                $isAvailable = is_food_menu_available($product);
+        $availabilityMessage = get_food_menu_availability_message($product);
+
             @endphp
 
             <div class="px-2 mt-2 product-card-container">
@@ -152,7 +127,7 @@
                             {{ $availabilityMessage }}
                         </div>
                     @endif
-                    
+                   
                     <!-- Product Image -->
                     <div class="relative overflow-hidden">
                         <img src="{{ $productImage ? asset('/public/storage/'.$productImage) : 'https://via.placeholder.com/300x300?text=' . urlencode($productName) }}"
@@ -238,36 +213,15 @@
             
             // Check food menu availability
             $isFoodMenu = $product->is_food_menu === 'yes';
-            $isAvailable = true;
-            $availabilityMessage = '';
-            
-            if ($isFoodMenu) {
-                $currentDate = now()->format('Y-m-d');
-                $currentTime = now()->format('H:i:s');
-                
-                $availableFromDate = $product->available_from_date;
-                $availableToDate = $product->available_to_date;
-                $availableFromTime = $product->available_from_time;
-                $availableToTime = $product->available_to_time;
-                
-                // Check date availability
-                $isDateAvailable = true;
-                if ($availableFromDate && $availableToDate) {
-                    $isDateAvailable = $currentDate >= $availableFromDate && $currentDate <= $availableToDate;
-                }
-                
-                // Check time availability
-                $isTimeAvailable = true;
-                if ($availableFromTime && $availableToTime) {
-                    $isTimeAvailable = $currentTime >= $availableFromTime && $currentTime <= $availableToTime;
-                }
-                
-                $isAvailable = $isDateAvailable && $isTimeAvailable;
-                
-                if (!$isAvailable) {
-                    $availabilityMessage = "Not available for now";
-                }
+           
+            $isAvailable = is_food_menu_available($product);
+        $availabilityMessage = get_food_menu_availability_message($product);
+            $isComingSoon = $product['is_coming_soon'] ?? false;
+            if ($isComingSoon) {
+                $isAvailable = false;
+                $availabilityMessage = "Coming Soon";
             }
+
         @endphp
 
         <div class="relative product-card-container">
@@ -378,8 +332,9 @@
                         $isFoodMenu = $product['is_food_menu'] ?? false;
                         $isAvailable = $product['is_available'] ?? true;
                         $availabilityMessage = $product['availability_message'] ?? '';
-                        
-                        // Additional check for coming soon products
+                        $aproduct = \App\Models\Product::find($product['id']);
+                        $isAvailable = is_food_menu_available($aproduct);
+        $availabilityMessage = get_food_menu_availability_message($aproduct);
                         $isComingSoon = $product['is_coming_soon'] ?? false;
                         if ($isComingSoon) {
                             $isAvailable = false;
