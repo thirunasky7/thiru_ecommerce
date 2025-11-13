@@ -12,8 +12,8 @@ class Product extends Model
 
     protected $fillable = [
         'category_id', 'seller_id', 'shop_id','price', 'stock', 'status', 'slug', 'currency', 'SKU',
-        'weight', 'dimensions', 'product_type',  'image_url', 'vendor_id','is_coming_soon','is_food_menu', 'available_from_date', 'available_to_date',
-    'available_from_time', 'available_to_time'
+        'weight', 'dimensions', 'product_type',  'image_url', 'vendor_id','is_coming_soon','is_food_menu', 'booking_from_datetime', 'booking_to_datetime',
+    'delivery_to_datetime'
     ]; 
 
     protected $casts = [
@@ -122,4 +122,6 @@ class Product extends Model
     {
         return $this->belongsToMany(Customer::class, 'wishlists');
     }
+
+    
 }
