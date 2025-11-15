@@ -15,6 +15,7 @@
       <a href="{{ url('/about-us')}}" class="hover:text-blue-600">About Us</a>
       <a href="{{ url('/services')}}" class="hover:text-blue-600">Services</a>
       <a href="{{ url('/contact-us')}}" class="hover:text-blue-600">Contact Us</a>
+      <a href="{{ url('/track-orders')}}" class="hover:text-blue-600">Track Order</a>
     </div>
     <div class="flex items-center space-x-4">
       <!-- <i data-feather="search" class="w-5 h-5 cursor-pointer"></i>
@@ -39,6 +40,7 @@
       <a href="{{ url('/about-us')}}" class="hover:text-blue-600">About Us</a>
       <a href="{{ url('/services')}}" class="hover:text-blue-600">Services</a>
       <a href="{{ url('/contact-us')}}" class="hover:text-blue-600">Contact Us</a>
+      <a href="{{ url('/track-orders')}}" class="hover:text-blue-600">Track Order</a>
     </nav>
   </div>
 </header>

@@ -29,7 +29,7 @@
                             <a href="#" class="text-dark me-3 position-relative">
                                 <i class="fas fa-heart fa-lg"></i>
                             </a>
-                            <a href="{{ route('cart.page') }}" class="text-dark me-3 position-relative">
+                            <a href="{{ route('cart.view') }}" class="text-dark me-3 position-relative">
                                 <i class="fas fa-shopping-cart fa-lg"></i>
                                 <span id="cart-count" class="cart-badge"> {{ session('cart') ? collect(session('cart'))->sum('quantity') : 0 }}</span>
                             </a>
