@@ -1,21 +1,27 @@
   <!-- ✅ MOBILE BOTTOM NAV -->
+
+@php
+    $currentRoute = Route::currentRouteName();
+    $currentPath = request()->path();
+@endphp
   <nav class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-inner flex justify-around items-center py-2 lg:hidden">
-    <a href="{{ url('/home')}}" class="flex flex-col items-center text-red-600">
-      <i data-feather="home" class="w-5 h-5"></i>
-      <span class="text-xs mt-1">Home</span>
+    <a href="{{ url('/home')}}" class="flex flex-col items-center {{ $currentPath === 'home' || $currentPath === '/' ? 'text-red-600' : 'text-gray-600 hover:text-red-600' }}">
+    <i data-feather="home" class="w-5 h-5"></i>
+    <span class="text-xs mt-1">Home</span>
     </a>
-    <a href="{{ url('/products')}}" class="flex flex-col items-center text-gray-600 hover:text-red-600">
-      <i data-feather="shopping-bag" class="w-5 h-5"></i>
-      <span class="text-xs mt-1">Products</span>
+    <a href="{{ url('/products')}}" class="flex flex-col items-center {{ str_starts_with($currentPath, 'products') ? 'text-red-600' : 'text-gray-600 hover:text-red-600' }}">
+        <i data-feather="shopping-bag" class="w-5 h-5"></i>
+        <span class="text-xs mt-1">Products</span>
     </a>
-    <a href="{{ url('/my-orders')}}" class="flex flex-col items-center text-gray-600 hover:text-red-600">
+
+    <!-- <a href="{{ url('/my-orders')}}" class="flex flex-col items-center text-gray-600 hover:text-red-600">
       <i data-feather="package" class="w-5 h-5"></i>
       <span class="text-xs mt-1">Orders</span>
     </a>
     <a href="{{ url('/accounts')}}" class="flex flex-col items-center text-gray-600 hover:text-red-600">
       <i data-feather="user" class="w-5 h-5"></i>
       <span class="text-xs mt-1">Profile</span>
-    </a>
+    </a> -->
   </nav>
 <!-- FOOTER -->
 <footer class="bg-gray-800 text-white py-6 mt-10 hidden lg:block">

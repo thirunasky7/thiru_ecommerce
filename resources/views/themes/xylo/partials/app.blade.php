@@ -67,6 +67,7 @@
   @include('themes.xylo.partials.footer')
 
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
   <script>
     feather.replace();
@@ -90,6 +91,26 @@
         overlay.classList.add('hidden');
       });
     }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Update cart counts on page load
+    function initializeCartCount() {
+        const cartCount = {{ session('cart') ? collect(session('cart'))->sum('quantity') : 0 }};
+        updateCartCount(cartCount);
+        console.log('Cart count initialized:', cartCount);
+    }
+
+    // Global function to update cart count everywhere
+    function updateCartCount(count) {
+        document.querySelectorAll('#cart-count, #cart-count-desktop').forEach(element => {
+                element.textContent = cartCount;
+            });
+    }
+
+    initializeCartCount();
+});
+</script>
+
   </script>
 
 </body>
