@@ -32,6 +32,7 @@ class HomeService
 
         return [
             'category_name' => optional($category->translation)->name ?? $category->name ?? 'Unnamed Category',
+            'slug' => $category->slug,
             'products' => $category->products->map(function ($product) {
                 
                 // Handle image
@@ -151,7 +152,7 @@ class HomeService
                 return [
                     'id' => $banner->id,
                     'name' => $banner->translation->title ?? null,
-                    'image_url' => Storage::url($banner->translation->image_url) ?? null,
+                    'image_url' => 'storage/'.$banner->translation->image_url ?? null,
                 ];
             });
         

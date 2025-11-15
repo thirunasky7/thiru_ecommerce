@@ -1,160 +1,110 @@
 <?php
 
-namespace App\Http\Controllers\Store;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use App\Models\Product;
-use App\Services\Store\CartService;
-use App\Models\ProductVariant;
 
 class CartController extends Controller
 {
-    protected $cartService;
-
-    public function __construct(CartService $cartService)
-    {
-        $this->cartService = $cartService;
-    }
-
     public function addToCart(Request $request)
     {
-        $productId = $request->product_id;
-        $quantity = (int) ($request->quantity ?? 1);
-        $attributeValueIds = $request->attribute_value_ids ?? [];
-    
-        $product = Product::with('thumbnail')->findOrFail($productId);
-    
-        $variant = null;
-        if ($product->product_type == 'simple') {
-            $variant = $product->variants()->where('is_primary', 1)->first();
-        } else {
-            $variant = $this->matchVariant($productId, $attributeValueIds);
-        }
-    
-        if (!$variant) {
-            return response()->json([
-                'message' => 'Selected variant is not available.'
-            ], 422);
+        $id = $request->product_id;
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['status' => false, 'message' => 'Product not found']);
         }
 
-        $attributePairs = [];
-        foreach ($attributeValueIds as $attributeValueId) {
-            $attributeValue = \App\Models\AttributeValue::with('attribute')->find($attributeValueId);
-            if ($attributeValue && $attributeValue->attribute) {
-                $attributePairs[$attributeValue->attribute->id] = $attributeValue->id;
-            }
-        }
-    
-        $cart = Session::get('cart', []);
-    
-        $attributeValueIdsSorted = collect($attributeValueIds)->sort()->values()->implode('_');
-        $key = "cart_{$productId}_{$attributeValueIdsSorted}";
-    
-        if (isset($cart[$key])) {
-            $cart[$key]['quantity'] += $quantity;
+        $cart = session()->get('cart', []);
+
+        $productImage = $product->image_url ?? null;
+        $productName = $product->translation->name ?? $product->name;
+        $primaryVariant = $product->primaryVariant;
+
+        $originalPrice = $primaryVariant->converted_price ?? $product->price ?? 0;
+        $discountPrice = $primaryVariant->converted_discount_price ?? $product->discount_price ?? 0;
+
+        $displayPrice = $discountPrice && $originalPrice > $discountPrice
+                        ? $discountPrice
+                        : $originalPrice;
+
+        if(isset($cart[$id])) {
+            $cart[$id]['quantity'] += 1;
         } else {
-            $cart[$key] = [
-                'product_id' => $product->id,
-                'variant_id' => $variant->id,
-                'variant_name' => $variant->name ?? $product->translation->name,
-                'price' => $variant->converted_discount_price ?? $variant->converted_price,
-                'quantity' => $quantity,
-                'image' => optional($variant->images->first() ?? $product->thumbnail)->image_url,
-                'attributes' => $attributePairs
+            $cart[$id] = [
+                "id" => $id,
+                "name" => $productName,
+                "price" => $displayPrice,
+                "image" => $productImage,
+                "quantity" => 1,
             ];
         }
-    
-        Session::put('cart', $cart);
-        Session::put('cart_count', array_sum(array_column($cart, 'quantity')));
-    
+
+        session()->put('cart', $cart);
+
         return response()->json([
-            'message' => 'Product added to cart successfully.',
-            'cart' => $cart,
-            'cart_count' => Session::get('cart_count')
-        ]);
-    }
-    
-    private function matchVariant($productId, array $attributeValueIds)
-    {
-        
-        if (empty($attributeValueIds)) {
-            return ProductVariant::where('product_id', $productId)->where('is_primary', true)->first();
-        }
-        
-        $variants = ProductVariant::with('attributeValues')
-            ->where('product_id', $productId)
-            ->get();
-
-        foreach ($variants as $variant) {
-            $variantAttrIds = $variant->attributeValues->pluck('id')->sort()->values();
-            if ($variantAttrIds->toArray() === collect($attributeValueIds)->sort()->values()->toArray()) {
-                return $variant;
-            }
-        }
-
-        return null;
-    }
-    
-
-
-    public function updateCart(Request $request)
-    {
-        $cart = Session::get('cart', []);
-    
-        foreach ($request->cart as $item) {
-            if (isset($cart[$item['product_id']])) {
-                $cart[$item['product_id']]['quantity'] = max(1, intval($item['quantity']));
-            }
-        }
-    
-        Session::put('cart', $cart);
-        Session::put('cart_count', array_sum(array_column($cart, 'quantity')));
-    
-        return response()->json([
-            'success' => true,
-            'message' => 'Cart updated successfully!',
-            'cart' => $cart,
-            'cart_count' => Session::get('cart_count')
+            'status' => true,
+            'cart_count' => collect($cart)->sum('quantity'),
         ]);
     }
 
-    public function viewCart()
+
+    public function updateQuantity(Request $request)
     {
-        $cart = Session::get('cart', []);
+        $id = $request->product_id;
+        $type = $request->action; // increase / decrease
 
-        return view('themes.xylo.cart', compact('cart'));
-    }
+        $cart = session()->get('cart', []);
 
-    public function removeFromCart(Request $request)
-    {
-        $cart = Session::get('cart', []);
-
-        if (isset($cart[$request->product_id])) {
-            unset($cart[$request->product_id]);
-            Session::put('cart', $cart);
+        if (!isset($cart[$id])) {
+            return response()->json(['status' => false]);
         }
 
-        if (empty($cart)) {
-            session()->forget('cart_coupon');
+        if ($type === 'increase') {
+            $cart[$id]['quantity'] += 1;
+        } elseif ($type === 'decrease') {
+            if ($cart[$id]['quantity'] > 1) {
+                $cart[$id]['quantity'] -= 1;
+            }
         }
 
-        return response()->json(['message' => 'Product removed from cart.', 'cart' => $cart]);
+        session()->put('cart', $cart);
+
+        return response()->json([
+            'status' => true,
+            'quantity' => $cart[$id]['quantity'],
+            'cart_total' => $this->cartTotal($cart),
+            'cart_count' => collect($cart)->sum('quantity')
+        ]);
     }
 
-    public function applyCoupon(Request $request)
-    {
-        $request->validate(['code' => 'required|string']);
-        
-        $result = $this->cartService->applyCoupon($request->code);
 
-        return response()->json($result);
+    public function removeItem(Request $request)
+    {
+        $id = $request->product_id;
+
+        $cart = session()->get('cart', []);
+
+        if (isset($cart[$id])) {
+            unset($cart[$id]);
+            session()->put('cart', $cart);
+        }
+
+        return response()->json([
+            'status' => true,
+            'cart_total' => $this->cartTotal($cart),
+            'cart_count' => collect($cart)->sum('quantity')
+        ]);
     }
 
-    public function removeCoupon()
+
+    private function cartTotal($cart)
     {
-        $this->cartService->removeCoupon();
-        return response()->json(['success' => true, 'message' => 'Coupon removed successfully!']);
+        $total = 0;
+        foreach($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+        return $total;
     }
 }

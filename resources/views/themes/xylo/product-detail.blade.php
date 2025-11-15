@@ -20,7 +20,7 @@
 <meta property="og:image" content="{{ $imageUrl }}">
 <meta name="twitter:card" content="summary_large_image">
 
-{{-- ? Product Structured Data (JSON-LD for Google) --}}
+{{-- ✅ Product Structured Data (JSON-LD for Google) --}}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org/",

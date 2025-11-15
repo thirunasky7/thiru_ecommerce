@@ -1,487 +1,370 @@
 @extends('admin.layouts.admin')
 
-@section('css')
-<style>
-    body {
-        background-color: #f8f9fa;
-        color: #333333;
-    }
-    
-    .stat-card {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        border-left: 4px solid #66b3ff;
-        transition: transform 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-5px);
-    }
-    
-    .stat-card.sales {
-        border-left-color: #28a745;
-    }
-    
-    .stat-card.orders {
-        border-left-color: #007bff;
-    }
-    
-    .stat-card.customers {
-        border-left-color: #6f42c1;
-    }
-    
-    .stat-card.products {
-        border-left-color: #fd7e14;
-    }
-    
-    .stat-card.revenue {
-        border-left-color: #20c997;
-    }
-    
-    .stat-card.pending {
-        border-left-color: #ffc107;
-    }
-    
-    .stat-number {
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 5px;
-    }
-    
-    .stat-label {
-        font-size: 14px;
-        color: #6c757d;
-        font-weight: 500;
-    }
-    
-    .stat-change {
-        font-size: 12px;
-        font-weight: 500;
-    }
-    
-    .stat-change.positive {
-        color: #28a745;
-    }
-    
-    .stat-change.negative {
-        color: #dc3545;
-    }
-    
-    .chart-container {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        margin-bottom: 20px;
-    }
-    
-    .recent-orders {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    }
-    
-    .order-status {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
-    }
-    
-    .status-completed {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .status-pending {
-        background: #fff3cd;
-        color: #856404;
-    }
-    
-    .status-processing {
-        background: #cce7ff;
-        color: #004085;
-    }
-    
-    .status-cancelled {
-        background: #f8d7da;
-        color: #721c24;
-    }
-    
-    .table th {
-        border-top: none;
-        font-weight: 600;
-        color: #495057;
-        font-size: 13px;
-        text-transform: uppercase;
-    }
-    
-    .top-products {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    }
-    
-    .product-rank {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: #66b3ff;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 14px;
-    }
-    
-    .product-rank.rank-1 {
-        background: #ffd700;
-    }
-    
-    .product-rank.rank-2 {
-        background: #c0c0c0;
-    }
-    
-    .product-rank.rank-3 {
-        background: #cd7f32;
-    }
-    
-    .quick-stats {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    }
-    
-    .quick-stat-item {
-        text-align: center;
-        padding: 15px;
-    }
-    
-    .quick-stat-number {
-        font-size: 24px;
-        font-weight: 700;
-        color: #66b3ff;
-    }
-    
-    .quick-stat-label {
-        font-size: 12px;
-        color: #6c757d;
-        text-transform: uppercase;
-        font-weight: 500;
-    }
-    
-    .dashboard-section-title {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: #2d2d2d;
-        display: flex;
-        align-items: center;
-    }
-    
-    .dashboard-section-title i {
-        margin-right: 10px;
-        color: #66b3ff;
-    }
-</style>
-@endsection
+@section('title', 'Dashboard')
 
 @section('content')
-<div class="container-fluid mt-4">
-    
-    <!-- Quick Stats Row -->
-    <div class="row mb-4">
-        <div class="col-md-2">
-            <div class="quick-stats">
-                <div class="quick-stat-item">
-                    <div class="quick-stat-number">{{ $todayOrders }}</div>
-                    <div class="quick-stat-label">Today's Orders</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="quick-stats">
-                <div class="quick-stat-item">
-                    <div class="quick-stat-number">{{ $pendingOrders }}</div>
-                    <div class="quick-stat-label">Pending Orders</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="quick-stats">
-                <div class="quick-stat-item">
-                    <div class="quick-stat-number">{{ $lowStockProducts }}</div>
-                    <div class="quick-stat-label">Low Stock Items</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="quick-stats">
-                <div class="quick-stat-item">
-                    <div class="quick-stat-number">{{ $newCustomers }}</div>
-                    <div class="quick-stat-label">New Customers</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="quick-stats">
-                <div class="quick-stat-item">
-                    <div class="quick-stat-number">{{ $totalProducts }}</div>
-                    <div class="quick-stat-label">Total Products</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="quick-stats">
-                <div class="quick-stat-item">
-                    <div class="quick-stat-number">{{ $totalCategories }}</div>
-                    <div class="quick-stat-label">Categories</div>
-                </div>
-            </div>
+<div class="container-fluid px-4">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+        <div class="d-none d-sm-inline-block">
+            <span class="text-muted">Last updated: </span>
+            <span id="last-updated">{{ now()->format('g:i A') }}</span>
+            <button onclick="updateStats()" class="btn btn-sm btn-outline-primary ms-2">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
         </div>
     </div>
 
-    <!-- Main Stats Row -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="stat-card sales">
-                <div class="stat-number">₹{{ number_format($totalSales, 2) }}</div>
-                <div class="stat-label">Total Sales</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> {{ $salesGrowth }}% from last month
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card orders">
-                <div class="stat-number">{{ $totalOrders }}</div>
-                <div class="stat-label">Total Orders</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> {{ $orderGrowth }}% from last month
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card customers">
-                <div class="stat-number">{{ $totalCustomers }}</div>
-                <div class="stat-label">Total Customers</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> {{ $customerGrowth }}% from last month
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card revenue">
-                <div class="stat-number">₹{{ number_format($averageOrderValue, 2) }}</div>
-                <div class="stat-label">Average Order Value</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> 5.2% from last month
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts and Recent Data Row -->
+    <!-- Revenue Row -->
     <div class="row">
-        <!-- Sales Chart -->
-        <div class="col-md-8">
-            <div class="chart-container">
-                <div class="dashboard-section-title">
-                    <i class="fas fa-chart-line"></i> Sales Overview (Last 30 Days)
-                </div>
-                <canvas id="salesChart" height="250"></canvas>
-            </div>
-        </div>
-
-        <!-- Order Status Distribution -->
-        <div class="col-md-4">
-            <div class="chart-container">
-                <div class="dashboard-section-title">
-                    <i class="fas fa-chart-pie"></i> Order Status
-                </div>
-                <canvas id="orderStatusChart" height="250"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Orders and Top Products Row -->
-    <div class="row mt-4">
-        <!-- Recent Orders -->
-        <div class="col-md-8">
-            <div class="recent-orders">
-                <div class="dashboard-section-title">
-                    <i class="fas fa-shopping-cart"></i> Recent Orders
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer ID</th>
-                                <th>Customer</th>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($recentOrders as $order)
-                            <tr>
-                                <td>#{{ $order->id }}</td>
-                                <td> {{ $order->customer->unique_id }}</td>
-                                <td>
-                                    @if($order->customer_id)
-                                        {{ $order->customer->name ?? 'N/A' }}
-                                    @else
-                                        {{ $order->guest_email }}
-                                    @endif
-                                </td>
-                                <td>{{ $order->created_at->format('M d, Y') }}</td>
-                                <td>₹{{ number_format($order->total_amount, 2) }}</td>
-                                <td>
-                                    <span class="order-status status-{{ $order->status }}">
-                                        {{ ucfirst($order->status) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Top Selling Products -->
-        <div class="col-md-4">
-            <div class="top-products">
-                <div class="dashboard-section-title">
-                    <i class="fas fa-star"></i> Top Selling Products
-                </div>
-                <div class="list-group">
-                    @foreach($topProducts as $index => $product)
-                    <div class="list-group-item d-flex align-items-center">
-                        <div class="product-rank rank-{{ $index + 1 }}">
-                            {{ $index + 1 }}
+        <!-- Monthly Revenue -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Monthly Revenue
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                ${{ number_format($monthlyRevenue, 2) }}
+                            </div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-{{ $revenueGrowth >= 0 ? 'success' : 'danger' }}">
+                                    <i class="fas fa-{{ $revenueGrowth >= 0 ? 'arrow-up' : 'arrow-down' }}"></i>
+                                    {{ abs($revenueGrowth) }}%
+                                </span>
+                                vs last month
+                            </div>
                         </div>
-                        <div class="ms-3 flex-grow-1">
-                            <h6 class="mb-1">{{ $product->name }}</h6>
-                            <small class="text-muted">{{ $product->total_sold }} sold • ₹{{ number_format($product->total_revenue, 2) }}</small>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
                         </div>
                     </div>
-                    @endforeach
                 </div>
             </div>
-<!-- Inventory Alert -->
-<div class="top-products mt-4">
-    <div class="dashboard-section-title">
-        <i class="fas fa-exclamation-triangle"></i> Low Stock Alert
-    </div>
-    <div class="list-group">
-        @foreach($lowStockItems as $item)
-        <div class="list-group-item d-flex align-items-center">
-            <div class="me-3 text-warning">
-                <i class="fas fa-exclamation-circle"></i>
-            </div>
-            <div class="flex-grow-1">
-                <h6 class="mb-1">{{ $item->name }}</h6>
-                <small class="text-muted">
-                    Stock: {{ $item->stock }} • Min: {{ $item->min_stock }}
-                    @if(isset($item->SKU))
-                        • SKU: {{ $item->SKU }}
-                    @endif
-                </small>
+        </div>
+
+        <!-- Today's Revenue -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Today's Revenue
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="today-revenue">
+                                ${{ number_format($todayRevenue, 2) }}
+                            </div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                {{ now()->format('M j, Y') }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        @endforeach
+
+        <!-- Total Orders -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Orders
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-orders">
+                                {{ $totalOrders }}
+                            </div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-{{ $orderGrowth >= 0 ? 'success' : 'danger' }}">
+                                    <i class="fas fa-{{ $orderGrowth >= 0 ? 'arrow-up' : 'arrow-down' }}"></i>
+                                    {{ abs($orderGrowth) }}%
+                                </span>
+                                growth
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Orders -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Orders
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="pending-orders">
+                                {{ $pendingOrders }}
+                            </div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                Needs attention
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+
+    <div class="row">
+        <!-- Order Type Breakdown -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Order Types</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-warning">
+                                <i class="fas fa-calendar-check"></i> Pre-orders
+                            </span>
+                            <strong>{{ $preorderCount }}</strong>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar bg-warning" role="progressbar" 
+                                 style="width: {{ $totalOrders > 0 ? ($preorderCount/$totalOrders)*100 : 0 }}%">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-success">
+                                <i class="fas fa-bolt"></i> Regular Orders
+                            </span>
+                            <strong>{{ $regularOrderCount }}</strong>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ $totalOrders > 0 ? ($regularOrderCount/$totalOrders)*100 : 0 }}%">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Pre-orders Overview -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">Today's Pre-orders</h6>
+                </div>
+                <div class="card-body">
+                    @forelse($todaysPreorders as $mealType => $items)
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-capitalize {{ $mealType == 'breakfast' ? 'text-primary' : ($mealType == 'lunch' ? 'text-success' : 'text-info') }}">
+                                <i class="fas fa-{{ $mealType == 'breakfast' ? 'sun' : ($mealType == 'lunch' ? 'sun' : 'moon') }}"></i>
+                                {{ $mealType }}
+                            </span>
+                            <span class="badge bg-{{ $mealType == 'breakfast' ? 'primary' : ($mealType == 'lunch' ? 'success' : 'info') }}">
+                                {{ count($items) }}
+                            </span>
+                        </div>
+                    </div>
+                    @empty
+                    <p class="text-muted mb-0">No pre-orders for today</p>
+                    @endforelse
+                    <div class="mt-3">
+                        <a href="{{ route('admin.orders.kitchen') }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-utensils"></i> Kitchen View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">Quick Stats</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <small class="text-muted">Today's Orders</small>
+                        <div class="h6" id="today-orders">{{ $todayOrders }}</div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Preparing Orders</small>
+                        <div class="h6">{{ $preparingOrders }}</div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Weekly Revenue</small>
+                        <div class="h6">${{ number_format($weeklyRevenue, 2) }}</div>
+                    </div>
+                    <div>
+                        <small class="text-muted">Avg Order Value</small>
+                        <div class="h6">${{ number_format($averageOrderValue, 2) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Growth -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Customers</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <div class="h1 font-weight-bold text-gray-800">{{ $totalCustomers }}</div>
+                        <p class="mb-2">Total Customers</p>
+                        <div class="mb-3">
+                            <span class="badge bg-success">
+                                +{{ $newCustomers }} today
+                            </span>
+                        </div>
+                        <div class="small text-{{ $customerGrowth >= 0 ? 'success' : 'danger' }}">
+                            <i class="fas fa-{{ $customerGrowth >= 0 ? 'arrow-up' : 'arrow-down' }}"></i>
+                            {{ abs($customerGrowth) }}% growth
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Revenue Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Monthly Revenue Trend</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Orders</h6>
+                    <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        @forelse($recentOrders as $order)
+                        <div class="list-group-item px-0 py-2">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">#{{ $order->order_number }}</h6>
+                                    <p class="mb-1 small text-muted">
+                                        {{ $order->customer->name ?? 'Guest' }}
+                                    </p>
+                                    <small class="text-muted">
+                                        {{ $order->order_date->format('M j, g:i A') }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="mb-1">
+                                        <span class="badge bg-{{ $order->status == 'delivered' ? 'success' : ($order->status == 'pending' ? 'warning' : 'primary') }}">
+                                            {{ ucfirst($order->status) }}
+                                        </span>
+                                    </div>
+                                    <strong>${{ number_format($order->total_amount, 2) }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="text-center py-4">
+                            <p class="text-muted">No recent orders</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Sales Chart
-        const salesCtx = document.getElementById('salesChart').getContext('2d');
-        const salesChart = new Chart(salesCtx, {
-            type: 'line',
-            data: {
-                labels: {!! json_encode($salesChart['labels']) !!},
-                datasets: [{
-                    label: 'Sales ($)',
-                    data: {!! json_encode($salesChart['data']) !!},
-                    borderColor: '#66b3ff',
-                    backgroundColor: 'rgba(102, 179, 255, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
-
-        // Order Status Chart
-        const statusCtx = document.getElementById('orderStatusChart').getContext('2d');
-        const statusChart = new Chart(statusCtx, {
-            type: 'doughnut',
-            data: {
-                labels: {!! json_encode($orderStatusData['labels']) !!},
-                datasets: [{
-                    data: {!! json_encode($orderStatusData['data']) !!},
-                    backgroundColor: [
-                        '#28a745',
-                        '#007bff',
-                        '#ffc107',
-                        '#dc3545'
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                cutout: '70%',
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
+// Update stats via AJAX
+function updateStats() {
+    $.get('{{ route("admin.dashboard.stats") }}', function(data) {
+        $('#today-orders').text(data.today_orders);
+        $('#pending-orders').text(data.pending_orders);
+        $('#today-revenue').text('$' + parseFloat(data.today_revenue).toFixed(2));
+        $('#last-updated').text(data.updated_at);
     });
+}
+
+// Auto-update every 2 minutes
+setInterval(updateStats, 120000);
+
+// Revenue Chart
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+const revenueChart = new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+        labels: @json($revenueChart['labels']),
+        datasets: [
+            {
+                label: 'Total Revenue',
+                data: @json($revenueChart['data']),
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                fill: true,
+                tension: 0.4
+            },
+            {
+                label: 'Pre-order Revenue',
+                data: @json($revenueChart['preorder_data']),
+                borderColor: '#f6c23e',
+                backgroundColor: 'rgba(246, 194, 62, 0.1)',
+                fill: true,
+                tension: 0.4
+            },
+            {
+                label: 'Regular Order Revenue',
+                data: @json($revenueChart['regular_data']),
+                borderColor: '#1cc88a',
+                backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                fill: true,
+                tension: 0.4
+            }
+        ]
+    },
+    options: {
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '$' + value;
+                    }
+                }
+            }
+        }
+    }
+});
 </script>
-@endsection
+@endpush

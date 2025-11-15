@@ -16,15 +16,17 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\AttributeController;
-
+use App\Http\Controllers\Auth\LoginController;
 
 
 Route::get('/admin/login', function () {
     return view('admin.auth.login');
 });
-
+Route::post('admin/login', [LoginController::class, 'login'])->name('admin.login');
+Route::get('/test', function () {
+    return view('tests');
+});
 Auth::routes();
-
 
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 

@@ -5,55 +5,24 @@
 @section('css')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"> 
 <style>
-    /* --- GENERAL --- */
     .error { color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem; }
-
-    /* --- PAYMENT CARDS --- */
-    .payment-method {
-        border: 2px solid #e5e7eb;
-        border-radius: 0.75rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
-        background-color: #fff;
-        cursor: pointer;
+    .delivery-badge {
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
     }
-    .payment-method:hover {
-        border-color: #2563eb;
-        background-color: #f9fafb;
+    .meal-type-badge {
+        background: #f0fdf4;
+        color: #166534;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-left: 0.5rem;
     }
-    .payment-method.selected {
-        border-color: #2563eb;
-        background-color: #f8fafc;
-        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
-    }
-    .payment-icon {
-        width: 2.5rem; height: 2.5rem; margin-right: 0.75rem;
-    }
-    .payment-details {
-        display: none;
-        margin-top: 0.75rem;
-        padding: 0.75rem 1rem;
-        background-color: #f9fafb;
-        border-radius: 0.5rem;
-    }
-    .payment-details.active { display: block; }
-    .radio-visible {
-        width: 1.2rem; height: 1.2rem; accent-color: #2563eb; margin-right: 0.75rem;
-    }
-
-    /* --- ORDER SUMMARY --- */
-    .order-summary {
-        background: white;
-        border-radius: 0.75rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        padding: 1.5rem;
-    }
-    .summary-item {
-        border-bottom: 1px solid #e5e7eb;
-        padding: 0.75rem 0;
-    }
-    .summary-item:last-child { border-bottom: none; }
 </style>
 @endsection
 
@@ -65,6 +34,8 @@
     <div class="container mx-auto px-4">
         <div class="breadcrumbs text-sm text-gray-600">
             <a href="{{ route('xylo.home') }}" class="hover:text-blue-600">Home</a>
+            <i class="fa fa-angle-right mx-2"></i>
+            <a href="{{ route('cart.page') }}" class="hover:text-blue-600">Cart</a>
             <i class="fa fa-angle-right mx-2"></i>
             <span class="text-gray-900 font-medium">Checkout</span>
         </div>
@@ -80,163 +51,153 @@
                 <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm">
                     @csrf
 
-                    <!-- Shipping Info -->
+                    <!-- Customer Information -->
                     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Shipping Information</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input type="text" name="full_name" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                                       placeholder="First Name" value="{{ old('first_name') }}">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                <input type="text" name="phone" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                                       placeholder="Phone" value="{{ old('phone') }}" required>
-                            </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Customer Information</h3>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                            <input type="text" name="full_name" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="Enter your full name" value="{{ old('full_name', Auth::user()->name ?? '') }}" required>
+                            @error('full_name')
+                                <div class="error">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                            <input type="text" name="address" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                                   placeholder="Full Address" value="{{ old('address') }}">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                            <input type="tel" name="phone" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="Enter your phone number" value="{{ old('phone', Auth::user()->phone ?? '') }}" required>
+                            @error('phone')
+                                <div class="error">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <div class="mt-4">
-                            <label class="flex items-center">
-                                <input type="checkbox" name="use_as_billing" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="ml-2 text-gray-700 text-sm">Use as billing address</span>
-                            </label>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Delivery Address *</label>
+                            <textarea name="address" rows="3" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                      placeholder="Enter your complete delivery address" required>{{ old('address', Auth::user()->address ?? '') }}</textarea>
+                            @error('address')
+                                <div class="error">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Order Notes (Optional)</label>
+                            <textarea name="notes" rows="2" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                      placeholder="Any special instructions for delivery...">{{ old('notes') }}</textarea>
                         </div>
                     </div>
 
-                    <!-- Payment Section -->
+                    <!-- Payment Section - Only COD -->
                     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Payment Method</h3>
 
-                        <!-- COD -->
-                        <div class="payment-method selected" data-method="cod">
+                        <div class="border-2 border-blue-500 rounded-lg p-4 bg-blue-50">
                             <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="payment_method" value="cod" checked class="radio-visible">
-                                <i class="fas fa-money-bill-wave payment-icon text-green-600"></i>
+                                <input type="radio" name="payment_method" value="cod" checked class="w-5 h-5 text-blue-600 focus:ring-blue-500">
+                                <i class="fas fa-money-bill-wave text-2xl text-green-600 ml-3 mr-4"></i>
                                 <div>
-                                    <strong class="text-gray-900">Cash on Delivery</strong>
-                                    <p class="text-gray-600 text-sm">Pay when your order arrives.</p>
+                                    <strong class="text-gray-900 text-lg">Cash on Delivery</strong>
+                                    <p class="text-gray-600">Pay when your order arrives. No online payment required.</p>
                                 </div>
                             </label>
-                            <div class="payment-details active" id="cod-details">
-                                <p class="text-gray-600 text-sm">Pay with cash once the package is delivered to you.</p>
-                            </div>
-                        </div>
-
-                        <!-- UPI -->
-                        <div class="payment-method" data-method="upi">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="payment_method" value="upi" class="radio-visible">
-                                <i class="fas fa-mobile-alt payment-icon text-purple-600"></i>
-                                <div>
-                                    <strong class="text-gray-900">UPI (Google Pay / PhonePe / Paytm)</strong>
-                                    <p class="text-gray-600 text-sm">Instant secure UPI payment.</p>
-                                </div>
-                            </label>
-                            <div class="payment-details" id="upi-details">
-                                <input type="text" name="upi_id" placeholder="Enter your UPI ID" 
-                                       class="w-full mt-2 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <p class="text-xs text-gray-500 mt-1">Example: yourname@okaxis</p>
-                            </div>
-                        </div>
-
-                        <!-- CARD -->
-                        <div class="payment-method" data-method="card">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="payment_method" value="card" class="radio-visible">
-                                <i class="fas fa-credit-card payment-icon text-blue-600"></i>
-                                <div>
-                                    <strong class="text-gray-900">Credit / Debit Card</strong>
-                                    <p class="text-gray-600 text-sm">Pay securely with your card.</p>
-                                </div>
-                            </label>
-                            <div class="payment-details" id="card-details">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-                                    <input type="text" placeholder="Card Number" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                                    <input type="text" placeholder="Name on Card" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                                    <input type="text" placeholder="MM/YY" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                                    <input type="text" placeholder="CVV" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                                </div>
+                            <div class="mt-3 p-3 bg-white rounded border">
+                                <p class="text-sm text-gray-600">💵 Pay with cash once the package is delivered to you</p>
+                                <p class="text-sm text-gray-600 mt-1">✅ No additional charges for COD</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Submit -->
+                    <!-- Submit Button -->
                     <button type="submit" id="submitBtn"
-                        class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center justify-center">
-                        <span id="submitText">Place Order (Cash on Delivery)</span>
+                        class="w-full bg-green-600 text-white py-4 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center text-lg">
+                        <span id="submitText">Place Order - Cash on Delivery</span>
                         <div id="loadingSpinner" class="hidden ml-2">
-                            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
                         </div>
                     </button>
                 </form>
             </div>
 
-            <!-- Order Summary (on same page) -->
+            <!-- Order Summary -->
             <div class="w-full lg:w-5/12">
                 <div class="order-summary sticky top-4">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Order Summary</h3>
 
-                    @php $subtotal = 0; @endphp
-                    @foreach($cart as $key => $item)
-                        @php
-                            $product = \App\Models\Product::with(['translations','thumbnail'])->find($item['product_id']);
-                            $variant = \App\Models\ProductVariant::with('images')->find($item['variant_id'] ?? null);
-                            $itemSubtotal = $item['price'] * $item['quantity'];
-                            $subtotal += $itemSubtotal;
-                        @endphp
-                        <div class="summary-item flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <img src="{{ $variant && $variant->images && $variant->images->first() ? asset('/public/storage/'.$variant->images->first()->image_url) : ($product && $product->thumbnail ? asset('/public/storage/'.$product->thumbnail->image_url) : 'https://via.placeholder.com/60x60') }}" 
-                                    class="w-14 h-14 rounded object-cover">
-                                <div>
-                                    <p class="font-medium text-gray-800 text-sm">{{ $product->translation->name ?? 'Product' }}</p>
-                                    <p class="text-gray-600 text-xs">{{ $currency->symbol }}{{ number_format($item['price'],2) }} × {{ $item['quantity'] }}</p>
-                                </div>
-                            </div>
-                            <p class="font-semibold text-gray-900 text-sm">{{ $currency->symbol }}{{ number_format($itemSubtotal, 2) }}</p>
-                        </div>
-                    @endforeach
-
+                    <!-- Group items by delivery date -->
                     @php
-                        $coupon = session('cart_coupon');
-                        $discountAmount = 0;
-                        if ($coupon) {
-                            $discountAmount = $coupon['type'] === 'percentage'
-                                ? $subtotal * ($coupon['discount'] / 100)
-                                : $coupon['discount'];
+                        $groupedItems = [];
+                        foreach ($cartItems as $item) {
+                            $date = $item['display_order_date'];
+                            if (!isset($groupedItems[$date])) {
+                                $groupedItems[$date] = [];
+                            }
+                            $groupedItems[$date][] = $item;
                         }
-                        $total = max(0, $subtotal - $discountAmount);
                     @endphp
 
+                    @foreach($groupedItems as $deliveryDate => $items)
+                    <div class="mb-4 pb-3 border-b">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-semibold text-gray-800">Delivery: {{ $deliveryDate }}</h4>
+                        </div>
+                        
+                        @foreach($items as $item)
+                        <div class="summary-item flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3 flex-1">
+                                <img src="{{ $item['image'] ?: 'https://via.placeholder.com/60x60' }}" 
+                                    class="w-14 h-14 rounded object-cover border">
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800 text-sm">{{ $item['name'] }}</p>
+                                    <p class="text-gray-600 text-xs">{{ $currency->symbol }}{{ number_format($item['price'], 2) }} × {{ $item['quantity'] }}</p>
+                                    <div class="flex items-center mt-1">
+                                        <span class="delivery-badge">
+                                            {{ $item['meal_type'] !== 'regular' ? 'Pre-order' : 'Regular' }}
+                                        </span>
+                                        @if($item['meal_type'] !== 'regular')
+                                        <span class="meal-type-badge capitalize">
+                                            {{ $item['meal_type'] }}
+                                        </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="font-semibold text-gray-900 text-sm">
+                                {{ $currency->symbol }}{{ number_format($item['price'] * $item['quantity'], 2) }}
+                            </p>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endforeach
+
+                    <!-- Order Totals -->
                     <div class="mt-4 text-sm">
-                        <div class="flex justify-between mb-2"><span class="text-gray-600">Subtotal</span> <span>{{ $currency->symbol }}{{ number_format($subtotal, 2) }}</span></div>
-                        @if($coupon)
-                        <div class="flex justify-between mb-2"><span class="text-green-600">Discount ({{ $coupon['code'] }})</span> <span>-{{ $currency->symbol }}{{ number_format($discountAmount, 2) }}</span></div>
-                        @endif
-                        <div class="flex justify-between mb-2"><span class="text-gray-600">Shipping</span> <span>Calculated at checkout</span></div>
-                        <hr class="my-2">
-                        <div class="flex justify-between font-bold text-gray-900 text-base">
-                            <span>Total</span>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Subtotal</span> 
+                            <span>{{ $currency->symbol }}{{ number_format($subtotal, 2) }}</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Delivery Charge</span> 
+                            <span class="text-green-600">FREE</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Tax</span> 
+                            <span>{{ $currency->symbol }}{{ number_format($tax, 2) }}</span>
+                        </div>
+                        <hr class="my-2 border-gray-300">
+                        <div class="flex justify-between font-bold text-gray-900 text-lg">
+                            <span>Total Amount</span>
                             <span>{{ $currency->symbol }}{{ number_format($total, 2) }}</span>
                         </div>
                     </div>
 
-                    <!-- Coupon Apply -->
-                    <div class="mt-4 pt-4 border-t border-gray-200">
-                        <form id="applyCouponForm" class="flex gap-2">
-                            @csrf
-                            <input type="text" name="code" id="coupon_code" placeholder="Enter coupon code"
-                                class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
-                            <button type="submit" class="bg-gray-800 text-white px-4 rounded-lg text-sm hover:bg-gray-900">Apply</button>
-                        </form>
+                    <!-- Delivery Information -->
+                    <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <h5 class="font-semibold text-blue-900 mb-2">📦 Delivery Information</h5>
+                        <p class="text-sm text-blue-800">
+                            Your order contains items with different delivery dates. Each item will be delivered on its scheduled date.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -250,31 +211,50 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
 $(document).ready(function(){
-    // Payment selection
-    $('.payment-method').click(function(){
-        $('.payment-method').removeClass('selected');
-        $(this).addClass('selected');
-        $(this).find('input[type="radio"]').prop('checked', true);
-        $('.payment-details').removeClass('active');
-        const method = $(this).data('method');
-        $(`#${method}-details`).addClass('active');
-        updateButtonText(method);
+    // Form submission handling
+    $('#checkoutForm').on('submit', function(e){
+        const submitBtn = $('#submitBtn');
+        const submitText = $('#submitText');
+        const spinner = $('#loadingSpinner');
+        
+        // Show loading state
+        submitBtn.prop('disabled', true);
+        submitText.text('Placing Order...');
+        spinner.removeClass('hidden');
     });
 
-    function updateButtonText(method) {
-        const map = { cod: 'Place Order (Cash on Delivery)', upi: 'Pay Now (UPI)', card: 'Pay Securely (Card)' };
-        $('#submitText').text(map[method] || 'Place Order');
+    // Auto-save form data to localStorage in case of page refresh
+    function saveFormData() {
+        const formData = {
+            full_name: $('input[name="full_name"]').val(),
+            phone: $('input[name="phone"]').val(),
+            address: $('textarea[name="address"]').val(),
+            notes: $('textarea[name="notes"]').val()
+        };
+        localStorage.setItem('checkoutFormData', JSON.stringify(formData));
     }
 
-    // Apply coupon
-    $('#applyCouponForm').on('submit', function(e){
-        e.preventDefault();
-        const code = $('#coupon_code').val().trim();
-        if (!code) return toastr.error('Enter coupon code');
-        $.post("{{ route('cart.applyCoupon') }}", { _token: "{{ csrf_token() }}", code }, function(res){
-            if (res.success) { toastr.success(res.message); setTimeout(()=>location.reload(), 800); }
-            else toastr.error(res.message);
-        }).fail(()=>toastr.error('Error applying coupon'));
+    // Load saved form data
+    function loadFormData() {
+        const savedData = localStorage.getItem('checkoutFormData');
+        if (savedData) {
+            const formData = JSON.parse(savedData);
+            $('input[name="full_name"]').val(formData.full_name || '');
+            $('input[name="phone"]').val(formData.phone || '');
+            $('textarea[name="address"]').val(formData.address || '');
+            $('textarea[name="notes"]').val(formData.notes || '');
+        }
+    }
+
+    // Auto-save on input change
+    $('input, textarea').on('input', saveFormData);
+    
+    // Load saved data on page load
+    loadFormData();
+
+    // Clear saved data on successful form submission
+    $('#checkoutForm').on('submit', function() {
+        localStorage.removeItem('checkoutFormData');
     });
 });
 </script>

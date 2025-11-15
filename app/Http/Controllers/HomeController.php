@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\ProductVariant;
+use Carbon\Carbon;
 use DB;
 
 class HomeController extends Controller
@@ -29,111 +31,217 @@ class HomeController extends Controller
      */
     public function index()
     {
-      // Total Sales
-    $totalSales = Order::where('status', 'delivered')->sum('total_amount');
-    
-    // Total Orders
-    $totalOrders = Order::count();
-    $todayOrders = Order::whereDate('created_at', today())->count();
-    $pendingOrders = Order::where('status', 'pending')->count();
-    
-    // Customers
-    $totalCustomers = Customer::count();
-    $newCustomers = Customer::whereDate('created_at', today())->count();
-    
-    // Products & Variants
-    $totalProducts = Product::count();
-    $totalCategories = Category::count();
-    
-    // Low stock calculation from product_variants
-    $lowStockProducts = ProductVariant::where('stock', '<=', 10)->count();
-    
-    // Growth calculations (compared to last month)
-    $lastMonthStart = now()->subMonth()->startOfMonth();
-    $lastMonthEnd = now()->subMonth()->endOfMonth();
-    $thisMonthStart = now()->startOfMonth();
-    
-    $lastMonthSales = Order::where('status', 'completed')
-        ->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])
-        ->sum('total_amount');
-    $salesGrowth = $lastMonthSales > 0 ? round((($totalSales - $lastMonthSales) / $lastMonthSales) * 100, 1) : 0;
-    
-    $lastMonthOrders = Order::whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])->count();
-    $orderGrowth = $lastMonthOrders > 0 ? round((($totalOrders - $lastMonthOrders) / $lastMonthOrders) * 100, 1) : 0;
-    
-    $lastMonthCustomers = Customer::whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])->count();
-    $customerGrowth = $lastMonthCustomers > 0 ? round((($totalCustomers - $lastMonthCustomers) / $lastMonthCustomers) * 100, 1) : 0;
-    
-    // Average Order Value
-    $averageOrderValue = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
-    
-    // Recent Orders with safe customer relationship
-    $recentOrders = Order::with(['customer' => function($query) {
-        $query->select('id', 'name', 'email','unique_id');
-    }])->latest()->take(10)->get();
-    
-    // Top Selling Products - Handle translation properly
-    $topProducts = ProductVariant::select([
-            'product_variants.id',
-            'product_variants.product_id',
-            DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold'),
-            DB::raw('COALESCE(SUM(order_details.quantity * order_details.price), 0) as total_revenue')
-        ])
-        ->join('products', 'product_variants.product_id', '=', 'products.id')
-        ->leftJoin('order_details', 'product_variants.id', '=', 'order_details.variant_id')
-        ->groupBy('product_variants.id', 'product_variants.product_id')
-        ->orderBy('total_sold', 'desc')
-        ->take(5)
-        ->get()
-        ->load(['product.translation']); // Eager load translations
-    
-    // Low Stock Items - Handle translation properly
-    $lowStockItems = ProductVariant::select([
-            'product_variants.id',
-            'product_variants.product_id',
-            'product_variants.stock',
-            'product_variants.SKU',
-            DB::raw('10 as min_stock')
-        ])
-        ->with(['product.translation']) // Eager load translations
-        ->where('product_variants.stock', '<=', 10)
-        ->orderBy('product_variants.stock', 'asc')
-        ->take(5)
-        ->get();
-    
-    // Sales Chart Data (Last 30 days)
-    $salesChart = [
-        'labels' => [],
-        'data' => []
-    ];
-    
-    for ($i = 29; $i >= 0; $i--) {
-        $date = now()->subDays($i);
-        $salesChart['labels'][] = $date->format('M d');
+        // Current month and year
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
         
-        $dailySales = Order::where('status', 'completed')
-            ->whereDate('created_at', $date)
+        // Monthly Revenue Calculations
+        $monthlyRevenue = Order::where('status', 'delivered')
+            ->whereMonth('order_date', $currentMonth)
+            ->whereYear('order_date', $currentYear)
             ->sum('total_amount');
-        $salesChart['data'][] = $dailySales;
-    }
-    
-    // Order Status Distribution
-    $orderStatusData = [
-        'labels' => ['Completed', 'Processing', 'Pending', 'Cancelled'],
-        'data' => [
-            Order::where('status', 'completed')->count(),
-            Order::where('status', 'processing')->count(),
-            Order::where('status', 'pending')->count(),
-            Order::where('status', 'cancelled')->count(),
-        ]
-    ];
+            
+        $lastMonthRevenue = Order::where('status', 'delivered')
+            ->whereMonth('order_date', $currentMonth - 1)
+            ->whereYear('order_date', $currentYear)
+            ->sum('total_amount');
+            
+        $revenueGrowth = $lastMonthRevenue > 0 ? 
+            round((($monthlyRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100, 1) : 100;
 
-    return view('admin.home', compact(
-        'totalSales', 'totalOrders', 'totalCustomers', 'averageOrderValue',
-        'todayOrders', 'pendingOrders', 'newCustomers', 'totalProducts',
-        'totalCategories', 'lowStockProducts', 'salesGrowth', 'orderGrowth',
-        'customerGrowth', 'recentOrders', 'topProducts', 'lowStockItems',
-        'salesChart', 'orderStatusData'
-    ));
+        // Total Sales (All time delivered orders)
+        $totalSales = Order::where('status', 'delivered')->sum('total_amount');
+        
+        // Order Statistics
+        $totalOrders = Order::count();
+        $todayOrders = Order::whereDate('order_date', today())->count();
+        $pendingOrders = Order::where('status', 'pending')->count();
+        $preparingOrders = Order::where('status', 'preparing')->count();
+        
+        // Order Type Breakdown
+        $preorderCount = Order::whereHas('orderItems', function($q) {
+            $q->where('meal_type', '!=', 'regular');
+        })->count();
+        
+        $regularOrderCount = Order::whereHas('orderItems', function($q) {
+            $q->where('meal_type', 'regular');
+        })->count();
+
+        // Customer Statistics
+        $totalCustomers = Customer::count();
+        $newCustomers = Customer::whereDate('created_at', today())->count();
+        
+        // Product Statistics
+        $totalProducts = Product::count();
+        $totalCategories = Category::count();
+        
+        // Low stock calculation from product_variants
+        $lowStockProducts = ProductVariant::where('stock', '<=', 10)->count();
+        
+        // Growth calculations (compared to last month)
+        $lastMonthStart = now()->subMonth()->startOfMonth();
+        $lastMonthEnd = now()->subMonth()->endOfMonth();
+        $thisMonthStart = now()->startOfMonth();
+        
+        $lastMonthOrders = Order::whereBetween('order_date', [$lastMonthStart, $lastMonthEnd])->count();
+        $orderGrowth = $lastMonthOrders > 0 ? 
+            round((($totalOrders - $lastMonthOrders) / $lastMonthOrders) * 100, 1) : 100;
+        
+        $lastMonthCustomers = Customer::whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])->count();
+        $customerGrowth = $lastMonthCustomers > 0 ? 
+            round((($totalCustomers - $lastMonthCustomers) / $lastMonthCustomers) * 100, 1) : 100;
+        
+        // Average Order Value
+        $averageOrderValue = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
+        
+        // Recent Orders with proper relationships
+        $recentOrders = Order::with(['customer', 'orderItems'])
+            ->latest()
+            ->take(8)
+            ->get();
+        
+        // Today's Pre-orders for kitchen
+        $todaysPreorders = OrderItem::with(['order.customer', 'product'])
+            ->whereDate('order_for_date', today())
+            ->where('meal_type', '!=', 'regular')
+            ->whereHas('order', function($q) {
+                $q->whereIn('status', ['confirmed', 'preparing']);
+            })
+            ->orderBy('meal_type')
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy('meal_type');
+
+        // Top Selling Products
+        $topProducts = Product::select([
+                'products.id',
+                DB::raw('COALESCE(SUM(order_items.quantity), 0) as total_sold'),
+                DB::raw('COALESCE(SUM(order_items.quantity * order_items.unit_price), 0) as total_revenue')
+            ])
+            ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
+            ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', 'delivered')
+            ->groupBy('products.id')
+            ->orderBy('total_sold', 'desc')
+            ->take(5)
+            ->get();
+
+        // Low Stock Items
+        $lowStockItems = ProductVariant::with(['product'])
+            ->where('stock', '<=', 10)
+            ->orderBy('stock', 'asc')
+            ->take(5)
+            ->get();
+
+        // Monthly Revenue Chart Data (Last 6 months)
+        $revenueChart = [
+            'labels' => [],
+            'data' => [],
+            'preorder_data' => [],
+            'regular_data' => []
+        ];
+        
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $monthName = $date->format('M Y');
+            $revenueChart['labels'][] = $date->format('M');
+            
+            // Total monthly revenue
+            $monthlyTotal = Order::where('status', 'delivered')
+                ->whereMonth('order_date', $date->month)
+                ->whereYear('order_date', $date->year)
+                ->sum('total_amount');
+            $revenueChart['data'][] = $monthlyTotal;
+            
+            // Pre-order revenue
+            $preorderRevenue = Order::where('status', 'delivered')
+                ->whereMonth('order_date', $date->month)
+                ->whereYear('order_date', $date->year)
+                ->whereHas('orderItems', function($q) {
+                    $q->where('meal_type', '!=', 'regular');
+                })
+                ->sum('total_amount');
+            $revenueChart['preorder_data'][] = $preorderRevenue;
+            
+            // Regular order revenue
+            $regularRevenue = Order::where('status', 'delivered')
+                ->whereMonth('order_date', $date->month)
+                ->whereYear('order_date', $date->year)
+                ->whereHas('orderItems', function($q) {
+                    $q->where('meal_type', 'regular');
+                })
+                ->sum('total_amount');
+            $revenueChart['regular_data'][] = $regularRevenue;
+        }
+
+        // Order Status Distribution
+        $orderStatusData = [
+            'labels' => ['Pending', 'Confirmed', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled'],
+            'data' => [
+                Order::where('status', 'pending')->count(),
+                Order::where('status', 'confirmed')->count(),
+                Order::where('status', 'preparing')->count(),
+                Order::where('status', 'out_for_delivery')->count(),
+                Order::where('status', 'delivered')->count(),
+                Order::where('status', 'cancelled')->count(),
+            ]
+        ];
+
+        // Today's Revenue
+        $todayRevenue = Order::where('status', 'delivered')
+            ->whereDate('order_date', today())
+            ->sum('total_amount');
+
+        // Weekly Revenue
+        $weeklyRevenue = Order::where('status', 'delivered')
+            ->whereBetween('order_date', [now()->startOfWeek(), now()->endOfWeek()])
+            ->sum('total_amount');
+
+        return view('admin.home', compact(
+            'monthlyRevenue',
+            'revenueGrowth',
+            'totalSales',
+            'totalOrders', 
+            'todayOrders', 
+            'pendingOrders',
+            'preparingOrders',
+            'totalCustomers', 
+            'averageOrderValue',
+            'newCustomers', 
+            'totalProducts',
+            'totalCategories', 
+            'lowStockProducts', 
+            'orderGrowth', 
+            'customerGrowth',
+            'recentOrders', 
+            'topProducts', 
+            'lowStockItems',
+            'revenueChart', 
+            'orderStatusData',
+            'preorderCount',
+            'regularOrderCount',
+            'todaysPreorders',
+            'todayRevenue',
+            'weeklyRevenue'
+        ));
+    }
+
+    /**
+     * Get dashboard statistics for AJAX updates
+     */
+    public function getDashboardStats()
+    {
+        $todayOrders = Order::whereDate('order_date', today())->count();
+        $pendingOrders = Order::where('status', 'pending')->count();
+        $todayRevenue = Order::where('status', 'delivered')
+            ->whereDate('order_date', today())
+            ->sum('total_amount');
+
+        return response()->json([
+            'today_orders' => $todayOrders,
+            'pending_orders' => $pendingOrders,
+            'today_revenue' => $todayRevenue,
+            'updated_at' => now()->format('g:i A')
+        ]);
     }
 }

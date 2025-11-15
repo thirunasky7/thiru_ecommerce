@@ -22,7 +22,7 @@
                 </ul>
             </div>
         </li>           
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#brandMenu" role="button" aria-expanded="false" aria-controls="brandMenu">
                 <span><i class="fas fa-tags me-2"></i> <span>{{ __('cms.sidebar.brands.title') }}</span></span>
                 <i class="fas fa-chevron-down"></i>
@@ -33,7 +33,7 @@
                     <li><a class="nav-link {{ Route::currentRouteName() == 'admin.brands.index' ? 'active' : '' }}" href="{{ route('admin.brands.index') }}">{{ __('cms.sidebar.brands.list') }}</a></li>
                 </ul>
             </div>
-        </li>
+        </li> -->
         <li class="nav-item">
             <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#productMenu" role="button" aria-expanded="false" aria-controls="productMenu">
                 <span><i class="fas fa-box me-2"></i> <span>{{ __('cms.sidebar.products.title') }}</span></span>
@@ -45,7 +45,7 @@
                     <li><a class="nav-link {{ Route::currentRouteName() == 'admin.products.index' ? 'active' : '' }}" href="{{ route('admin.products.index') }}">{{ __('cms.sidebar.products.list') }}</a></li>
                 </ul>
             </div>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#attributeMenu" role="button" aria-expanded="false" aria-controls="attributeMenu">
                     <span><i class="fas fa-cogs me-2"></i> <span>{{ __('cms.sidebar.attributes.title') }}</span></span>
                     <i class="fas fa-chevron-down"></i>
@@ -56,7 +56,7 @@
                         <li><a class="nav-link {{ Route::currentRouteName() == 'admin.attributes.index' ? 'active' : '' }}" href="{{ route('admin.attributes.index') }}">{{ __('cms.sidebar.attributes.list') }}</a></li>
                     </ul>
                 </div>
-            </li>            
+            </li>             -->
             <li class="nav-item">
                 <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#customerMenu" role="button" aria-expanded="false" aria-controls="customerMenu">
                     <span><i class="fas fa-users me-2"></i> <span>{{ __('cms.sidebar.customers.title') }}</span></span>
@@ -68,7 +68,7 @@
                     </ul>
                 </div>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#sellerMenu" role="button" aria-expanded="false" aria-controls="sellerMenu">
                     <span><i class="fas fa-user-tie me-2"></i> <span>{{ __('cms.sidebar.sellers.title') }}</span></span>
                     <i class="fas fa-chevron-down"></i>
@@ -85,9 +85,9 @@
                         </li>
                     </ul>
                 </div>
-            </li>
+            </li> -->
             
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#productReviewMenu" role="button" aria-expanded="false" aria-controls="productReviewMenu">
                     <span><i class="fas fa-star me-2"></i> <span>{{ __('cms.sidebar.product_reviews.title') }}</span></span>
                     <i class="fas fa-chevron-down"></i>
@@ -97,7 +97,7 @@
                         <li><a class="nav-link {{ Route::currentRouteName() == 'admin.product_reviews.index' ? 'active' : '' }}" href="{{ route('admin.reviews.index') }}">{{ __('cms.sidebar.product_reviews.list') }}</a></li>
                     </ul>
                 </div>
-            </li>                
+            </li>                 -->
         <li class="nav-item">
             <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#bannerMenu" role="button" aria-expanded="false" aria-controls="bannerMenu">
                 <span><i class="fas fa-image me-2"></i> <span>{{ __('cms.sidebar.banners.title') }}</span></span>
@@ -117,12 +117,12 @@
             </a>
             <div class="collapse {{ Route::currentRouteName() == 'admin.menus.create' || Route::currentRouteName() == 'admin.menus.index' ? 'show' : '' }}" id="menuMenu">
                 <ul class="nav flex-column ms-3">
-                    <li><a class="nav-link {{ Route::currentRouteName() == 'admin.menus.create' ? 'active' : '' }}" href="{{ route('admin.menus.create') }}">{{ __('cms.sidebar.menu.add_new') }}</a></li>
-                    <li><a class="nav-link {{ Route::currentRouteName() == 'admin.menus.index' ? 'active' : '' }}" href="{{ route('admin.menus.index') }}">{{ __('cms.sidebar.menu.list') }}</a></li>
+                    <li><a class="nav-link {{ Route::currentRouteName() == 'admin.menus.create' ? 'active' : '' }}" href="{{ url('admin/weekly-menu/create') }}">{{ __('cms.sidebar.menu.add_new') }}</a></li>
+                    <li><a class="nav-link {{ Route::currentRouteName() == 'admin.menus.index' ? 'active' : '' }}" href="{{ url('admin/weekly-menu') }}">{{ __('cms.sidebar.menu.list') }}</a></li>
                 </ul>
             </div>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#menuItemMenu" role="button" aria-expanded="false" aria-controls="menuItemMenu">
                 <span><i class="fas fa-list me-2"></i> <span>{{ __('cms.sidebar.menu_items.title') }}</span></span>
                 <i class="fas fa-chevron-down"></i>
@@ -135,7 +135,7 @@
                     @endif
                 </ul>
             </div>
-        </li>                       
+        </li>                        -->
         <li class="nav-item">
             <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#socialMediaLinkMenu" role="button" aria-expanded="false" aria-controls="socialMediaLinkMenu">
                 <span><i class="fas fa-link me-2"></i> <span>{{ __('cms.sidebar.social_media_links.title') }}</span></span>
@@ -167,8 +167,8 @@
             <div class="collapse {{ Route::currentRouteName() == 'admin.orders.index' || Route::currentRouteName() == 'admin.orders.pending' || Route::currentRouteName() == 'admin.orders.completed' ? 'show' : '' }}" id="ordersMenu">
                 <ul class="nav flex-column ms-3">
                     <li><a class="nav-link {{ Route::currentRouteName() == 'admin.orders.index' ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">{{ __('cms.sidebar.orders.all_orders') }}</a></li>
-                    <li><a class="nav-link {{ Route::currentRouteName() == 'admin.orders.pending' ? 'active' : '' }}" href="">{{ __('cms.sidebar.orders.pending_orders') }}</a></li>
-                    <li><a class="nav-link {{ Route::currentRouteName() == 'admin.orders.completed' ? 'active' : '' }}" href="">{{ __('cms.sidebar.orders.completed_orders') }}</a></li>
+                    <!-- <li><a class="nav-link {{ Route::currentRouteName() == 'admin.orders.pending' ? 'active' : '' }}" href="">{{ __('cms.sidebar.orders.pending_orders') }}</a></li>
+                    <li><a class="nav-link {{ Route::currentRouteName() == 'admin.orders.completed' ? 'active' : '' }}" href="">{{ __('cms.sidebar.orders.completed_orders') }}</a></li> -->
                 </ul>
             </div>
         </li>

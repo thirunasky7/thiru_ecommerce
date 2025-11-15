@@ -146,7 +146,7 @@
                                 $discountPercent = round((($originalPrice - $discountPrice) / $originalPrice) * 100);
                             @endphp
                             <span class="absolute top-2 left-2 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                                -{{ $discountPercent }}%
+                                -{{ $discountPercent }}%  
                             </span>
                         @endif
                     </div>
@@ -156,7 +156,7 @@
                         <!-- Product Name -->
                         <a href="{{ $isAvailable ? url('/product/'.$product->slug) : 'javascript:void(0)' }}" 
                            class="block font-medium text-gray-800 hover:text-orange-600 transition-colors duration-200 mb-2 line-clamp-2 text-sm {{ !$isAvailable ? 'pointer-events-none' : '' }}">
-                            {{ Str::limit($productName, 50) }}
+                            {{ Str::limit($productName, 50) }} 
                         </a>
 
                         <!-- Star Ratings -->

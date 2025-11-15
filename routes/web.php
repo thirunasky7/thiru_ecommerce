@@ -28,6 +28,23 @@ Route::get('/test', function () {
 });
 Auth::routes();
 
+Route::prefix('admin')->middleware('auth')->group(function () {
+
+    Route::get('/weekly-menu', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'index'])->name('admin.weeklymenu.index');
+
+    Route::get('/weekly-menu/create', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'create'])->name('admin.weeklymenu.create');
+
+    Route::post('/weekly-menu/store', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'store'])->name('admin.weeklymenu.store');
+
+    Route::get('/weekly-menu/{id}/edit', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'edit'])->name('admin.weeklymenu.edit');
+
+    Route::post('/weekly-menu/{id}/update', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'update'])->name('admin.weeklymenu.update');
+
+    Route::delete('/weekly-menu/{id}', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'destroy'])->name('admin.weeklymenu.delete');
+
+});
+
+
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     Route::resource('categories', CategoryController::class);
@@ -87,15 +104,15 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 });
 
 
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function() {
-    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::delete('orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
-    Route::post('orders/data', [OrderController::class, 'getData'])->name('orders.data');
-    Route::post('/orders/update-status', [OrderController::class, 'updateStatus'])
-    ->name('orders.updateStatus');
-    Route::get('/orders/{id}', [OrderController::class, 'show'])
-    ->name('orders.show');
-});
+// Route::prefix('admin')->name('admin.')->middleware('auth')->group(function() {
+//     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+//     Route::delete('orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
+//     Route::post('orders/data', [OrderController::class, 'getData'])->name('orders.data');
+//     Route::post('/orders/update-status', [OrderController::class, 'updateStatus'])
+//     ->name('orders.updateStatus');
+//     Route::get('/orders/{id}', [OrderController::class, 'show'])
+//     ->name('orders.show');
+// });
 
 
 Route::prefix('admin')->name('admin.')->middleware( 'auth')->group(function () {
@@ -131,3 +148,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('values/{value}/translations', [AttributeController::class, 'storeTranslation'])->name('values.translations.store');
     Route::delete('translations/{translation}', [AttributeController::class, 'destroyTranslation'])->name('translations.destroy');
 });
+
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
+    Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.update-status');
+    Route::post('/order-items/{orderItem}/status', [OrderController::class, 'updateItemStatus'])->name('admin.orders.update-item-status');
+    Route::get('/kitchen-display', [OrderController::class, 'kitchenDisplay'])->name('admin.orders.kitchen');
+    Route::get('/delivery-schedule', [OrderController::class, 'deliverySchedule'])->name('admin.orders.delivery-schedule');
+});
+Route::get('/admin/dashboard/stats', [HomeController::class, 'getDashboardStats'])->name('admin.dashboard.stats');

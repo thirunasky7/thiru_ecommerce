@@ -152,7 +152,7 @@ class HomeService
                 return [
                     'id' => $banner->id,
                     'name' => $banner->translation->title ?? null,
-                    'image_url' => Storage::url($banner->translation->image_url) ?? null,
+                    'image_url' => 'public/storage/'.$banner->translation->image_url ?? null,
                 ];
             });
         

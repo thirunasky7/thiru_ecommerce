@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\CurrencyController;
-use App\Http\Controllers\Store\CartController;
+//use App\Http\Controllers\Store\CartController;
 use App\Http\Controllers\Store\ShopController;
 use App\Http\Controllers\Store\SearchController;
 use App\Http\Controllers\Admin\LanguageController;
@@ -18,11 +18,19 @@ use App\Http\Controllers\Store\WishlistController;
 use App\Http\Controllers\Store\CheckoutController;
 use App\Http\Controllers\Store\PaymentController;
 use App\Http\Controllers\OrderHistoryController;
+use App\Http\Controllers\WeeklyMenuController;
+use App\Http\Controllers\CartController;
 
 
 
-Route::get('/', [StoreController::class, 'index'])->name('xylo.home');
-Route::get('/home', [StoreController::class, 'index']);
+
+Route::get('/', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('xylo.home');
+Route::get('/menus', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('xylo.menus');
+Route::get('/menu', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('menu');
+Route::get('/cutoff-time', [WeeklyMenuController::class, 'getCutoffTime'])->name('cutoff.time');
+Route::get('/debug-menu/{day}', [WeeklyMenuController::class, 'debugMenu']);
+
+Route::get('/home', [WeeklyMenuController::class, 'showThreeDayMenu']);
 Route::get('/services', function(){
     return view('services');
 });
@@ -30,9 +38,13 @@ Route::get('/about-us', function(){
     return view('about-us');
 });
 
+
 Route::get('/contact-us', function(){
     return view('contact-us');
 });
+
+Route::post('/payment/status', [PaymentController::class, 'checkStatus'])->name('payment.status');
+Route::post('/payment/callback', [PaymentController::class, 'handleCallback'])->name('payment.callback');
 
 Route::get('/categories', [StoreController::class, 'allcategories'])->name('categories.index');
 Route::get('/products', [StoreController::class, 'allproducts'])->name('products.index');
@@ -43,10 +55,10 @@ Route::get('/category/products/{slug}', function ($slug) {
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
 Route::post('/change-currency', [CurrencyController::class, 'changeCurrency'])->name('change.currency');
 
-Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
-Route::get('/cart', [CartController::class, 'viewCart'])->name('cart.view');
-Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
-Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('cart.remove');
+// Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+// Route::get('/cart', [CartController::class, 'viewCart'])->name('cart.view');
+// Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
+// Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('cart.remove');
 
 Route::post('/change-store-language', [LanguageController::class, 'changeLanguage'])->name('change.store.language');
 
@@ -100,4 +112,16 @@ Route::prefix('customer')->name('customer.')->group(function () {
     });
 });
 
+// Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+// Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
+// Route::delete('/cart/remove/{id}', [CartController::class, 'removeItem'])->name('cart.remove');
+// Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
+// // Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+// Route::get('/cart', [WeeklyMenuController::class, 'cartPage'])->name('cart');
+// routes/web.php
+Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.update-quantity');
+Route::delete('/cart/remove/{cartItemId}', [CartController::class, 'removeItem'])->name('cart.remove');
+Route::get('/cart', [WeeklyMenuController::class, 'cartPage'])->name('cart.page');
+Route::get('/menu', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('menu');
 

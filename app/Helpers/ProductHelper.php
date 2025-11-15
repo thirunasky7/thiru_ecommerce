@@ -1,0 +1,305 @@
+<?php
+
+namespace App\Helpers;
+
+use App\Models\Product;
+use Carbon\Carbon;
+
+class ProductHelper
+{
+    /**
+     * Get product image URL with fallback
+     */
+    public static function getProductImage($product, $default = null)
+    {
+        $defaultImage = $default ?? 'https://via.placeholder.com/300x300?text=No+Image';
+        
+        // Check thumbnail first
+        if ($product->thumbnail && $product->thumbnail->image_url) {
+            return asset('/public/storage/' . $product->thumbnail->image_url);
+        }
+        
+        // Check primary variant images
+        $primaryVariant = $product->primaryVariant;
+        if ($primaryVariant && $primaryVariant->images->isNotEmpty()) {
+            return asset('/public/storage/' . $primaryVariant->images->first()->image_url);
+        }
+        
+        // Check product images
+        if ($product->images->isNotEmpty()) {
+            return asset('/public/storage/' . $product->images->first()->image_url);
+        }
+        
+        // Check if image_url exists directly on product
+        if ($product->image_url) {
+            return asset('/public/storage/' . $product->image_url);
+        }
+        
+        return $defaultImage;
+    }
+
+    /**
+     * Get product name with fallback
+     */
+    public static function getProductName($product)
+    {
+        return $product->translation->name ?? $product->name ?? 'Product';
+    }
+
+    /**
+     * Get product description with fallback
+     */
+    public static function getProductDescription($product)
+    {
+        return $product->translation->description ?? $product->description ?? '';
+    }
+
+    /**
+     * Get original price with currency conversion
+     */
+    public static function getOriginalPrice($product)
+    {
+        $primaryVariant = $product->primaryVariant;
+        
+        if ($primaryVariant && $primaryVariant->converted_price) {
+            return $primaryVariant->converted_price;
+        }
+        
+        if ($primaryVariant && $primaryVariant->price) {
+            return $primaryVariant->price;
+        }
+        
+        return $product->price ?? 0;
+    }
+
+    /**
+     * Get discount price with currency conversion
+     */
+    public static function getDiscountPrice($product)
+    {
+        $primaryVariant = $product->primaryVariant;
+        
+        if ($primaryVariant && $primaryVariant->converted_discount_price) {
+            return $primaryVariant->converted_discount_price;
+        }
+        
+        if ($primaryVariant && $primaryVariant->discount_price) {
+            return $primaryVariant->discount_price;
+        }
+        
+        return $product->discount_price ?? 0;
+    }
+
+    /**
+     * Check if product has discount
+     */
+    public static function hasDiscount($product)
+    {
+        $originalPrice = self::getOriginalPrice($product);
+        $discountPrice = self::getDiscountPrice($product);
+        
+        return $discountPrice && $discountPrice > 0 && $originalPrice > $discountPrice;
+    }
+
+    /**
+     * Calculate discount percentage
+     */
+    public static function getDiscountPercent($product)
+    {
+        if (!self::hasDiscount($product)) {
+            return 0;
+        }
+        
+        $originalPrice = self::getOriginalPrice($product);
+        $discountPrice = self::getDiscountPrice($product);
+        
+        return round((($originalPrice - $discountPrice) / $originalPrice) * 100);
+    }
+
+    /**
+     * Get display price (discount price if available, otherwise original price)
+     */
+    public static function getDisplayPrice($product)
+    {
+        if (self::hasDiscount($product)) {
+            return self::getDiscountPrice($product);
+        }
+        
+        return self::getOriginalPrice($product);
+    }
+
+    /**
+     * Check if food menu item is available
+     */
+    public static function isFoodMenuAvailable($product)
+    {
+        // If not a food menu item, it's always available
+        if ($product->is_food_menu !== 'yes') {
+            return true;
+        }
+        
+        // Check if product is coming soon
+        if ($product->is_coming_soon) {
+            return false;
+        }
+        
+        // Check product status
+        if ($product->status !== 'active') {
+            return false;
+        }
+        
+        // For food menu items, check availability based on time and day
+        return self::checkFoodMenuTiming($product);
+    }
+
+    /**
+     * Check food menu timing availability
+     */
+    public static function checkFoodMenuTiming($product)
+    {
+        $now = Carbon::now();
+        $currentHour = $now->hour;
+        $currentDay = strtolower($now->englishDayOfWeek);
+        
+        // Define time ranges for each meal type
+        $timeRanges = [
+            'breakfast' => ['start' => 6, 'end' => 11],   // 6 AM to 11 AM
+            'lunch' => ['start' => 11, 'end' => 15],      // 11 AM to 3 PM
+            'snacks' => ['start' => 15, 'end' => 19],     // 3 PM to 7 PM
+            'dinner' => ['start' => 19, 'end' => 23],     // 7 PM to 11 PM
+        ];
+        
+        // Get meal type from product (you might need to adjust this based on your data structure)
+        $mealType = $product->meal_type ?? self::detectMealTypeFromProduct($product);
+        
+        if (!$mealType || !isset($timeRanges[$mealType])) {
+            return true; // If no meal type defined, assume available
+        }
+        
+        $startHour = $timeRanges[$mealType]['start'];
+        $endHour = $timeRanges[$mealType]['end'];
+        
+        return $currentHour >= $startHour && $currentHour < $endHour;
+    }
+
+    /**
+     * Detect meal type from product (you can customize this based on your data)
+     */
+    private static function detectMealTypeFromProduct($product)
+    {
+        // This is a sample implementation - adjust based on your product data structure
+        $name = strtolower(self::getProductName($product));
+        $description = strtolower(self::getProductDescription($product));
+        
+        if (str_contains($name, 'breakfast') || str_contains($description, 'breakfast')) {
+            return 'breakfast';
+        } elseif (str_contains($name, 'lunch') || str_contains($description, 'lunch')) {
+            return 'lunch';
+        } elseif (str_contains($name, 'dinner') || str_contains($description, 'dinner')) {
+            return 'dinner';
+        } elseif (str_contains($name, 'snack') || str_contains($description, 'snack')) {
+            return 'snacks';
+        }
+        
+        return null;
+    }
+
+    /**
+     * Get food menu availability message
+     */
+    public static function getFoodMenuAvailabilityMessage($product)
+    {
+        if ($product->is_food_menu !== 'yes') {
+            return '';
+        }
+        
+        if ($product->is_coming_soon) {
+            return 'Coming Soon';
+        }
+        
+        if ($product->status !== 'active') {
+            return 'Currently Unavailable';
+        }
+        
+        if (!self::isFoodMenuAvailable($product)) {
+            $mealType = $product->meal_type ?? self::detectMealTypeFromProduct($product);
+            $timeRanges = [
+                'breakfast' => '6 AM - 11 AM',
+                'lunch' => '11 AM - 3 PM',
+                'snacks' => '3 PM - 7 PM',
+                'dinner' => '7 PM - 11 PM',
+            ];
+            
+            if ($mealType && isset($timeRanges[$mealType])) {
+                return "Available {$timeRanges[$mealType]}";
+            }
+            
+            return 'Available during specific hours';
+        }
+        
+        return '';
+    }
+
+    /**
+     * Get product rating information
+     */
+    public static function getProductRating($product)
+    {
+        return [
+            'average' => round($product->reviews_avg_rating ?? 4.5, 1),
+            'count' => $product->reviews_count ?? 0,
+            'stars' => self::generateStarRating($product->reviews_avg_rating ?? 4.5),
+        ];
+    }
+
+    /**
+     * Generate star rating HTML
+     */
+    public static function generateStarRating($rating)
+    {
+        $stars = '';
+        $fullStars = floor($rating);
+        $hasHalfStar = ($rating - $fullStars) >= 0.5;
+        
+        for ($i = 1; $i <= 5; $i++) {
+            if ($i <= $fullStars) {
+                $stars .= '<i class="fas fa-star text-yellow-400 text-xs"></i>';
+            } elseif ($hasHalfStar && $i == $fullStars + 1) {
+                $stars .= '<i class="fas fa-star-half-alt text-yellow-400 text-xs"></i>';
+                $hasHalfStar = false;
+            } else {
+                $stars .= '<i class="far fa-star text-yellow-400 text-xs"></i>';
+            }
+        }
+        
+        return $stars;
+    }
+
+    /**
+     * Check if product is in stock
+     */
+    public static function isInStock($product)
+    {
+        $primaryVariant = $product->primaryVariant;
+        
+        if ($primaryVariant) {
+            return $primaryVariant->stock > 0;
+        }
+        
+        return $product->stock > 0;
+    }
+
+    /**
+     * Get stock quantity
+     */
+    public static function getStockQuantity($product)
+    {
+        $primaryVariant = $product->primaryVariant;
+        
+        if ($primaryVariant) {
+            return $primaryVariant->stock;
+        }
+        
+        return $product->stock ?? 0;
+    }
+}
