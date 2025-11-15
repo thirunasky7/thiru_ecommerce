@@ -13,10 +13,21 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('set null');
-            $table->string('guest_email')->nullable();
+             $table->string('order_number')->unique();
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->string('customer_name');
+            $table->string('customer_phone');
+            $table->text('customer_address');
+            $table->enum('payment_method', ['cod', 'card', 'upi'])->default('cod');
+            $table->enum('status', ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'])->default('pending');
+            $table->decimal('subtotal', 10, 2);
+            $table->decimal('shipping', 10, 2)->default(0);
+            $table->decimal('tax', 10, 2)->default(0);
             $table->decimal('total_amount', 10, 2);
-            $table->enum('status', ['pending', 'processing', 'completed', 'canceled'])->default('pending');
+            $table->text('order_notes')->nullable();
+            $table->dateTime('order_date');
+            $table->dateTime('delivered_date')->nullable();
             $table->timestamps();
         });
     }
