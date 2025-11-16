@@ -76,7 +76,7 @@ class BannerService
                     if ($translation->image_url && Storage::exists($translation->image_url)) {
                         Storage::delete($translation->image_url);
                     }
-                    $imageUrl = $languageData['image']->store('public/banner_images');
+                    $imageUrl = $languageData['image']->store('/banner_images');
                 }
 
                 $translation->title = $languageData['title'];
@@ -86,7 +86,7 @@ class BannerService
             } else {
                 $imageUrl = null;
                 if (isset($languageData['image']) && $languageData['image']) {
-                    $imageUrl = $languageData['image']->store('public/banner_images');
+                    $imageUrl = $languageData['image']->store('/banner_images');
                 }
 
                 BannerTranslation::create([
