@@ -16,23 +16,23 @@ class ProductHelper
         
         // Check thumbnail first
         if ($product->thumbnail && $product->thumbnail->image_url) {
-            return asset('/storage/' . $product->thumbnail->image_url);
+            return asset('/public/storage/' . $product->thumbnail->image_url);
         }
         
         // Check primary variant images
         $primaryVariant = $product->primaryVariant;
         if ($primaryVariant && $primaryVariant->images->isNotEmpty()) {
-            return asset('/storage/' . $primaryVariant->images->first()->image_url);
+            return asset('/public/storage/' . $primaryVariant->images->first()->image_url);
         }
         
         // Check product images
         if ($product->images->isNotEmpty()) {
-            return asset('/storage/' . $product->images->first()->image_url);
+            return asset('/public/storage/' . $product->images->first()->image_url);
         }
         
         // Check if image_url exists directly on product
         if ($product->image_url) {
-            return asset('/storage/' . $product->image_url);
+            return asset('/public/storage/' . $product->image_url);
         }
         
         return $defaultImage;

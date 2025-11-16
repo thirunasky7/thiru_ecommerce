@@ -89,6 +89,7 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+  
 
     // Scopes
     public function scopePending($query)

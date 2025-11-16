@@ -105,15 +105,10 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
-     public function product()
+    public function product()
     {
         return $this->belongsTo(Product::class);
     }
-
-    /**
-     * Get the order that owns the order item.
-     */
-    
 
     public function variant()
     {

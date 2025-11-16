@@ -11,7 +11,6 @@
     </div>
     <div class="hidden lg:flex space-x-6 font-medium">
       <a href="{{ url('/home')}}" class="hover:text-blue-600">Home</a>
-      <a href="{{ url('/products')}}" class="hover:text-blue-600">Products</a>
       <a href="{{ url('/about-us')}}" class="hover:text-blue-600">About Us</a>
       <a href="{{ url('/services')}}" class="hover:text-blue-600">Services</a>
       <a href="{{ url('/contact-us')}}" class="hover:text-blue-600">Contact Us</a>
@@ -20,11 +19,12 @@
     <div class="flex items-center space-x-4">
       <!-- <i data-feather="search" class="w-5 h-5 cursor-pointer"></i>
       <i data-feather="heart" class="w-5 h-5 cursor-pointer"></i> -->
-      <a href="{{ route('cart.view') }}" class="relative inline-block text-gray-800 me-3">
+      <a href="{{ route('cart.page') }}" class="relative inline-block text-gray-800 me-3">
         <!-- Cart Icon -->
         <i data-feather="shopping-cart" class="w-6 h-6 cursor-pointer"></i>
         
         <!-- Cart Count Badge -->
+         
         <span id="cart-count"
                 class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold rounded-full px-1.5 py-0.5">
             {{ session('cart') ? collect(session('cart'))->sum('quantity') : 0 }}

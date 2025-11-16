@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 use App\Models\Product;
 use Carbon\Carbon;
-
+use Illuminate\Support\Str;
 class ProductHelper
 {
     /**
@@ -51,7 +51,13 @@ class ProductHelper
      */
     public static function getProductDescription($product)
     {
-        return $product->translation->description ?? $product->description ?? '';
+          $clean = html_entity_decode(strip_tags($product->translation->description));
+        $clean = preg_replace('/[^A-Za-z0-9\s\.\,\-\']+/', '', $clean);
+        $clean = preg_replace('/\s{2,}/', ' ', $clean);
+        $clean = trim($clean);
+        $excerpt = Str::limit($clean, 100);
+
+        return  $excerpt ?? $product->description ?? '';
     }
 
     /**
@@ -131,114 +137,287 @@ class ProductHelper
     /**
      * Check if food menu item is available
      */
-    public static function isFoodMenuAvailable($product)
-    {
-        // If not a food menu item, it's always available
-        if ($product->is_food_menu !== 'yes') {
-            return true;
-        }
-        
-        // Check if product is coming soon
-        if ($product->is_coming_soon) {
-            return false;
-        }
-        
-        // Check product status
-        if ($product->status !== 'active') {
-            return false;
-        }
-        
-        // For food menu items, check availability based on time and day
-        return self::checkFoodMenuTiming($product);
+   public static function isFoodMenuAvailable($product)
+{
+    // If not a food menu item, it's always available
+    if ($product->is_food_menu == 'no') {
+        return true;
     }
+    
+    // Check if product is coming soon
+    if ($product->is_coming_soon) {
+        return false;
+    }
+    
+    // Check product status
+    if ($product->status == 0) {
+        return false;
+    }
+    
+    // For food menu items, check availability based on product mode and timing
+    return self::checkFoodMenuTiming($product);
+}
 
-    /**
-     * Check food menu timing availability
-     */
-    public static function checkFoodMenuTiming($product)
-    {
+/**
+ * Check food menu timing availability based on product mode
+ */
+public static function checkFoodMenuTiming($product)
+{
+    $now = Carbon::now();
+    $currentHour = $now->hour;
+    $currentDay = $now->englishDayOfWeek;
+    
+    // Get product mode (preorder or regular)
+    $productMode = $product->product_mode ?? 'regular'; // default to regular if not set
+    $mealType = $product->meal_type ?? self::detectMealTypeFromProduct($product);
+   
+    
+    if (!$mealType) {
+        return true; // If no meal type defined, assume available
+    }
+    
+    // Regular product mode availability (6AM to 10PM daily)
+    if ($productMode === 'regular') {
+        return $currentHour >= 6 && $currentHour < 22; // 6AM to 10PM
+    }
+    
+    // Preorder product mode availability
+    if ($productMode === 'preorder') {
+        return self::checkPreOrderAvailability($mealType, $now);
+    }
+    
+    return true;
+}
+
+/**
+ * Check pre-order availability based on meal type and current time
+ */
+private static function checkPreOrderAvailability($mealType, $currentTime)
+{
+    $currentHour = $currentTime->hour;
+    $currentDate = $currentTime->format('Y-m-d');
+    
+    // Define cutoff times for each meal type
+    $cutoffTimes = [
+        'breakfast' => [
+            'today' => null, // Never available for today (order closed)
+            'tomorrow' => 24, // Available until midnight for tomorrow
+            'day_after' => 24 // Available until midnight for day after
+        ],
+        'lunch' => [
+            'today' => 10, // Available until 10AM for today
+            'tomorrow' => 24, // Available until midnight for tomorrow
+            'day_after' => 24 // Available until midnight for day after
+        ],
+        'snacks' => [
+            'today' => 18, // Available until 6PM for today
+            'tomorrow' => 24, // Available until midnight for tomorrow
+            'day_after' => 24 // Available until midnight for day after
+        ],
+        'dinner' => [
+            'today' => 17, // Available until 5PM for today
+            'tomorrow' => 24, // Available until midnight for tomorrow
+            'day_after' => 24 // Available until midnight for day after
+        ]
+    ];
+    
+    if (!isset($cutoffTimes[$mealType])) {
+        return false; // Unknown meal type
+    }
+    
+    $mealCutoff = $cutoffTimes[$mealType];
+    
+    // Check if ordering for today
+    if (self::isOrderingForToday($currentTime)) {
+        // For breakfast today - always closed
+        if ($mealType === 'breakfast') {
+            return false;
+        }
+        
+        // For other meals today - check if before cutoff time
+        return $currentHour < $mealCutoff['today'];
+    }
+    
+    // Check if ordering for tomorrow
+    if (self::isOrderingForTomorrow($currentTime)) {
+        return $currentHour < $mealCutoff['tomorrow'];
+    }
+    
+    // Check if ordering for day after tomorrow
+    if (self::isOrderingForDayAfterTomorrow($currentTime)) {
+        return $currentHour < $mealCutoff['day_after'];
+    }
+    
+    return false;
+}
+
+/**
+ * Check if the order is for today's delivery
+ */
+private static function isOrderingForToday($currentTime)
+{
+    // Assuming delivery date is today
+    // You might need to adjust this based on how you determine delivery date
+    return true; // Default implementation - adjust as needed
+}
+
+/**
+ * Check if the order is for tomorrow's delivery
+ */
+private static function isOrderingForTomorrow($currentTime)
+{
+    // This would depend on your delivery date selection logic
+    // For now, returning false - you'll need to implement based on your cart/delivery system
+    return false;
+}
+
+/**
+ * Check if the order is for day after tomorrow's delivery
+ */
+private static function isOrderingForDayAfterTomorrow($currentTime)
+{
+    // This would depend on your delivery date selection logic
+    // For now, returning false - you'll need to implement based on your cart/delivery system
+    return false;
+}
+
+/**
+ * Detect meal type from product
+ */
+private static function detectMealTypeFromProduct($product)
+{
+    // This is a sample implementation - adjust based on your product data structure
+    $name = strtolower(self::getProductName($product));
+    $description = strtolower(self::getProductDescription($product));
+    $category = strtolower(self::getProductCategory($product));
+    
+    $searchText = $name . ' ' . $description . ' ' . $category;
+    
+    if (str_contains($searchText, 'breakfast') || 
+        str_contains($searchText, 'morning') ||
+        str_contains($searchText, 'break fast')) {
+        return 'breakfast';
+    } elseif (str_contains($searchText, 'lunch') || 
+              str_contains($searchText, 'afternoon')) {
+        return 'lunch';
+    } elseif (str_contains($searchText, 'dinner') || 
+              str_contains($searchText, 'night') ||
+              str_contains($searchText, 'evening')) {
+        return 'dinner';
+    } elseif (str_contains($searchText, 'snack') || 
+              str_contains($searchText, 'evening')) {
+        return 'snacks';
+    }
+    
+    
+    return null;
+}
+
+/**
+ * Get product name (adjust based on your implementation)
+ */
+
+
+
+/**
+ * Get product category (adjust based on your implementation)
+ */
+private static function getProductCategory($product)
+{
+    return $product->category->name ?? '';
+}
+
+/**
+ * Get availability message for display
+ */
+public static function getFoodMenuAvailabilityMessage($product)
+{
+    if ($product->is_food_menu !== 'yes') {
+        return 'Available';
+    }
+    
+    $productMode = $product->product_mode ?? 'regular';
+    $mealType = $product->meal_type ?? self::detectMealTypeFromProduct($product);
+    
+    if ($productMode === 'regular') {
+        return 'Available today (6AM - 10PM)';
+    }
+    
+    if ($productMode === 'preorder') {
         $now = Carbon::now();
-        $currentHour = $now->hour;
-        $currentDay = strtolower($now->englishDayOfWeek);
         
-        // Define time ranges for each meal type
-        $timeRanges = [
-            'breakfast' => ['start' => 6, 'end' => 11],   // 6 AM to 11 AM
-            'lunch' => ['start' => 11, 'end' => 15],      // 11 AM to 3 PM
-            'snacks' => ['start' => 15, 'end' => 19],     // 3 PM to 7 PM
-            'dinner' => ['start' => 19, 'end' => 23],     // 7 PM to 11 PM
-        ];
-        
-        // Get meal type from product (you might need to adjust this based on your data structure)
-        $mealType = $product->meal_type ?? self::detectMealTypeFromProduct($product);
-        
-        if (!$mealType || !isset($timeRanges[$mealType])) {
-            return true; // If no meal type defined, assume available
+        if ($mealType === 'breakfast') {
+            return 'Today\'s breakfast order closed';
+        } elseif ($mealType === 'lunch') {
+            $availableUntil = '10 AM';
+            return "Today\'s lunch available until {$availableUntil}";
+        } elseif ($mealType === 'snacks') {
+            $availableUntil = '6 PM';
+            return "Today\'s snacks available until {$availableUntil}";
+        } elseif ($mealType === 'dinner') {
+            $availableUntil = '5 PM';
+            return "Today\'s dinner available until {$availableUntil}";
         }
-        
-        $startHour = $timeRanges[$mealType]['start'];
-        $endHour = $timeRanges[$mealType]['end'];
-        
-        return $currentHour >= $startHour && $currentHour < $endHour;
     }
+    
+    return 'Check availability';
+}
 
-    /**
-     * Detect meal type from product (you can customize this based on your data)
-     */
-    private static function detectMealTypeFromProduct($product)
-    {
-        // This is a sample implementation - adjust based on your product data structure
-        $name = strtolower(self::getProductName($product));
-        $description = strtolower(self::getProductDescription($product));
-        
-        if (str_contains($name, 'breakfast') || str_contains($description, 'breakfast')) {
-            return 'breakfast';
-        } elseif (str_contains($name, 'lunch') || str_contains($description, 'lunch')) {
-            return 'lunch';
-        } elseif (str_contains($name, 'dinner') || str_contains($description, 'dinner')) {
-            return 'dinner';
-        } elseif (str_contains($name, 'snack') || str_contains($description, 'snack')) {
-            return 'snacks';
-        }
-        
-        return null;
+/**
+ * Check if product can be added to cart with specific delivery date
+ */
+public static function canAddToCartWithDeliveryDate($product, $deliveryDate)
+{
+    if ($product->is_food_menu !== 'yes') {
+        return true;
     }
+    
+    $productMode = $product->product_mode ?? 'regular';
+    $mealType = $product->meal_type ?? self::detectMealTypeFromProduct($product);
+    
+    if ($productMode === 'regular') {
+        // Regular products available for any delivery date within operating hours
+        $currentHour = Carbon::now()->hour;
+        return $currentHour >= 6 && $currentHour < 22;
+    }
+    
+    if ($productMode === 'preorder') {
+        $currentTime = Carbon::now();
+        $deliveryCarbon = Carbon::parse($deliveryDate);
+        
+        // Check if delivery is today, tomorrow, or day after tomorrow
+        $daysDiff = $currentTime->diffInDays($deliveryCarbon, false);
+        
+        if ($daysDiff === 0) { // Today
+            return self::checkTodayPreOrderAvailability($mealType, $currentTime->hour);
+        } elseif ($daysDiff === 1) { // Tomorrow
+            return true; // Always available for tomorrow
+        } elseif ($daysDiff === 2) { // Day after tomorrow
+            return true; // Always available for day after tomorrow
+        }
+    }
+    
+    return false;
+}
 
-    /**
-     * Get food menu availability message
-     */
-    public static function getFoodMenuAvailabilityMessage($product)
-    {
-        if ($product->is_food_menu !== 'yes') {
-            return '';
-        }
-        
-        if ($product->is_coming_soon) {
-            return 'Coming Soon';
-        }
-        
-        if ($product->status !== 'active') {
-            return 'Currently Unavailable';
-        }
-        
-        if (!self::isFoodMenuAvailable($product)) {
-            $mealType = $product->meal_type ?? self::detectMealTypeFromProduct($product);
-            $timeRanges = [
-                'breakfast' => '6 AM - 11 AM',
-                'lunch' => '11 AM - 3 PM',
-                'snacks' => '3 PM - 7 PM',
-                'dinner' => '7 PM - 11 PM',
-            ];
-            
-            if ($mealType && isset($timeRanges[$mealType])) {
-                return "Available {$timeRanges[$mealType]}";
-            }
-            
-            return 'Available during specific hours';
-        }
-        
-        return '';
+/**
+ * Check today's pre-order availability based on current hour
+ */
+private static function checkTodayPreOrderAvailability($mealType, $currentHour)
+{
+    switch ($mealType) {
+        case 'breakfast':
+            return false; // Never available for today
+        case 'lunch':
+            return $currentHour < 10; // Available until 10AM
+        case 'snacks':
+            return $currentHour < 18; // Available until 6PM
+        case 'dinner':
+            return $currentHour < 17; // Available until 5PM
+        default:
+            return false;
     }
+}
 
     /**
      * Get product rating information
