@@ -221,7 +221,6 @@
 </div>
 
 <!-- Shopping Cart -->
-@include('partials.cart')
 <script>
 // Cut-off timer for pre-orders
 function updateCutoffTimer() {
