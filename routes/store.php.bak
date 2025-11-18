@@ -20,6 +20,7 @@ use App\Http\Controllers\Store\PaymentController;
 use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\WeeklyMenuController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderTrackingController;
 
 
 
@@ -124,4 +125,8 @@ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])-
 Route::delete('/cart/remove/{cartItemId}', [CartController::class, 'removeItem'])->name('cart.remove');
 Route::get('/cart', [WeeklyMenuController::class, 'cartPage'])->name('cart.page');
 Route::get('/menu', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('menu');
+
+Route::get('/track-order', [OrderTrackingController::class, 'showTrackingPage'])->name('order.tracking');
+Route::post('/track-order', [OrderTrackingController::class, 'trackOrder'])->name('order.track');
+Route::get('/order-details/{orderId}', [OrderTrackingController::class, 'getOrderDetails'])->name('order.details');
 

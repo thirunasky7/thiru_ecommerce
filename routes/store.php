@@ -25,13 +25,13 @@ use App\Http\Controllers\OrderTrackingController;
 
 
 
-Route::get('/', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('xylo.home');
+Route::get('/', [WeeklyMenuController::class, 'preOrderPage'])->name('xylo.home');
 Route::get('/menus', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('xylo.menus');
 Route::get('/menu', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('menu');
 Route::get('/cutoff-time', [WeeklyMenuController::class, 'getCutoffTime'])->name('cutoff.time');
 Route::get('/debug-menu/{day}', [WeeklyMenuController::class, 'debugMenu']);
 
-Route::get('/home', [WeeklyMenuController::class, 'showThreeDayMenu']);
+Route::get('/home', [WeeklyMenuController::class, 'preOrderPage']);
 Route::get('/services', function(){
     return view('services');
 });
@@ -123,6 +123,11 @@ Route::prefix('customer')->name('customer.')->group(function () {
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.update-quantity');
 Route::delete('/cart/remove/{cartItemId}', [CartController::class, 'removeItem'])->name('cart.remove');
+// Route::get('/cart', [WeeklyMenuController::class, 'cartPage'])->name('cart.page');
+// Route::get('/menu', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('menu');
+Route::get('/menu', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('menu');
+Route::get('/pre-order', [WeeklyMenuController::class, 'preOrderPage'])->name('pre-order');
+Route::get('/regular-order', [WeeklyMenuController::class, 'regularOrderPage'])->name('regular-order');
 Route::get('/cart', [WeeklyMenuController::class, 'cartPage'])->name('cart.page');
 Route::get('/menu', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('menu');
 

@@ -11,6 +11,8 @@
     </div>
     <div class="hidden lg:flex space-x-6 font-medium">
       <a href="{{ url('/home')}}" class="hover:text-blue-600">Home</a>
+      <a href="{{ url('/pre-order')}}" class="hover:text-blue-600">Foods</a>
+      <a href="{{ url('/regular-order')}}" class="hover:text-blue-600">Groceries</a>
       <a href="{{ url('/about-us')}}" class="hover:text-blue-600">About Us</a>
       <a href="{{ url('/services')}}" class="hover:text-blue-600">Services</a>
       <a href="{{ url('/contact-us')}}" class="hover:text-blue-600">Contact Us</a>
@@ -36,7 +38,8 @@
   <div id="mobile-menu" class="hidden bg-white border-t border-gray-200 absolute w-full left-0 top-full shadow-lg">
     <nav class="flex flex-col p-4 space-y-3 font-medium">
       <a href="{{ url('/home')}}" class="hover:text-blue-600">Home</a>
-      <a href="{{ url('/products')}}" class="hover:text-blue-600">Products</a>
+      <a href="{{ url('/pre-order')}}" class="hover:text-blue-600">Foods</a>
+      <a href="{{ url('/regular-order')}}" class="hover:text-blue-600">Groceries</a>
       <a href="{{ url('/about-us')}}" class="hover:text-blue-600">About Us</a>
       <a href="{{ url('/services')}}" class="hover:text-blue-600">Services</a>
       <a href="{{ url('/contact-us')}}" class="hover:text-blue-600">Contact Us</a>

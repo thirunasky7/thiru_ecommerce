@@ -1,0 +1,1032 @@
+@extends('themes.xylo.partials.app')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+@section('content')
+<style>
+/* Enhanced Custom Styles */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.slide {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+.active-slide {
+    display: block;
+    opacity: 1;
+}
+
+.meal-section-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+.meal-section-disabled::after {
+    content: "Order Closed";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: bold;
+    z-index: 10;
+    font-size: 1.1rem;
+}
+
+.product-disabled {
+    opacity: 0.5;
+}
+
+.availability-badge {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-left: 8px;
+    font-weight: 600;
+}
+
+/* Enhanced Products Grid */
+.products-scroll-container {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 15px 10px 25px 10px;
+    margin: 0 -15px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: 16px;
+}
+.products-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.product-card-scroll {
+    min-width: 280px;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.product-card-scroll:hover {
+    transform: translateY(-5px);
+    border-color: #0d6efd;
+    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.15);
+}
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 5px;
+    width: 100%;
+    text-align: center;
+    pointer-events: none;
+}
+.scroll-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #d1d5db;
+    border-radius: 50%;
+    margin: 0 4px;
+}
+.scroll-indicator span.active {
+    background: #6b7280;
+}
+
+.custom-notification {
+    animation: slideInRight 0.3s ease-out;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.animate-bounce {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Enhanced Bootstrap overrides */
+.tab-button {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 12px 12px 0 0 !important;
+}
+.tab-button:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+/* Enhanced Active tab styling */
+.nav-tabs .nav-link.active {
+    border-bottom: 4px solid #0d6efd !important;
+    color: #0d6efd !important;
+    font-weight: 700;
+    background-color: transparent;
+    transform: translateY(-1px);
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: #6c757d;
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+}
+
+.nav-tabs .nav-link:hover {
+    border: none;
+    color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+/* Enhanced Delivery time styling */
+.delivery-time-badge {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1565c0;
+    border: 2px solid #90caf9;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+.delivery-time-icon {
+    width: 14px;
+    height: 14px;
+}
+
+/* Enhanced Product Cards */
+.enhanced-product-card {
+    border: 2px solid #e9ecef;
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    background: white;
+    height: 100%;
+}
+
+.enhanced-product-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 10px 30px rgba(13, 110, 253, 0.15);
+}
+
+.product-image-container {
+    height: 140px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.product-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.enhanced-product-card:hover .product-image-container img {
+    transform: scale(1.05);
+}
+
+/* Enhanced Quantity Controls */
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 1rem 0;
+}
+
+.quantity-btn {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #dee2e6;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.quantity-btn:hover {
+    background: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+.quantity-display {
+    width: 50px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Enhanced Add to Cart Button */
+.add-to-cart-btn {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.add-to-cart-btn:hover {
+    background: linear-gradient(135deg, #c82333, #bd2130);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+
+/* Enhanced Alert */
+.enhanced-alert {
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border-left: 4px solid #ffc107;
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+    .products-scroll-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        overflow-x: visible;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .product-card-scroll {
+        min-width: auto;
+        margin-right: 0;
+    }
+    
+    .nav-tabs .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .enhanced-product-card {
+        padding: 1rem;
+    }
+    
+    .product-image-container {
+        height: 120px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .products-scroll-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .products-scroll-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+    }
+}
+
+/* Enhanced Banner */
+.enhanced-banner {
+    height: 300px;
+    object-fit: cover;
+    border-radius: 0 0 20px 20px;
+}
+
+.banner-controls {
+    background: rgba(0,0,0,0.7);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.banner-controls:hover {
+    background: rgba(0,0,0,0.9);
+    transform: scale(1.1);
+}
+
+/* Enhanced Section Headers */
+.section-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+}
+
+/* Price styling */
+.price-display {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #dc3545;
+    background: linear-gradient(135deg, #ffe6e6, #ffcccc);
+    padding: 4px 12px;
+    border-radius: 8px;
+}
+
+/* Meal type header */
+.meal-type-header {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #0d6efd;
+}
+
+/* No products message */
+.no-products-message {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    border: 2px dashed #dee2e6;
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+</style>
+
+@php
+    $currentHour = now()->hour;
+    $todayHasAvailableMenus = false;
+    
+    // Define delivery times for each meal type
+    $deliveryTimes = [
+        'breakfast' => '7:00 AM - 9:00 AM',
+        'lunch' => '12:00 PM - 2:00 PM', 
+        'snacks' => '4:00 PM - 6:00 PM',
+        'dinner' => '7:00 PM - 9:00 PM'
+    ];
+    
+    // Check if today has any available menus
+    if (isset($threeDays[0])) {
+        foreach($threeDays[0]['menus'] as $menu) {
+            $hideBreakfast = $menu->meal_type === 'breakfast';
+            
+            if (!$hideBreakfast) {
+                switch($menu->meal_type) {
+                    case 'lunch':
+                        $isMealAvailable = $currentHour < 10;
+                        break;
+                    case 'snacks':
+                        $isMealAvailable = $currentHour < 18;
+                        break;
+                    case 'dinner':
+                        $isMealAvailable = $currentHour < 17;
+                        break;
+                    default:
+                        $isMealAvailable = false;
+                }
+                
+                if ($isMealAvailable) {
+                    $todayHasAvailableMenus = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Determine which tab should be active by default
+    $defaultActiveTab = $todayHasAvailableMenus ? 0 : 1;
+@endphp
+
+<div class="min-vh-100 bg-light">
+    <!-- Enhanced Banner Section -->
+    <section class="text-white">
+        <div class="position-relative w-100" id="bannerCarousel">
+            @foreach ($banners as $index => $banner)
+                <div class="slide {{ $index === 0 ? 'active-slide' : '' }}">
+                    <img src="{{ $banner['image_url']}}" alt="{{ $banner['name'] }}" class="w-100 enhanced-banner">
+                </div>
+            @endforeach
+            <button onclick="moveSlide(-1)" class="position-absolute top-50 start-0 translate-middle-y banner-controls text-white border-0 ms-3" style="z-index: 10;">‹</button>
+            <button onclick="moveSlide(1)" class="position-absolute top-50 end-0 translate-middle-y banner-controls text-white border-0 me-3" style="z-index: 10;">›</button>
+        </div>
+    </section>
+    
+    <div class="container-fluid px-3 px-md-4 px-lg-5 mt-5">
+        <!-- Enhanced Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold section-header mb-3">Pre-Order Foods</h1>
+            <p class="lead text-muted">Order in advance for specific delivery dates</p>
+        </div>
+
+        <!-- Enhanced Bootstrap Tabs -->
+        <div class="mb-5">
+            <ul class="nav nav-tabs border-0 overflow-auto flex-nowrap scrollbar-hide justify-content-center" id="preOrderTabs" role="tablist">
+                @foreach($threeDays as $index => $dayData)
+                @php
+                    $isToday = $index === 0;
+                    $isTomorrow = $index === 1;
+                    $isDayAfter = $index === 2;
+                    $isActive = $index === $defaultActiveTab;
+                @endphp
+                <li class="nav-item" role="presentation" style="flex-shrink: 0;">
+                    <button class="nav-link text-nowrap py-3 px-4 fw-medium {{ $isActive ? 'active' : '' }}" 
+                            id="tab-{{ $index }}" 
+                            data-bs-toggle="tab" 
+                            data-bs-target="#content-{{ $index }}" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="content-{{ $index }}" 
+                            aria-selected="{{ $isActive ? 'true' : 'false' }}">
+                        <div class="d-flex flex-column">
+                            <span class="small text-muted">
+                                @if($dayData['display_name'] !== 'Today')
+                                Pre Order for
+                                @endif
+                            </span>
+                            <span class="fw-bold">{{ $dayData['display_name'] }}</span>
+                        </div>
+                    </button>
+                </li>
+                @endforeach
+            </ul>
+        </div>
+        
+        <!-- Enhanced Tab Content -->
+        <div class="tab-content" id="preOrderTabsContent">
+            @foreach($threeDays as $index => $dayData)
+            @php
+                $isToday = $index === 0;
+                $isTomorrow = $index === 1;
+                $isDayAfter = $index === 2;
+                $currentHour = now()->hour;
+                $hasAvailableMenus = false;
+                $isActive = $index === $defaultActiveTab;
+                
+                // Check if there are any available menus for this day
+                foreach($dayData['menus'] as $menu) {
+                    $hideBreakfast = $isToday && $menu->meal_type === 'breakfast';
+                    
+                    if ($isToday && !$hideBreakfast) {
+                        switch($menu->meal_type) {
+                            case 'lunch':
+                                $isMealAvailable = $currentHour < 10;
+                                break;
+                            case 'snacks':
+                                $isMealAvailable = $currentHour < 18;
+                                break;
+                            case 'dinner':
+                                $isMealAvailable = $currentHour < 17;
+                                break;
+                            default:
+                                $isMealAvailable = false;
+                        }
+                    } elseif ($isTomorrow || $isDayAfter) {
+                        $isMealAvailable = true;
+                    } else {
+                        $isMealAvailable = false;
+                    }
+                    
+                    if ($isMealAvailable && !$hideBreakfast) {
+                        $hasAvailableMenus = true;
+                        break;
+                    }
+                }
+            @endphp
+            
+            <div class="tab-pane fade {{ $isActive ? 'show active' : '' }}" 
+                 id="content-{{ $index }}" 
+                 role="tabpanel" 
+                 aria-labelledby="tab-{{ $index }}" 
+                 tabindex="0">
+                
+                @if($isTomorrow)
+                <div class="enhanced-alert alert-warning mb-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-clock text-warning fa-lg me-3"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="mb-0 fw-semibold">
+                                Order within <span class="fw-bold text-dark" id="cutoff-timer">--:--:--</span> for {{ $dayData['display_name'] }} delivery
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                @if(!$hasAvailableMenus)
+                <div class="no-products-message">
+                    <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted mb-2">No pre-order menu available</h4>
+                    <p class="text-muted mb-0">Check back later for {{ $dayData['display_name'] }}'s menu</p>
+                </div>
+                @else
+                <div class="space-y-4">
+                    @foreach($dayData['menus'] as $menu)
+                    @php
+                        $isMealAvailable = true;
+                        $availabilityMessage = 'Available';
+                        $cutoffTime = null;
+                        $showCutoffTimer = false;
+                        
+                        // Hide today's breakfast
+                        $hideBreakfast = $isToday && $menu->meal_type === 'breakfast';
+                        
+                        // Availability logic - Only show available meals
+                        if ($isToday && !$hideBreakfast) {
+                            switch($menu->meal_type) {
+                                case 'lunch':
+                                    $isMealAvailable = $currentHour < 10;
+                                    $availabilityMessage = $isMealAvailable ? "Available until 10 AM" : "Today's lunch order closed";
+                                    $cutoffTime = 10;
+                                    $showCutoffTimer = $isMealAvailable;
+                                    break;
+                                case 'snacks':
+                                    $isMealAvailable = $currentHour < 18;
+                                    $availabilityMessage = $isMealAvailable ? "Available until 6 PM" : "Today's snacks order closed";
+                                    $cutoffTime = 18;
+                                    $showCutoffTimer = $isMealAvailable;
+                                    break;
+                                case 'dinner':
+                                    $isMealAvailable = $currentHour < 17;
+                                    $availabilityMessage = $isMealAvailable ? "Available until 5 PM" : "Today's dinner order closed";
+                                    $cutoffTime = 17;
+                                    $showCutoffTimer = $isMealAvailable;
+                                    break;
+                                default:
+                                    $isMealAvailable = false;
+                                    $availabilityMessage = "Today's {$menu->meal_type} order closed";
+                            }
+                        } elseif ($isTomorrow || $isDayAfter) {
+                            $isMealAvailable = true;
+                            $availabilityMessage = "Available";
+                            $showCutoffTimer = false;
+                        } else {
+                            $isMealAvailable = false;
+                            $availabilityMessage = "Order closed";
+                        }
+                        
+                        $availabilityClass = $isMealAvailable ? 'bg-success text-white' : 'bg-danger text-white';
+                        $deliveryTime = $deliveryTimes[$menu->meal_type] ?? 'Delivery time not set';
+                    @endphp
+                    
+                    {{-- Only show available meals --}}
+                    @if($isMealAvailable && !$hideBreakfast)
+                    <div class="meal-type-header {{ !$isMealAvailable ? 'meal-section-disabled' : '' }}">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div>
+                                <h3 class="h4 fw-bold text-dark mb-2 text-capitalize">
+                                    <i class="fas fa-utensils me-2 text-primary"></i>
+                                    {{ $menu->meal_type }} 
+                                </h3>
+                                <span class="delivery-time-badge">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Delivery: {{ $deliveryTime }}
+                                </span>
+                            </div>
+                            <span class="badge availability-badge {{ $availabilityClass }} fs-6">
+                                {{ $availabilityMessage }}
+                            </span>
+                        </div>
+                        <p class="text-muted mb-0 mt-2">
+                            <i class="fas fa-calendar-day me-1"></i>
+                            Pre-order for {{ $dayData['display_name'] }}
+                        </p>
+                        
+                        @if($showCutoffTimer && $cutoffTime)
+                        <div class="mt-3 p-3 bg-info bg-opacity-10 rounded">
+                            <div class="d-flex align-items-center small text-info">
+                                <i class="fas fa-hourglass-half me-2"></i>
+                                Order within <span class="fw-bold ms-1 fs-6" id="cutoff-{{ $menu->meal_type }}">--:--:--</span>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                    
+                    <div class="products-scroll-container">
+                        @foreach($menu->products as $product)
+                        @php
+                            $productImage = product_image($product);
+                            $productName = product_name($product);
+                            $displayPrice = product_price($product);
+                            $isProductAvailable = is_product_available($product) && $isMealAvailable;
+                            $description = product_description($product);
+                            $uniqueId = $product->id . '-' . $dayData['date']->format('Y-m-d') . '-' . $menu->meal_type;
+                        @endphp
+                        
+                        @if($isProductAvailable)
+                        <div class="product-card-scroll enhanced-product-card">
+                            <div class="product-image-container">
+                                @if($productImage)
+                                <img src="{{ $productImage }}" alt="{{ $productName }}" class="w-100 h-100">
+                                @else
+                                <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-image fa-2x text-muted"></i>
+                                </div>
+                                @endif
+                            </div>
+                            
+                            <h5 class="fw-bold text-dark mb-2">{{ $productName }}</h5>
+                            <p class="text-muted small mb-3" style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                {{ $description ?? 'Delicious meal prepared with care' }}
+                            </p>
+                            
+                            <div class="quantity-controls">
+                                <span class="small text-muted">Qty:</span>
+                                <div class="d-flex align-items-center ms-auto">
+                                    <button type="button" onclick="decrementQuantity('{{ $uniqueId }}')" class="quantity-btn">−</button>
+                                    <span id="quantity-{{ $uniqueId }}" class="quantity-display mx-2">1</span>
+                                    <button type="button" onclick="incrementQuantity('{{ $uniqueId }}')" class="quantity-btn">+</button>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="price-display">₹{{ $displayPrice }}</span>
+                                <button onclick="addToCartWithQuantity({{ $product->id }}, '{{ $dayData['date']->format('Y-m-d') }}', '{{ $menu->meal_type }}', '{{ $uniqueId }}')" 
+                                        class="add-to-cart-btn">
+                                    <i class="fas fa-cart-plus me-2"></i>
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                        @endif
+                        @endforeach
+                    </div>
+                    @endif
+                    @endforeach
+                </div>
+                @endif
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+// Enhanced Cart functionality
+let quantityStore = {};
+
+// Enhanced Quantity management
+function incrementQuantity(uniqueId) {
+    if (!quantityStore[uniqueId]) quantityStore[uniqueId] = 1;
+    quantityStore[uniqueId]++;
+    updateQuantityDisplay(uniqueId);
+}
+
+function decrementQuantity(uniqueId) {
+    if (!quantityStore[uniqueId]) quantityStore[uniqueId] = 1;
+    if (quantityStore[uniqueId] > 1) {
+        quantityStore[uniqueId]--;
+    }
+    updateQuantityDisplay(uniqueId);
+}
+
+function updateQuantityDisplay(uniqueId) {
+    const el = document.getElementById(`quantity-${uniqueId}`);
+    if (el) {
+        el.textContent = quantityStore[uniqueId] || 1;
+        // Add animation
+        el.classList.add('animate-bounce');
+        setTimeout(() => {
+            el.classList.remove('animate-bounce');
+        }, 300);
+    }
+}
+
+function getQuantity(uniqueId) {
+    return quantityStore[uniqueId] || 1;
+}
+
+// Enhanced Add to cart function
+async function addToCartWithQuantity(productId, orderForDate, mealType, uniqueId) {
+    const quantity = getQuantity(uniqueId);
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+    button.disabled = true;
+    
+    try {
+        const response = await fetch('{{ route("cart.add") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: quantity,
+                order_for_date: orderForDate,
+                meal_type: mealType,
+            })
+        });
+
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            showNotification('🎉 Product added to cart successfully!', 'success');
+            
+            // Enhanced cart count update
+            updateCartCount(result.cart_count);
+            const cartCount = result.cart_count;
+            document.querySelectorAll('#cart-count, #cart-count-desktop').forEach(element => {
+                element.textContent = cartCount;
+            });
+            
+            // Reset quantity with animation
+            quantityStore[uniqueId] = 1;
+            updateQuantityDisplay(uniqueId);
+            
+            // Success state on button
+            button.innerHTML = '<i class="fas fa-check me-2"></i>Added!';
+            button.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '';
+                button.disabled = false;
+            }, 1500);
+        } else {
+            showNotification(result.message || 'Failed to add product to cart', 'error');
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        showNotification('Error adding product to cart', 'error');
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }
+}
+
+// Enhanced cart count update
+function updateCartCount(count) {
+    const cartElements = document.querySelectorAll('#cart-count, #cart-count-desktop');
+    cartElements.forEach(element => {
+        element.textContent = count;
+        element.classList.add('animate-bounce');
+        setTimeout(() => {
+            element.classList.remove('animate-bounce');
+        }, 1000);
+    });
+}
+
+// Enhanced Notification function
+function showNotification(message, type = 'info') {
+    const existingNotifications = document.querySelectorAll('.custom-notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    const notification = document.createElement('div');
+    const bgColor = type === 'success' ? 'linear-gradient(135deg, #28a745, #20c997)' :
+                   type === 'error' ? 'linear-gradient(135deg, #dc3545, #c82333)' :
+                   'linear-gradient(135deg, #17a2b8, #138496)';
+    
+    notification.className = `custom-notification position-fixed top-3 end-3 p-4 shadow z-3`;
+    notification.style.background = bgColor;
+    notification.style.color = 'white';
+    notification.style.borderRadius = '12px';
+    notification.style.fontWeight = '600';
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-2"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Enhanced animation
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+        notification.style.transition = 'transform 0.3s ease-out';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Rest of the existing functions remain the same...
+// [Cut-off timer functions, banner carousel, initialization functions remain unchanged]
+
+// Cut-off timer functions
+function updateCutoffTimer() {
+    const now = new Date();
+    const cutoff = new Date();
+    cutoff.setHours(22, 0, 0, 0);
+    
+    if (now > cutoff) {
+        cutoff.setDate(cutoff.getDate() + 1);
+    }
+    
+    const diff = cutoff - now;
+    const cutoffElement = document.getElementById('cutoff-timer');
+    
+    if (cutoffElement) {
+        if (diff <= 0) {
+            cutoffElement.textContent = '00:00:00';
+        } else {
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            cutoffElement.textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    }
+}
+
+function updateMealCutoffTimers() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    const mealCutoffs = {
+        'lunch': 10,
+        'snacks': 18, 
+        'dinner': 17
+    };
+    
+    Object.keys(mealCutoffs).forEach(mealType => {
+        const cutoffHour = mealCutoffs[mealType];
+        const cutoffElement = document.getElementById(`cutoff-${mealType}`);
+        
+        if (cutoffElement && currentHour < cutoffHour) {
+            const cutoffTime = new Date();
+            cutoffTime.setHours(cutoffHour, 0, 0, 0);
+            
+            const diff = cutoffTime - now;
+            
+            if (diff > 0) {
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                cutoffElement.textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                cutoffElement.textContent = '00:00:00';
+            }
+        }
+    });
+}
+
+// Banner carousel
+let currentIndex = 0;
+const slides = document.querySelectorAll('#bannerCarousel .slide');
+
+function showSlide(index) {
+    slides.forEach(slide => slide.classList.remove('active-slide'));
+    if (slides[index]) {
+        slides[index].classList.add('active-slide');
+    }
+}
+
+function moveSlide(step) {
+    currentIndex = (currentIndex + step + slides.length) % slides.length;
+    showSlide(currentIndex);
+}
+
+// Function to check if today has available menus and switch tab if needed
+function checkAndSwitchTab() {
+    const todayTab = document.getElementById('tab-0');
+    const tomorrowTab = document.getElementById('tab-1');
+    const todayContent = document.getElementById('content-0');
+    
+    const todayHasContent = todayContent && !todayContent.querySelector('.no-products-message');
+    
+    if (!todayHasContent && tomorrowTab) {
+        const tomorrowTabInstance = new bootstrap.Tab(tomorrowTab);
+        tomorrowTabInstance.show();
+    }
+}
+
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Enhanced pre-order page initialized');
+    
+    // Initialize Bootstrap tabs
+    const preOrderTabs = document.getElementById('preOrderTabs');
+    if (preOrderTabs) {
+        const tab = new bootstrap.Tab(preOrderTabs.querySelector('.nav-link.active'));
+    }
+    
+    // Check and switch tab if today has no available menus
+    setTimeout(checkAndSwitchTab, 100);
+    
+    // Start timers
+    setInterval(updateCutoffTimer, 1000);
+    setInterval(updateMealCutoffTimers, 1000);
+    updateCutoffTimer();
+    updateMealCutoffTimers();
+    
+    // Start banner carousel
+    if (slides.length > 1) {
+        setInterval(() => moveSlide(1), 4000);
+    }
+    
+    // Enhanced horizontal scrolling for mobile
+    initHorizontalScroll();
+});
+
+// Enhanced horizontal scrolling
+function initHorizontalScroll() {
+    const scrollContainers = document.querySelectorAll('.products-scroll-container');
+    
+    scrollContainers.forEach(container => {
+        if (window.innerWidth < 768) {
+            container.style.cursor = 'grab';
+            
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            container.addEventListener('mousedown', (e) => {
+                isDown = true;
+                container.style.cursor = 'grabbing';
+                startX = e.pageX - container.offsetLeft;
+                scrollLeft = container.scrollLeft;
+            });
+
+            container.addEventListener('mouseleave', () => {
+                isDown = false;
+                container.style.cursor = 'grab';
+            });
+
+            container.addEventListener('mouseup', () => {
+                isDown = false;
+                container.style.cursor = 'grab';
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - container.offsetLeft;
+                const walk = (x - startX) * 2;
+                container.scrollLeft = scrollLeft - walk;
+            });
+
+            // Touch events for mobile
+            container.addEventListener('touchstart', (e) => {
+                isDown = true;
+                startX = e.touches[0].pageX - container.offsetLeft;
+                scrollLeft = container.scrollLeft;
+            });
+
+            container.addEventListener('touchend', () => {
+                isDown = false;
+            });
+
+            container.addEventListener('touchmove', (e) => {
+                if (!isDown) return;
+                const x = e.touches[0].pageX - container.offsetLeft;
+                const walk = (x - startX) * 2;
+                container.scrollLeft = scrollLeft - walk;
+            });
+        }
+    });
+}
+</script>
+@endsection
