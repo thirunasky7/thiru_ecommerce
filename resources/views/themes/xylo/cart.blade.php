@@ -409,7 +409,7 @@
             
             <!-- Continue Shopping Link -->
             <div class="text-center mt-3">
-                <a href="{{ route('menu') }}" class="text-gray-600 hover:text-gray-900 text-sm transition-colors">
+                <a href="{{ url('/pre-order') }}" class="text-gray-600 hover:text-gray-900 text-sm transition-colors">
                     <i class="fa fa-arrow-left mr-1"></i>
                     Continue Shopping
                 </a>
