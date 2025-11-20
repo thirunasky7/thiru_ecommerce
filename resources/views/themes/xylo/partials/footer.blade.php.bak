@@ -9,9 +9,9 @@
     <i data-feather="home" class="w-5 h-5"></i>
     <span class="text-xs mt-1">Home</span>
     </a>
-    <a href="{{ url('/products')}}" class="flex flex-col items-center {{ str_starts_with($currentPath, 'products') ? 'text-red-600' : 'text-gray-600 hover:text-red-600' }}">
+    <a href="{{ url('/cart')}}" class="flex flex-col items-center {{ str_starts_with($currentPath, 'products') ? 'text-red-600' : 'text-gray-600 hover:text-red-600' }}">
         <i data-feather="shopping-bag" class="w-5 h-5"></i>
-        <span class="text-xs mt-1">Products</span>
+        <span class="text-xs mt-1">Cart</span>
     </a>
 
     <!-- <a href="{{ url('/my-orders')}}" class="flex flex-col items-center text-gray-600 hover:text-red-600">
@@ -163,60 +163,8 @@ function updateCartCount(cart) {
     }
 }
 
-function addToCart(productId) {
-  
-    // AJAX call to add to cart
-    fetch("{{ route('cart.add') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        body: JSON.stringify({
-            product_id: productId,
-            quantity: 1
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            toastr.success(` added to cart!`, 'Success');
-            updateCartCount(data.cart);
-        } else {
-            toastr.error(data.message || 'Failed to add to cart', 'Error');
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        toastr.error('Error adding to cart', 'Network Error');
-    });
-}
 
-function addToCart(productId, quantity) {
-  
-    $.ajax({
-        url: "{{ route('cart.add') }}",
-        method: "POST",
-        data: {
-            _token: "{{ csrf_token() }}",
-            product_id: productId,
-            quantity: quantity
-        },
-        success: function (response) {
-            // ✅ Update cart icon count dynamically
-            $('#cart-count').text(response.cart_count);
 
-             toastr.success('Added to cart!');
-        },
-        error: function (xhr) {
-            if (xhr.status === 422) {
-                alert(xhr.responseJSON.message);
-            } else {
-                alert('Something went wrong. Please try again.');
-            }
-        }
-    });
-}
 function updateCartCount(cart) {
   let totalCount = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
     $('#cart-count').text(totalCount);

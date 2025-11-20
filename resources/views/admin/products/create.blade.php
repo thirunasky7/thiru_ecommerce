@@ -106,64 +106,7 @@
     </div>
 
     <!-- Food Menu Fields (Hidden by default) -->
-    <div id="food-menu-fields" style="display: none;">
-        <div class="row mt-3">
-    <div class="col-md-6">
-    <label class="form-label">Available From *</label>
-    <input type="date" name="available_from_date" class="form-control mb-2"
-           value="{{ old('available_from_date') }}">
-    
-    <select name="available_from_time" class="form-control">
-        @for($h = 0; $h < 24; $h++)
-            @foreach(['00', '30'] as $m)
-                @php
-                    $timeValue = sprintf('%02d:%s', $h, $m);
-                @endphp
-                <option value="{{ $timeValue }}">{{ $timeValue }}</option>
-            @endforeach
-        @endfor
-    </select>
-</div>
-
-    <div class="col-md-6">
-         <label class="form-label">Available To *</label>
-            <input type="date" name="available_to_date" class="form-control mb-2"
-                value="{{ old('available_to_date') }}">
-            
-            <select name="available_to_time" class="form-control">
-                @for($h = 0; $h < 24; $h++)
-                    @foreach(['00', '30'] as $m)
-                        @php
-                            $timeValue = sprintf('%02d:%s', $h, $m);
-                        @endphp
-                        <option value="{{ $timeValue }}">{{ $timeValue }}</option>
-                    @endforeach
-                @endfor
-            </select>
-            </div>
-</div>
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <label class="form-label">{{ __('cms.products.deliver_at') }} *</label>
-                <input 
-                    type="date" 
-                    name="delivery_to_date" 
-                    class="form-control" 
-                    value="{{ old('delivery_to_date') }}"
-                >
-                <select name="delivery_to_time" class="form-control">
-                @for($h = 0; $h < 24; $h++)
-                    @foreach(['00', '30'] as $m)
-                        @php
-                            $timeValue = sprintf('%02d:%s', $h, $m);
-                        @endphp
-                        <option value="{{ $timeValue }}">{{ $timeValue }}</option>
-                    @endforeach
-                @endfor
-            </select>
-
-    </div>
-</div>
+   
 
     </div>
 </div>

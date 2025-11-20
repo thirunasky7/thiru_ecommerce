@@ -9,19 +9,19 @@
     <i data-feather="home" class="w-5 h-5"></i>
     <span class="text-xs mt-1">Home</span>
     </a>
-    <a href="{{ url('/cart')}}" class="flex flex-col items-center {{ str_starts_with($currentPath, 'products') ? 'text-red-600' : 'text-gray-600 hover:text-red-600' }}">
+    <a href="{{ url('/cart')}}" class="flex flex-col items-center {{ str_starts_with($currentPath, 'cart') ? 'text-red-600' : 'text-gray-600 hover:text-red-600' }}">
         <i data-feather="shopping-bag" class="w-5 h-5"></i>
         <span class="text-xs mt-1">Cart</span>
     </a>
 
-    <!-- <a href="{{ url('/my-orders')}}" class="flex flex-col items-center text-gray-600 hover:text-red-600">
+    <a href="{{ url('/regular-order')}}" class="flex flex-col items-center {{ $currentPath === 'regular-order' || $currentPath === '/regular-order' ? 'text-red-600' : 'text-gray-600 hover:text-red-600' }}">
+      <i data-feather="shopping-bag" class="w-5 h-5"></i>
+      <span class="text-xs mt-1">Daily Products</span>
+    </a>
+    <a href="{{ url('/track-order')}}" class="flex flex-col items-center {{ $currentPath === 'track-order' || $currentPath === '/track-order' ? 'text-red-600' : 'text-gray-600 hover:text-red-600' }}">
       <i data-feather="package" class="w-5 h-5"></i>
       <span class="text-xs mt-1">Orders</span>
     </a>
-    <a href="{{ url('/accounts')}}" class="flex flex-col items-center text-gray-600 hover:text-red-600">
-      <i data-feather="user" class="w-5 h-5"></i>
-      <span class="text-xs mt-1">Profile</span>
-    </a> -->
   </nav>
 <!-- FOOTER -->
 <footer class="bg-gray-800 text-white py-6 mt-10 hidden lg:block">

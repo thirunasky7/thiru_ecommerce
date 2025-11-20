@@ -14,7 +14,7 @@ class Product extends Model
     protected $fillable = [
         'category_id', 'seller_id', 'shop_id','price', 'stock', 'status', 'slug', 'currency', 'SKU',
         'weight', 'dimensions', 'product_type',  'image_url', 'vendor_id','is_coming_soon','is_food_menu', 'booking_from_datetime', 'booking_to_datetime',
-    'delivery_to_datetime','product_mode'.'status'
+    'delivery_to_datetime','product_mode','status'
     ]; 
 
     protected $casts = [

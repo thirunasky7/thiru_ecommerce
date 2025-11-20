@@ -626,15 +626,9 @@ category-item { text-align: center; cursor: pointer; transition: transform .18s 
                                     $availabilityMessage = "Today's {$menu->meal_type} order closed";
                             }
                         } elseif ($isTomorrow || $isDayAfter) {
-
-                            // Hide tomorrow breakfast if current time is 10 PM or later
-                            $hideBreakfast = $isTomorrow 
-                                && $menu->meal_type === 'breakfast' 
-                                && $currentHour >= 22 && !$isDayAfter;
-
-                            $isMealAvailable = !$hideBreakfast;
-                            $availabilityMessage = $hideBreakfast ? "Closed" : "Available";
-                            $showCutoffTimer = !$hideBreakfast;
+                            $isMealAvailable = true;
+                            $availabilityMessage = "Available";
+                            $showCutoffTimer = false;
                         } else {
                             $isMealAvailable = false;
                             $availabilityMessage = "Order closed";

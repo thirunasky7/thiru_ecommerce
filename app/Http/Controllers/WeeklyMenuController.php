@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Services\Api\HomeService;
 use App\Traits\ApiResponseTrait;
+use App\Models\Category;
 
 class WeeklyMenuController extends Controller
 {
@@ -88,28 +89,86 @@ class WeeklyMenuController extends Controller
                 'menus' => $menusWithProducts
             ];
         }
+        $categories = Category::where('status', 1)
+        ->with('translation')
+        ->orderBy('id', 'desc')
+        ->take(10)
+        ->get();
 
         $banners = $this->homeService->getBanners();
 
-        return view('themes.xylo.pre-order', compact('threeDays', 'currentTime', 'banners'));
+        return view('themes.xylo.pre-order', compact('threeDays', 'currentTime', 'banners','categories'));
     }
 
     public function regularOrderPage()
     {
         $currentTime = Carbon::now();
-        
-        // Get regular sale items
+
+        // Get only ACTIVE categories
+        $categories = Category::where('status', 1)
+            ->with('translation')
+            ->orderBy('id', 'desc')
+            ->take(10)
+            ->get();
+
+        // Get only active category IDs
+        $activeCategoryIds = $categories->pluck('id');
+
+        // Get ONLY active products that belong to active categories
         $saleItems = Product::where(function($query) {
-            $query->where('is_food_menu', 'no')
-                  ->orWhere('product_mode', 'regular');
-        })
-        ->where('status', 1)
-        ->get();
+                    $query->where('is_food_menu', 'no')
+                        ->orWhere('product_mode', 'regular');
+                })
+                ->where('status', 1)                // product active
+                ->whereIn('category_id', $activeCategoryIds) // category active
+                ->get();
 
         $banners = $this->homeService->getBanners();
 
-        return view('themes.xylo.regular-order', compact('saleItems', 'currentTime', 'banners'));
+        return view('themes.xylo.regular-order', compact(
+            'saleItems',
+            'currentTime',
+            'banners',
+            'categories'
+        ));
     }
+
+
+    public function regularCategoryFilter($slug)
+    {
+        $currentTime = Carbon::now();
+
+        // Get only ACTIVE category
+        $category = Category::where('slug', $slug)
+            ->where('status', 1)
+            ->firstOrFail();
+
+        // Get ONLY ACTIVE products inside ACTIVE category
+        $saleItems = Product::where(function ($query) {
+                $query->where('is_food_menu', 'no')
+                    ->orWhere('product_mode', 'regular');
+            })
+            ->where('category_id', $category->id)
+            ->where('status', 1)  // product active
+            ->get();
+
+        $banners = $this->homeService->getBanners();
+
+        // Get only ACTIVE categories for filter/sidebar
+        $categories = Category::where('status', 1)
+            ->with('translation')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view('themes.xylo.regular-order', compact(
+            'saleItems',
+            'currentTime',
+            'banners',
+            'categories',
+            'category'
+        ));
+    }
+
 
     private function loadMenuWithProducts($menu)
     {

@@ -97,17 +97,7 @@ class ProductController extends Controller
         'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5048',
     ];
 
-    // Add food menu validation rules if is_food_menu is "yes"
-    if ($request->is_food_menu === 'yes') {
-        $validationRules = array_merge($validationRules, [
-            'available_from_date' => 'required|date',
-            'available_to_date' => 'required|date|after_or_equal:available_from_date',
-            'available_from_time' => 'required|date_format:H:i',
-            'available_to_time' => 'required|date_format:H:i',
-            'delivery_to_date' => 'required',
-            'delivery_to_time' => 'required'
-        ]);
-    }
+   
 
     // Add validation rules based on product type
     if ($request->product_type === 'simple') {
@@ -160,16 +150,10 @@ class ProductController extends Controller
             ];
 
             // Add food menu fields if applicable
-            if ($request->is_food_menu === 'yes') {
-                $available_from_datetime = $request->available_from_date . ' ' . $request->available_from_time;
-                $available_to_datetime = $request->available_to_date . ' ' . $request->available_to_time;
-                $delivery_to_datetime = $request->delivery_to_date . ' ' . $request->delivery_to_time;
-                $productData = array_merge($productData, [
-                    'booking_from_datetime' => $available_from_datetime,
-                    'booking_to_datetime' => $available_to_datetime,
-                    'delivery_to_datetime' => $delivery_to_datetime,
-                    'is_food_menu' => $request->is_food_menu,
-                ]);
+             if ($request->is_food_menu =='yes') {
+                $productData['product_mode'] ="preorder";
+            }else{
+                $productData['product_mode'] ="regular";
             }
 
             $product = Product::create($productData);
@@ -377,16 +361,7 @@ class ProductController extends Controller
     ];
 
     // Add food menu validation rules if is_food_menu is "yes"
-    if ($request->is_food_menu === 'yes') {
-        $validationRules = array_merge($validationRules, [
-            'available_from_date' => 'required|date',
-            'available_to_date' => 'required|date|after_or_equal:available_from_date',
-            'available_from_time' => 'required|date_format:H:i',
-            'available_to_time' => 'required|date_format:H:i',
-            'delivery_to_date' => 'required',
-            'delivery_to_time' => 'required'
-        ]);
-    }
+   
 
     // Add validation rules based on product type
     if ($request->product_type === 'simple') {
@@ -437,23 +412,10 @@ class ProductController extends Controller
             ];
 
             // Add or clear food menu fields based on selection
-            if ($request->is_food_menu === 'yes') {
-                $available_from_datetime = $request->available_from_date . ' ' . $request->available_from_time;
-                $available_to_datetime = $request->available_to_date . ' ' . $request->available_to_time;
-                $delivery_to_datetime = $request->delivery_to_date . ' ' . $request->delivery_to_time;
-                $productData = array_merge($productData, [
-                    'booking_from_datetime' => $available_from_datetime,
-                    'booking_to_datetime' => $available_to_datetime,
-                    'delivery_to_datetime' => $delivery_to_datetime,
-                    'is_food_menu' => $request->is_food_menu,
-                ]);
-            } else {
-                $productData = array_merge($productData, [
-                    'available_from_date' => null,
-                    'available_to_date' => null,
-                    'available_from_time' => null,
-                    'available_to_time' => null,
-                ]);
+            if ($request->is_food_menu =='yes') {
+                $productData['product_mode'] ="preorder";
+            }else{
+                $productData['product_mode'] ="regular";
             }
 
             $product->update($productData);

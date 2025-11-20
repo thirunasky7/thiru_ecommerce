@@ -83,8 +83,8 @@ Route::post('/validate-customer', [ProductController::class, 'validateCustomer']
 Route::post('/submit-review', [ProductController::class, 'submitReview'])->name('submit-review');
 
 // routes/web.php
-Route::get('/track-orders', [OrderHistoryController::class, 'showForm'])->name('orders.form');
-Route::post('/track-orders', [OrderHistoryController::class, 'fetchOrders'])->name('orders.fetch');
+// Route::get('/track-orders', [OrderHistoryController::class, 'showForm'])->name('orders.form');
+// Route::post('/track-orders', [OrderHistoryController::class, 'fetchOrders'])->name('orders.fetch');
 
 
 Route::prefix('customer')->name('customer.')->group(function () {
@@ -128,8 +128,8 @@ Route::delete('/cart/remove/{cartItemId}', [CartController::class, 'removeItem']
 Route::get('/menu', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('menu');
 Route::get('/pre-order', [WeeklyMenuController::class, 'preOrderPage'])->name('pre-order');
 Route::get('/regular-order', [WeeklyMenuController::class, 'regularOrderPage'])->name('regular-order');
+Route::get('/regular-order/{slug}', [WeeklyMenuController::class, 'regularCategoryFilter']);
 Route::get('/cart', [WeeklyMenuController::class, 'cartPage'])->name('cart.page');
-Route::get('/menu', [WeeklyMenuController::class, 'showThreeDayMenu'])->name('menu');
 
 Route::get('/track-order', [OrderTrackingController::class, 'showTrackingPage'])->name('order.tracking');
 Route::post('/track-order', [OrderTrackingController::class, 'trackOrder'])->name('order.track');

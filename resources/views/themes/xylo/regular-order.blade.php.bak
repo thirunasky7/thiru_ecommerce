@@ -412,9 +412,12 @@
                     <label class="filter-label">Category:</label>
                     <select id="categoryFilter" class="filter-select" onchange="filterProducts()">
                         <option value="">All Categories</option>
-                        @foreach($categories as $listcategory)
-                            <option value="{{$listcategory->id}}" @if(isset($category) && $category->id == $listcategory->id) {{"selected"}} @endif>{{$listcategory->translation->name}}</option>
-                        @endforeach
+                        <option value="veg">Vegetarian</option>
+                        <option value="non-veg">Non-Vegetarian</option>
+                        <option value="vegan">Vegan</option>
+                        <option value="beverage">Beverages</option>
+                        <option value="snack">Snacks</option>
+                        <option value="main-course">Main Course</option>
                     </select>
                 </div>
 
@@ -502,13 +505,8 @@
                     $uniqueId = $product->id . '-regular-' . now()->format('Y-m-d');
                     
                     // Mock product data for filtering - replace with actual product attributes
-                    $productCategory = $product->category_id; // This should come from your product model
+                    $productCategory = 'veg'; // This should come from your product model
                     $isPopular = $loop->index < 3; // Mock popular products
-                    $is_coming_soon =  $product->is_coming_soon;
-                    if($is_coming_soon == 1){
-                        $isProductAvailable = false;
-                        $availableText = "Coming Soon";
-                    }
                 @endphp
 
                 <div class="product-card border border-gray-200 rounded-lg p-3 md:p-2 hover:shadow-lg transition-shadow {{ !$isProductAvailable ? 'product-disabled' : '' }} flex flex-col"
@@ -543,7 +541,7 @@
                     <div class="flex justify-between items-center mt-auto">
                         <span class="text-sm md:text-lg font-bold text-green-600">₹{{ $displayPrice }}</span>
                         <button onclick="{{ $isProductAvailable ? 'addToCartWithQuantity(' . $product->id . ', \'' . now()->format('Y-m-d') . '\', \'regular\', \'' . $uniqueId . '\')' : 'showUnavailableMessage(\'' . $regularAvailabilityMessage . '\')' }}" class="{{ $isProductAvailable ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed' }} text-white mobile-btn rounded-lg transition-colors">
-                            {{ $isProductAvailable ? 'Add to Cart' : $availableText }}
+                            {{ $isProductAvailable ? 'Add to Cart' : 'Unavailable' }}
                         </button>
                     </div>
                 </div>
