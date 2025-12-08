@@ -472,7 +472,7 @@ category-item { text-align: center; cursor: pointer; transition: transform .18s 
         <div class="col-4 col-sm-3 col-md-2 d-flex justify-content-center">
             <a href="{{ url('/regular-order/'.$cat->slug) }}" class="category-item text-decoration-none">
                 <div class="avatar">
-                    <img src="{{ \Storage::url($cat->translation->image_url) }}" alt="{{ $cat->translation->name }}">
+                    <img src="{{ asset('/public/storage/'.$cat->translation->image_url) }}" alt="{{ $cat->translation->name }}">
                 </div>
                 <div class="category-title">{{ $cat->translation->name }}</div>
             </a>

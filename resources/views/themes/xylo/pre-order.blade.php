@@ -543,7 +543,7 @@ category-item { text-align: center; cursor: pointer; transition: transform .18s 
                                 $isMealAvailable = $currentHour < 18;
                                 break;
                             case 'dinner':
-                                $isMealAvailable = $currentHour < 17;
+                                $isMealAvailable = $currentHour < 19;
                                 break;
                             default:
                                 $isMealAvailable = false;
@@ -616,7 +616,7 @@ category-item { text-align: center; cursor: pointer; transition: transform .18s 
                                     $showCutoffTimer = $isMealAvailable;
                                     break;
                                 case 'dinner':
-                                    $isMealAvailable = $currentHour < 17;
+                                    $isMealAvailable = $currentHour < 19;
                                     $availabilityMessage = $isMealAvailable ? "Available until 5 PM" : "Today's dinner order closed";
                                     $cutoffTime = 17;
                                     $showCutoffTimer = $isMealAvailable;
@@ -922,7 +922,7 @@ function updateMealCutoffTimers() {
     const mealCutoffs = {
         'lunch': 10,
         'snacks': 18, 
-        'dinner': 17
+        'dinner': 19
     };
     
     Object.keys(mealCutoffs).forEach(mealType => {
