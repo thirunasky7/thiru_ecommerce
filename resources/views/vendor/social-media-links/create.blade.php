@@ -1,5 +1,5 @@
 
-@extends('admin.vendor-views.layouts.master')
+@extends('vendor.layouts.master')
 
 @section('title', 'Create Social Media Link')
 

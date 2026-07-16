@@ -113,7 +113,9 @@ class StoreController extends Controller
     }
 
     $send_data['categories'] = Category::where('status', 1)->with('translation')->get();
-    $send_data['products'] = $query->where('status', 1)->get();
+        $send_data['products'] = $query->where('status', 1)
+            ->with(['shop', 'serviceType'])
+            ->paginate(16);
     
     // Pass current filter values to view
     $send_data['currentFilters'] = [

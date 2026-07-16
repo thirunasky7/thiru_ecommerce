@@ -3,19 +3,20 @@
 @section('title', 'Order Management')
 
 @section('content')
-<div class="container-fluid px-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Order Management</h1>
-        <div class="btn-group">
-            <a href="{{ route('admin.orders.kitchen') }}" class="btn btn-warning">
-                <i class="fas fa-utensils"></i> Kitchen Display
-            </a>
-            <a href="{{ route('admin.orders.delivery-schedule') }}" class="btn btn-info">
-                <i class="fas fa-truck"></i> Delivery Schedule
-            </a>
-        </div>
+<div class="ad-page-head">
+    <div>
+        <h1>Order management</h1>
+        <p class="ad-muted">Track packages, meals, and marketplace orders</p>
     </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ route('admin.orders.kitchen') }}" class="btn btn-outline-dark btn-sm">
+            <i class="fas fa-utensils me-1"></i> Kitchen
+        </a>
+        <a href="{{ route('admin.orders.delivery-schedule') }}" class="btn btn-dark btn-sm">
+            <i class="fas fa-truck me-1"></i> Delivery
+        </a>
+    </div>
+</div>
 
     <!-- Filters -->
     <div class="card mb-4">
@@ -215,5 +216,4 @@
         </div>
         @endif
     </div>
-</div>
 @endsection

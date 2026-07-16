@@ -8,7 +8,7 @@ use App\Repositories\Admin\Product\ProductRepository;
 use App\Repositories\Admin\Product\ProductRepositoryInterface;
 use App\Repositories\Admin\Brand\BrandRepositoryInterface;
 use App\Repositories\Admin\Brand\BrandRepository;
-use App\Serves\Admin\Brand\BrandService;
+use App\Services\Admin\BrandService;
 use App\Repositories\Admin\Banner\BannerRepository;
 use App\Repositories\Admin\Banner\BannerRepositoryInterface;
 use App\Repositories\Admin\Menu\MenuRepository;

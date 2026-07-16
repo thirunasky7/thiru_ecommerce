@@ -11,16 +11,22 @@
     
 @endsection
 
-@section('content')
+@section('title', 'Social links')
 
-<div class="card mt-4">
-    <div class="card-header card-header-bg text-white">
-        <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.social_media_links.create') }}</h6>
+@section('content')
+<div class="ad-page-head">
+    <div>
+        <h1>Social media links</h1>
+        <p class="ad-muted">Footer and marketing social profiles</p>
     </div>
+    <a href="{{ route('admin.social-media-links.create') }}" class="btn btn-dark btn-sm">
+        <i class="fas fa-plus me-1"></i> {{ __('cms.social_media_links.add_new') }}
+    </a>
+</div>
+
+<div class="card">
     <div class="card-body">
-        
-        <a href="{{ route('admin.social-media-links.create') }}" class="btn btn-success float-end mb-3">{{ __('cms.social_media_links.add_new') }}</a>
-        <table id="social-media-links-table" class="table table-bordered mt-4">
+        <table id="social-media-links-table" class="table table-hover">
             <thead>
                 <tr>
                     <th>{{ __('cms.social_media_links.id') }}</th>

@@ -68,26 +68,13 @@ class OrderController extends Controller
         $oldStatus = $order->status;
         $order->update(['status' => $request->status]);
 
-        // Update order items preparation status if needed
-        // if (in_array($request->status, ['preparing', 'out_for_delivery'])) {
-        //     $order->orderItems()->update(['preparation_status' => $request->status]);
-        // }
-
-        // if ($request->status == 'delivered') {
-        //     $order->update(['delivered_date' => Carbon::now()]);
-        //     $order->orderItems()->update(['is_delivered' => true, 'delivered_time' => Carbon::now()]);
-        // }
-
-        if ($request->status == 'delivered') {
-           // $order->update(['delivered_date' => Carbon::now()]);
-            $order->update(['delivered' => 'delivered']);
+        if ($request->status === 'delivered') {
+            $order->update(['delivered_date' => Carbon::now()]);
+            $order->orderItems()->update([
+                'is_delivered' => true,
+                'delivered_time' => Carbon::now(),
+            ]);
         }
-
-        if ($request->status == 'preparing') {
-            $order->update(['status' => $request->status]);
-        }
-
-        // Log status change
 
         return back()->with('success', 'Order status updated successfully.');
     }
@@ -113,11 +100,18 @@ class OrderController extends Controller
         $tomorrow = Carbon::tomorrow();
 
         // Get today's pre-orders grouped by meal type
-        $todayPreorders = OrderItem::with(['order.customer', 'product'])
-            ->whereDate('order_for_date', $today)
+        $todayPreorders = OrderItem::with(['order.customer', 'product', 'foodPackage'])
+            ->where(function ($q) use ($today) {
+                $q->whereDate('order_for_date', $today)
+                  ->orWhere(function ($q2) use ($today) {
+                      $q2->where('item_type', 'package')
+                         ->whereDate('package_start_date', '<=', $today)
+                         ->whereDate('package_end_date', '>=', $today);
+                  });
+            })
             ->where('meal_type', '!=', 'regular')
-            ->whereHas('order', function($q) {
-                $q->whereIn('status', ['confirmed', 'preparing']);
+            ->whereHas('order', function ($q) {
+                $q->whereIn('status', ['confirmed', 'preparing', 'pending']);
             })
             ->orderBy('meal_type')
             ->orderBy('created_at')
@@ -127,40 +121,52 @@ class OrderController extends Controller
         // Get regular orders for today
         $regularOrders = OrderItem::with(['order.customer', 'product'])
             ->where('meal_type', 'regular')
-            ->whereHas('order', function($q) use ($today) {
-                $q->whereIn('status', ['confirmed', 'preparing'])
+            ->whereHas('order', function ($q) use ($today) {
+                $q->whereIn('status', ['confirmed', 'preparing', 'pending'])
                   ->whereDate('order_date', $today);
             })
             ->orderBy('created_at')
             ->get();
 
-        return view('admin.orders.kitchen', compact('todayPreorders', 'regularOrders', 'today'));
+        $packageOrders = OrderItem::with(['order.customer', 'foodPackage'])
+            ->where('item_type', 'package')
+            ->whereDate('package_start_date', '<=', $today)
+            ->whereDate('package_end_date', '>=', $today)
+            ->whereHas('order', function ($q) {
+                $q->whereIn('status', ['confirmed', 'preparing', 'pending']);
+            })
+            ->get();
+
+        return view('admin.orders.kitchen', compact('todayPreorders', 'regularOrders', 'packageOrders', 'today'));
     }
 
     public function deliverySchedule()
     {
         $today = Carbon::today();
-        $tomorrow = Carbon::tomorrow();
-        $dayAfter = Carbon::tomorrow()->addDay();
-
         $schedule = [];
 
-        // Get orders for next 3 days
         for ($i = 0; $i < 3; $i++) {
             $date = $today->copy()->addDays($i);
             $dateFormatted = $date->format('Y-m-d');
 
-            $schedule[$dateFormatted] = OrderItem::with(['order.customer', 'product'])
-                ->whereDate('order_for_date', $date)
-                ->whereHas('order', function($q) {
-                    $q->whereIn('status', ['confirmed', 'preparing', 'out_for_delivery']);
+            $schedule[$dateFormatted] = OrderItem::with(['order.customer', 'product', 'foodPackage'])
+                ->where(function ($q) use ($date) {
+                    $q->whereDate('order_for_date', $date)
+                      ->orWhere(function ($q2) use ($date) {
+                          $q2->where('item_type', 'package')
+                             ->whereDate('package_start_date', '<=', $date)
+                             ->whereDate('package_end_date', '>=', $date);
+                      });
+                })
+                ->whereHas('order', function ($q) {
+                    $q->whereIn('status', ['confirmed', 'preparing', 'out_for_delivery', 'pending']);
                 })
                 ->get()
-                ->groupBy(function($item) {
-                    return $item->meal_type . '|' . $item->order->customer_id;
+                ->groupBy(function ($item) {
+                    return $item->meal_type ?: 'general';
                 });
         }
 
-        return view('admin.orders.delivery-schedule', compact('schedule', 'today', 'tomorrow', 'dayAfter'));
+        return view('admin.orders.delivery-schedule', compact('schedule'));
     }
 }

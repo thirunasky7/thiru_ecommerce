@@ -34,26 +34,31 @@
 </style>
 
 <div class="kitchen-display">
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="display-4 text-primary">
-                <i class="fas fa-utensils"></i> Kitchen Display
-            </h1>
-            <div class="text-end">
-                <h3 class="text-muted">{{ now()->format('l, F j, Y') }}</h3>
-                <h2 class="text-success" id="current-time">{{ now()->format('g:i:s A') }}</h2>
-            </div>
+    <div class="ad-page-head">
+        <div>
+            <h1><i class="fas fa-utensils me-2"></i>Kitchen display</h1>
+            <p class="ad-muted">Live prep board · auto-refreshes every 30s</p>
         </div>
+        <div class="text-end">
+            <div class="ad-muted">{{ now()->format('l, F j, Y') }}</div>
+            <div class="ad-stat__value" id="current-time" style="font-size:1.75rem;">{{ now()->format('g:i:s A') }}</div>
+        </div>
+    </div>
 
         <div class="row">
             <!-- Today's Pre-orders -->
             <div class="col-lg-8">
                 <div class="meal-section">
                     <h2 class="text-primary mb-4">
-                        <i class="fas fa-calendar-day"></i> Today's Pre-orders
+                        <i class="fas fa-calendar-day"></i> Today's meal & package orders
                         <span class="badge bg-primary fs-6">{{ $today->format('M j') }}</span>
                     </h2>
-                    
+
+                    @if(isset($packageOrders) && $packageOrders->count())
+                        <div class="alert alert-warning">
+                            <strong>{{ $packageOrders->count() }}</strong> active monthly package subscription(s) covering today.
+                        </div>
+                    @endif
                     @forelse($todayPreorders as $mealType => $items)
                     <div class="mb-4">
                         <h4 class="text-warning border-bottom pb-2">
@@ -155,7 +160,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </div>
 
 <script>

@@ -1,10 +1,16 @@
 @extends('admin.layouts.admin')
+@section('title', 'Create Product')
 @section('content')
 
-<div class="card mt-4">
-    <div class="card-header card-header-bg text-white">
-        <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.products.title_create') }}</h6>
+<div class="ad-page-head">
+    <div>
+        <a href="{{ route('admin.products.index') }}" class="ad-muted small d-inline-block mb-2">&larr; Back to products</a>
+        <h1>Create product</h1>
+        <p class="ad-muted">Add a new catalog item</p>
     </div>
+</div>
+
+<div class="card">
     <div class="card-body">
         <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="productForm" novalidate>
             @csrf

@@ -12,10 +12,31 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'category_id', 'seller_id', 'shop_id','price', 'stock', 'status', 'slug', 'currency', 'SKU',
-        'weight', 'dimensions', 'product_type',  'image_url', 'vendor_id','is_coming_soon','is_food_menu', 'booking_from_datetime', 'booking_to_datetime',
-    'delivery_to_datetime','product_mode','status'
-    ]; 
+        'category_id',
+        'seller_id',
+        'shop_id',
+        'price',
+        'stock',
+        'status',
+        'slug',
+        'currency',
+        'SKU',
+        'weight',
+        'dimensions',
+        'product_type',
+        'image_url',
+        'vendor_id',
+        'service_type_id',
+        'brand_id',
+        'is_coming_soon',
+        'is_food_menu',
+        'booking_from_datetime',
+        'booking_to_datetime',
+        'delivery_to_datetime',
+        'product_mode',
+        'discount_price',
+        'is_featured',
+    ];
 
     protected $casts = [
         'available_from_date' => 'date',
@@ -23,90 +44,98 @@ class Product extends Model
         'available_from_time' => 'datetime',
         'available_to_time' => 'datetime',
         'price' => 'decimal:2',
-        'status' => 'boolean'
-        // ... your other casts ...
+        'discount_price' => 'decimal:2',
+        'status' => 'boolean',
+        'is_featured' => 'boolean',
+        'is_coming_soon' => 'boolean',
     ];
 
-     public function isPreorder(): bool {
+    public function isPreorder(): bool
+    {
         return $this->product_mode === 'preorder';
     }
 
-    
-
-    // Add this scope method
     public function scopeActive($query)
     {
         return $query->where('status', 1);
     }
 
-    // Scope for food items
     public function scopeFood($query)
     {
         return $query->where('is_food_menu', 'yes');
     }
 
-    // Scope for vegetable items
     public function scopeVegetable($query)
     {
         return $query->where('is_food_menu', 'no');
     }
 
-    // Scope for preorder items
     public function scopePreorder($query)
     {
         return $query->where('product_mode', 'preorder');
     }
 
-    // Scope for regular sale items
     public function scopeRegular($query)
     {
-        return $query->where('product_mode', '!=', 'preorder')
-                    ->orWhereNull('product_mode');
+        return $query->where(function ($q) {
+            $q->where('product_mode', '!=', 'preorder')
+              ->orWhereNull('product_mode');
+        });
     }
 
-    // Relationship for translations (if you have)
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    public function scopeOfService($query, $serviceTypeId)
+    {
+        return $query->where('service_type_id', $serviceTypeId);
+    }
+
     public function translation()
     {
         return $this->hasOne(ProductTranslation::class);
     }
 
-    // Get products for weekly menu
     public function weeklyMenus()
     {
         return $this->belongsToMany(WeeklyMenu::class);
     }
 
-    /**
-     * Get the translations for the product.
-     */
     public function translations()
     {
         return $this->hasMany(ProductTranslation::class);
     }
 
-   
-
-    /**
-     * Get the category for the product.
-     */
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-     // One-to-many relationship with ProductImage
-     public function images()
-     {
-         return $this->hasMany(ProductImage::class);
-     } 
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
 
-
-    /**
-     * Get the brand for the product.
-     */
     public function brand()
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class);
+    }
+
+    public function serviceType()
+    {
+        return $this->belongsTo(ServiceType::class);
     }
 
     public function orders()
@@ -121,7 +150,7 @@ class Product extends Model
         return $translation ? $translation->$field : null;
     }
 
-     public function thumbnail()
+    public function thumbnail()
     {
         return $this->hasOne(ProductImage::class)->where('type', 'thumb');
     }
@@ -151,10 +180,6 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
-    /*public function attributeValues()
-    {
-        return $this->belongsToMany(AttributeValue::class, 'product_attribute_values', 'product_id', 'attribute_value_id');
-    }*/
     public function attributeValues()
     {
         return $this->belongsToMany(AttributeValue::class, 'product_attribute_values')
@@ -170,6 +195,4 @@ class Product extends Model
     {
         return $this->belongsToMany(Customer::class, 'wishlists');
     }
-
-    
 }

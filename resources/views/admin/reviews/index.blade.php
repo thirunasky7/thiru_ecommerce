@@ -8,34 +8,31 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
 @endsection
 
+@section('title', 'Reviews')
+
 @section('content')
-<div class="container">
-    <div class="card mt-4">
-        <div class="card-header card-header-bg text-white">
-            <h6>{{ __('cms.product_reviews.title_manage') }}</h6>
-        </div>
+<div class="ad-page-head">
+    <div>
+        <h1>Product reviews</h1>
+        <p class="ad-muted">Moderate customer feedback across the catalog</p>
     </div>
+</div>
 
-    <div class="card mt-4">
-        <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-
-            <table id="reviews-table" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>{{ __('cms.product_reviews.review_id') }}</th>
-                        <th>{{ __('cms.product_reviews.customer_name') }}</th>
-                        <th>{{ __('cms.product_reviews.product_name') }}</th>
-                        <th>{{ __('cms.product_reviews.rating') }}</th>
-                        <th>{{ __('cms.product_reviews.status') }}</th>
-                        <th>{{ __('cms.product_reviews.actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+<div class="card">
+    <div class="card-body">
+        <table id="reviews-table" class="table table-hover">
+            <thead>
+                <tr>
+                    <th>{{ __('cms.product_reviews.review_id') }}</th>
+                    <th>{{ __('cms.product_reviews.customer_name') }}</th>
+                    <th>{{ __('cms.product_reviews.product_name') }}</th>
+                    <th>{{ __('cms.product_reviews.rating') }}</th>
+                    <th>{{ __('cms.product_reviews.status') }}</th>
+                    <th>{{ __('cms.product_reviews.actions') }}</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 </div>
 

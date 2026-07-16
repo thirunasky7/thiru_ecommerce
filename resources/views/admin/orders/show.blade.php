@@ -3,26 +3,20 @@
 @section('title', 'Order #' . $order->order_number)
 
 @section('content')
-<div class="container-fluid px-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-0 text-gray-800">Order #{{ $order->order_number }}</h1>
-            <p class="text-muted mb-0">Placed on {{ $order->order_date->format('F j, Y \a\t g:i A') }}</p>
-        </div>
-        <div class="btn-group">
-            <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Orders
-            </a>
-        </div>
+<div class="ad-page-head">
+    <div>
+        <a href="{{ route('admin.orders.index') }}" class="ad-muted small d-inline-block mb-2">&larr; Back to orders</a>
+        <h1>Order #{{ $order->order_number }}</h1>
+        <p class="ad-muted">Placed on {{ $order->order_date->format('F j, Y \a\t g:i A') }}</p>
     </div>
+</div>
 
-    <div class="row">
+<div class="row">
         <!-- Order Details -->
         <div class="col-lg-8">
             <!-- Order Status Card -->
             <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header">
                     <h5 class="card-title mb-0">Order Status</h5>
                 </div>
                 <div class="card-body">
@@ -180,7 +174,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <!-- Status Update Modal -->
 <div class="modal fade" id="statusModal" tabindex="-1">

@@ -4,137 +4,93 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Fonts -->
-
-    <!-- Bootstrap CSS -->
+    <title>@yield('title', 'ThaiYur Admin')</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Font Awesome & Toastr -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/admin-premium.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ asset('/public/css/app.css') }}">
-
     @yield('css')
 </head>
-<body>
+<body class="ad-body">
     @include('admin.layouts.sidebar')
-    
-    <!-- Content Area -->
-    <div id="content" class="w-100">
-        <nav class="navbar navbar-expand navbar-light bg-light p-3">
-            <button class="btn btn-dark" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+    <div class="ad-sidebar-backdrop" id="sidebarBackdrop"></div>
 
-            <!-- Language Dropdown -->
-            <div class="dropdown ms-auto me-3">
-                <button class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
-                    <img src="https://flagcdn.com/w40/us.png" width="20">{{ __('cms.languages.english') }}
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item language-select {{ app()->getLocale() == 'en' ? 'active' : '' }}" data-lang="en" href="#"><img src="https://flagcdn.com/w40/us.png" width="20">{{ __('cms.languages.english') }}</a></li>
-                    <li><a class="dropdown-item language-select" data-lang="es" href="#"><img src="https://flagcdn.com/w40/es.png" width="20">{{ __('cms.languages.spanish') }}</a></li>
-                    <!-- Add other languages as needed -->
-                </ul>
+    <div id="content" class="ad-content">
+        <header class="ad-topbar">
+            <button class="btn-toggle" id="sidebarToggle" type="button" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div>
+                <h1 class="ad-topbar__title">@yield('title', 'Dashboard')</h1>
             </div>
-
-            <!-- Profile Dropdown -->
-            <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
-                    <img src="https://via.placeholder.com/40" class="rounded-circle" alt="Profile">
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li>
-                        <form id="admin-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            @csrf
-                        </form>
-                        <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();">
-                            Logout
-                        </a>
-                    </li>
-                </ul>
+            <div class="ad-topbar__actions">
+                <a href="{{ url('/') }}" class="btn btn-outline-dark btn-sm" target="_blank">
+                    <i class="fas fa-external-link-alt me-1"></i> Storefront
+                </a>
+                <div class="dropdown">
+                    <button class="ad-avatar-btn dropdown-toggle" data-bs-toggle="dropdown" type="button">
+                        {{ strtoupper(substr(optional(auth()->user())->name ?? 'A', 0, 1)) }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        <li class="dropdown-header">{{ optional(auth()->user())->name ?? 'Admin' }}</li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form id="admin-logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">@csrf</form>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </nav>
+        </header>
 
-        <div class="container mt-4">
+        <main class="ad-main">
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
             @yield('content')
-        </div>
+        </main>
     </div>
 
-    <!-- Modal for Confirmation -->
-    <div class="modal fade" id="languageChangeModal" tabindex="-1" aria-labelledby="languageChangeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="languageChangeModalLabel">{{ __('cms.languages.change_language') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    {{ __('cms.languages.confirm_language_change') }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('cms.languages.cancel') }}</button>
-                    <button type="button" id="confirmChange" class="btn btn-primary">{{ __('cms.languages.yes_change') }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- JS Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ asset('/public/js/app.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const searchInput = document.getElementById("searchInput");
-            const menuItems = document.querySelectorAll(".nav-item");
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const toggle = document.getElementById('sidebarToggle');
+            function closeSidebar() {
+                sidebar?.classList.remove('is-open');
+                backdrop?.classList.remove('show');
+            }
+            toggle?.addEventListener('click', function () {
+                sidebar?.classList.toggle('is-open');
+                backdrop?.classList.toggle('show');
+            });
+            backdrop?.addEventListener('click', closeSidebar);
 
-            if(searchInput) {
-                searchInput.addEventListener("input", function () {
-                    const searchTerm = searchInput.value.toLowerCase();
-                    menuItems.forEach((item) => {
-                        let linkTexts = item.querySelectorAll(".nav-link");
-                        let matchFound = false;
-
-                        linkTexts.forEach((link) => {
-                            if (link.textContent.toLowerCase().includes(searchTerm)) {
-                                matchFound = true;
-                                link.closest(".nav-item").style.display = "block";
-                            } else {
-                                link.closest(".nav-item").style.display = "none";
-                            }
-                        });
-
-                        let submenu = item.querySelector(".collapse");
-                        if (submenu) {
-                            let childLinks = submenu.querySelectorAll(".nav-link");
-                            childLinks.forEach((childLink) => {
-                                if (childLink.textContent.toLowerCase().includes(searchTerm)) {
-                                    matchFound = true;
-                                }
-                            });
-
-                            if (matchFound) {
-                                item.style.display = "block";
-                                submenu.classList.add("show");
-                            } else {
-                                item.style.display = "none";
-                                submenu.classList.remove("show");
-                            }
-                        }
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    const term = this.value.toLowerCase();
+                    document.querySelectorAll('#sidebar .nav-item').forEach(function (item) {
+                        const text = item.textContent.toLowerCase();
+                        item.style.display = text.includes(term) ? '' : 'none';
                     });
                 });
             }
-        });
+        })();
     </script>
-
     @yield('js')
 </body>
 </html>

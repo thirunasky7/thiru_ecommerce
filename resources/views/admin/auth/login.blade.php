@@ -1,67 +1,55 @@
 @extends('admin.layouts.login')
 
-@section('css')
-<style>
-html, body {
-    height: 100%;
-    margin: 0;
-    background-color: #f4f7f6;
-    color: #333333;
-    justify-content: center;
-    align-items: center;
-}
-
-.container-wrapper {
-    width: 100%;
-    max-width: 450px; /* Balanced width */
-    padding: 20px;
-}
-
-.login-container {
-    width: 100%;
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-</style>
-@endsection
+@section('title', 'Admin Login — ThaiYur')
 
 @section('content')
-<div class="container-wrapper">
-    <div class="login-container">
-        <div class="text-center mb-3">
-            <h1 class="fw-bold">Velstore</h1>
+<div class="ty-admin-login">
+    <div class="ty-admin-login__card">
+        <div class="ty-admin-login__brand">
+            <span class="ty-admin-login__mark">TY</span>
+            <div>
+                <h1>ThaiYur Admin</h1>
+                <p>Multivendor marketplace control panel</p>
+            </div>
         </div>
-        <h2 class="text-center mb-4">{{ cms_translate('auth.login') }}</h2>
 
-        @error('password')
-            <div id="errorBar" class="alert alert-danger" role="alert">{{ $message }}</div>
-        @enderror
-        @error('email')
-            <div id="errorBar" class="alert alert-danger" role="alert">{{ $message }}</div>
-        @enderror
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                @foreach ($errors->all() as $error)
+                    <div>{{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
 
-        <form method="POST" action="{{ route('login') }}" autocomplete="off">
+        @if (session('status'))
+            <div class="alert alert-success">{{ session('status') }}</div>
+        @endif
+
+        <form method="POST" action="{{ route('admin.login') }}" autocomplete="off">
             @csrf
             <div class="mb-3">
-                <label for="email" class="form-label">{{ cms_translate('auth.email') }}</label>
-                <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" id="email" placeholder="{{ cms_translate('auth.email') }}" required>
+                <label for="email" class="form-label">Email</label>
+                <input id="email" type="email" name="email" value="{{ old('email', 'admin@thaiyur.com') }}"
+                       class="form-control form-control-lg @error('email') is-invalid @enderror" required autofocus>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">{{ cms_translate('auth.password') }}</label>
-                <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" placeholder="{{ cms_translate('auth.password') }}" required>
+                <label for="password" class="form-label">Password</label>
+                <input id="password" type="password" name="password"
+                       class="form-control form-control-lg @error('password') is-invalid @enderror" required>
             </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="rememberMe">
-                <label class="form-check-label" for="rememberMe">{{ cms_translate('auth.remember_me') }}</label>
+            <div class="mb-4 form-check">
+                <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                <label class="form-check-label" for="remember">Remember me</label>
             </div>
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">{{ cms_translate('auth.login') }}</button>
-            </div>
+            <button type="submit" class="btn btn-dark btn-lg w-100">Sign in</button>
         </form>
+
+        <div class="ty-admin-login__hint">
+            Default: <code>admin@thaiyur.com</code> / <code>password</code>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{{ url('/') }}" class="text-decoration-none">← Back to storefront</a>
+        </div>
     </div>
 </div>
 @endsection
-

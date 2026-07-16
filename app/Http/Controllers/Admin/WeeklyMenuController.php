@@ -17,7 +17,10 @@ class WeeklyMenuController extends Controller
 
     public function create()
     {
-        $products = Product::where('product_mode', 'preorder')->get();
+        $products = Product::where(function ($q) {
+            $q->where('product_mode', 'preorder')
+              ->orWhere('is_food_menu', 'yes');
+        })->where('status', 1)->get();
         return view('admin.weekly-menu.create', compact('products'));
     }
 
@@ -56,7 +59,10 @@ class WeeklyMenuController extends Controller
     {
         $weeklymenu = WeeklyMenu::findOrFail($id);
      
-        $products = Product::where('product_mode', 'preorder')->get();
+        $products = Product::where(function ($q) {
+            $q->where('product_mode', 'preorder')
+              ->orWhere('is_food_menu', 'yes');
+        })->where('status', 1)->get();
 
         // Fix for product_ids format - handle both string and array formats
         $selectedProducts = $weeklymenu->product_ids ?? [];

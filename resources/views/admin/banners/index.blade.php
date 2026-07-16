@@ -5,33 +5,33 @@
 @section('css')
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-@section('content')
-    <div class="container">
+@endsection
 
-        <!-- Card-like Heading for "All Banners" -->
-        <div class="card mt-4">
-            <div class="card-header card-header-bg text-white">
-                <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.banners.all_banners') }}</h6>
-            </div>
+@section('content')
+    <div class="ad-page-head">
+        <div>
+            <h1>Banners</h1>
+            <p class="ad-muted">Hero and promotional storefront imagery</p>
         </div>
-        <!-- Banner Table -->
-        <div class="card mt-4">
-            <div class="card-body">
-                <table id="banners-table" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>{{ __('cms.banners.id') }}</th>
-                            <th>{{ __('cms.banners.banner_type') }}</th>
-                            <th>{{ __('cms.banners.image') }}</th>
-                            <th>{{ __('cms.banners.status') }}</th> <!-- New status column -->
-                            <th>{{ __('cms.banners.actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rows will be dynamically added by DataTables -->
-                    </tbody>
-                </table>
-            </div>
+        <a href="{{ route('admin.banners.create') }}" class="btn btn-dark btn-sm">
+            <i class="fas fa-plus me-1"></i> Add banner
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table id="banners-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ __('cms.banners.id') }}</th>
+                        <th>{{ __('cms.banners.banner_type') }}</th>
+                        <th>{{ __('cms.banners.image') }}</th>
+                        <th>{{ __('cms.banners.status') }}</th>
+                        <th>{{ __('cms.banners.actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 

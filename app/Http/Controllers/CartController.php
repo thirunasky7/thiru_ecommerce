@@ -11,8 +11,36 @@ class CartController extends Controller
     public function index()
     {
         $cart = session()->get('cart', []);
-        dd($cart);
         return response()->json($cart);
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $request->validate(['code' => 'required|string']);
+
+        $coupon = \App\Models\Coupon::where('code', $request->code)
+            ->where(function ($q) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
+            ->first();
+
+        if (!$coupon) {
+            return response()->json(['status' => false, 'message' => 'Invalid or expired coupon code.'], 422);
+        }
+
+        session()->put('coupon', [
+            'code' => $coupon->code,
+            'discount' => $coupon->discount ?? 0,
+            'type' => $coupon->type ?? 'fixed',
+        ]);
+
+        return response()->json(['status' => true, 'message' => 'Coupon applied.', 'coupon' => session('coupon')]);
+    }
+
+    public function removeCoupon()
+    {
+        session()->forget('coupon');
+        return response()->json(['status' => true, 'message' => 'Coupon removed.']);
     }
 
     public function addToCart(Request $request)
@@ -20,15 +48,15 @@ class CartController extends Controller
     $request->validate([
         'product_id' => 'required|exists:products,id',
         'quantity' => 'required|integer|min:1',
-        'order_for_date' => 'required|date',
-        'meal_type' => 'required|in:breakfast,lunch,dinner,snack,regular'
+        'order_for_date' => 'nullable|date',
+        'meal_type' => 'nullable|in:breakfast,lunch,dinner,snack,regular'
     ]);
 
     $id = $request->product_id;
-    $product = Product::find($id);
+    $product = Product::with('primaryVariant')->find($id);
     $quantity = $request->quantity;
-    $orderForDate = $request->order_for_date;
-    $mealType = $request->meal_type;
+    $orderForDate = $request->order_for_date ?? now()->toDateString();
+    $mealType = $request->meal_type ?? 'regular';
 
     $cart = session()->get('cart', []);
 
@@ -39,8 +67,8 @@ class CartController extends Controller
     $productName = product_name($product);
     $primaryVariant = $product->primaryVariant;
 
-    $originalPrice = $primaryVariant->converted_price ?? $product->price ?? 0;
-    $discountPrice = $primaryVariant->converted_discount_price ?? $product->discount_price ?? 0;
+    $originalPrice = optional($primaryVariant)->converted_price ?? $product->price ?? 0;
+    $discountPrice = optional($primaryVariant)->converted_discount_price ?? $product->discount_price ?? 0;
 
     $displayPrice = $discountPrice && $originalPrice > $discountPrice ? $discountPrice : $originalPrice;
 

@@ -23,6 +23,6 @@ class WeeklyMenu extends Model
     // Check if menu is available for ordering
     public function isAvailableForOrdering()
     {
-        return $this->status === 'active';
+        return (bool) $this->status;
     }
 }

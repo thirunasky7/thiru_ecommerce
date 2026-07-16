@@ -1,10 +1,14 @@
 @extends('admin.layouts.admin')
+@section('title', 'Create Brand')
 @section('content')
-    <div class="card mt-4">
-        <div class="card-header card-header-bg text-white">
-            <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.brands.heading') }}
-            </h6>
+    <div class="ad-page-head">
+        <div>
+            <a href="{{ route('admin.brands.index') }}" class="ad-muted small d-inline-block mb-2">&larr; Back</a>
+            <h1>Create brand</h1>
+            <p class="ad-muted">Add a brand partner</p>
         </div>
+    </div>
+    <div class="card">
         <div class="card-body">
             <form action="{{ route('admin.brands.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf

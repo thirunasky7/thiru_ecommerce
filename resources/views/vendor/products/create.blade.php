@@ -1,5 +1,5 @@
 
-@extends('admin.vendor-views.layouts.master')
+@extends('vendor.layouts.master')
 @section('content')
     <div class="card mt-4">
         <div class="card-header card-header-bg text-white">

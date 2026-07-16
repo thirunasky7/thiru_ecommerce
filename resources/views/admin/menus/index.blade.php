@@ -7,16 +7,22 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 @endsection
 
-@section('content')
-<div class="card mt-4">
-    <div class="card-header card-header-bg text-white">
-        <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.menus.all_menus') }}</h6>
-    </div>
-    <div class="card-body">
-       
-        <a href="{{ route('admin.menus.create') }}" class="btn btn-success float-end mb-3">{{ __('cms.menus.add_new') }}</a>
+@section('title', 'Menus')
 
-        <table id="menus-table" class="table table-bordered mt-4">
+@section('content')
+<div class="ad-page-head">
+    <div>
+        <h1>Navigation menus</h1>
+        <p class="ad-muted">Storefront header and footer link groups</p>
+    </div>
+    <a href="{{ route('admin.menus.create') }}" class="btn btn-dark btn-sm">
+        <i class="fas fa-plus me-1"></i> {{ __('cms.menus.add_new') }}
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table id="menus-table" class="table table-hover">
             <thead>
                 <tr>
                     <th>{{ __('cms.menus.id') }}</th>

@@ -115,13 +115,25 @@ class WeeklyMenuController extends Controller
         $activeCategoryIds = $categories->pluck('id');
 
         // Get ONLY active products that belong to active categories
-        $saleItems = Product::where(function($query) {
+        $saleItems = Product::with(['translation', 'primaryVariant'])
+                ->where(function($query) {
                     $query->where('is_food_menu', 'no')
                         ->orWhere('product_mode', 'regular');
                 })
-                ->where('status', 1)                // product active
-                ->whereIn('category_id', $activeCategoryIds) // category active
+                ->where('status', 1)
+                ->whereIn('category_id', $activeCategoryIds)
                 ->get();
+
+        // Fallback: if no category-filtered items, show all regular/food items
+        if ($saleItems->isEmpty()) {
+            $saleItems = Product::with(['translation', 'primaryVariant'])
+                ->where('status', 1)
+                ->where(function ($q) {
+                    $q->where('product_mode', 'regular')->orWhere('is_food_menu', 'yes');
+                })
+                ->take(24)
+                ->get();
+        }
 
         $banners = $this->homeService->getBanners();
 
@@ -194,11 +206,24 @@ class WeeklyMenuController extends Controller
     {
         $cartItems = session()->get('cart', []);
         $cartItems = array_filter($cartItems, function ($item) {
-            return isset($item['product_id']) && $item['product_id'] != null;
+            return (!empty($item['product_id'])) || (!empty($item['food_package_id']));
         });
         session()->put('cart', $cartItems);
-        $groupedCartItems = collect($cartItems)->groupBy('order_for_date');
+        $groupedCartItems = collect($cartItems)->groupBy(function ($item) {
+            return $item['item_type'] ?? 'product';
+        });
 
         return view('themes.xylo.cart', compact('cartItems', 'groupedCartItems'));
+    }
+
+    public function getCutoffTime()
+    {
+        return response()->json([
+            'breakfast' => '06:00',
+            'lunch' => '10:00',
+            'dinner' => '17:00',
+            'snack' => '18:00',
+            'server_time' => now()->toDateTimeString(),
+        ]);
     }
 }

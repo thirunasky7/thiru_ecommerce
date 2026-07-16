@@ -6,19 +6,22 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 @endsection
 
-@section('content')
-<div class="card mt-4">
-    <div class="card-header  card-header-bg text-white">
-        <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.menu_items.heading') }}</h6>
-    </div>
-    <div class="card-body">
-        <!-- Add Menu Item Button (aligned to the right) -->
-        <div class="d-flex justify-content-end mb-3">
-            <a href="{{ route('admin.menus.items.create', $menu->id) }}" class="btn btn-primary mt-2">{{ __('cms.menu_items.add_new') }}</a>
-        </div>
+@section('title', 'Menu items')
 
-        <!-- Menu Items Table -->
-        <table id="menu-items-table" class="table">
+@section('content')
+<div class="ad-page-head">
+    <div>
+        <h1>Menu items</h1>
+        <p class="ad-muted">Links inside “{{ $menu->title ?? 'menu' }}”</p>
+    </div>
+    <a href="{{ route('admin.menus.items.create', $menu->id) }}" class="btn btn-dark btn-sm">
+        <i class="fas fa-plus me-1"></i> {{ __('cms.menu_items.add_new') }}
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table id="menu-items-table" class="table table-hover">
             <thead>
                 <tr>
                     <th>{{ __('cms.menu_items.id') }}</th>

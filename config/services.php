@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'phonepe' => [
+        'merchant_id' => env('PHONEPE_MERCHANT_ID'),
+        'salt_key' => env('PHONEPE_SALT_KEY'),
+        'salt_index' => env('PHONEPE_SALT_INDEX', 1),
+        'base_url' => env('PHONEPE_BASE_URL', 'https://api.phonepe.com/apis/hermes'),
+    ],
+
 ];

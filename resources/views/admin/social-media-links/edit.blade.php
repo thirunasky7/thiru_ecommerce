@@ -5,12 +5,14 @@
 @section('title', 'Edit Social Media Link')
 
 @section('content')
-    <div class="container mt-4">
-        <!-- Card Structure -->
+    <div class="ad-page-head">
+        <div>
+            <a href="{{ route('admin.social-media-links.index') }}" class="ad-muted small d-inline-block mb-2">&larr; Back</a>
+            <h1>Edit social link</h1>
+            <p class="ad-muted">{{ $socialMediaLink->platform }}</p>
+        </div>
+    </div>
         <div class="card">
-            <div class="card-header card-header-bg text-white">
-                <h6>{{ __('cms.social_media_links.edit') }}</h6>
-            </div>
             <div class="card-body">
 
                 <!-- Success/Error Messages -->
@@ -78,9 +80,8 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="mt-3 btn btn-success">{{ __('cms.social_media_links.update') }}</button>
+                    <button type="submit" class="mt-3 btn btn-dark">{{ __('cms.social_media_links.update') }}</button>
                 </form>
             </div>
         </div>
-    </div>
 @endsection

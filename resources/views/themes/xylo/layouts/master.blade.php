@@ -4,172 +4,68 @@
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopEasy - Online Shopping</title>
-    <!-- Bootstrap CSS -->
+    <title>@yield('title', 'ThaiYur — Food · Grocery · Marketplace')</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"> 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">   
-    <link rel="stylesheet" href="{{ url('/css/front-style.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url('/css/front-style.css') }}">
+    @yield('css')
 </head>
-<body>
+<body class="ty-body">
     @include('themes.xylo.layouts.header')
-    @yield('content')
+    <main>
+        @yield('content')
+    </main>
     @include('themes.xylo.layouts.footer')
-    
-    <!-- jQuery -->
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Slick Carousel JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
-    
-    <!-- Custom JS Files from Public Folder -->
-    <script src="{{ asset('public/js/main.js') }}"></script>
-    <script src="{{ asset('public/js/app.js') }}"></script>
-    
-    @yield('js')
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
-        $(document).ready(function () {
-            // Category Slider
-            $('.category-slider').slick({
-                slidesToShow: 4,
-                slidesToScroll: 1,
-                autoplay: true,
-                autoplaySpeed: 2000,
-                dots: false,
-                arrows: true,
-                prevArrow: '<button class="slick-prev"><i class="fa fa-angle-left"></i></button>',
-                nextArrow: '<button class="slick-next"><i class="fa fa-angle-right"></i></button>',
-                responsive: [
-                    {
-                        breakpoint: 1024,
-                        settings: {
-                            slidesToShow: 3,
-                        }
-                    },
-                    {
-                        breakpoint: 768,
-                        settings: {
-                            slidesToShow: 1,
-                        }
-                    },
-                    {
-                        breakpoint: 480,
-                        settings: {
-                            slidesToShow: 1,
-                        }
-                    }
-                ]
-            });
-            
-            // Banner Slider
-            $('.banner-slider').slick({
-                slidesToShow: 1,
-                slidesToScroll: 1,
-                autoplay: true,
-                fade: true,
-                speed: 500,
-                cssEase: 'linear',
-                autoplaySpeed: 5000,
-                dots: true,
-                arrows: false,
-            });
-            
-            // Product Slider
-            $('.product-slider').slick({
-                slidesToShow: 4,
-                slidesToScroll: 1,
-                infinite: true,
-                autoplay: true,
-                autoplaySpeed: 3000,
-                arrows: true,
-                prevArrow: $('.prev'),
-                nextArrow: $('.next'),
-                responsive: [
-                    {
-                        breakpoint: 1024,
-                        settings: {
-                            slidesToShow: 3,
-                        }
-                    },
-                    {
-                        breakpoint: 768,
-                        settings: {
-                            slidesToShow: 2,
-                        }
-                    },
-                    {
-                        breakpoint: 480,
-                        settings: {
-                            slidesToShow: 1,
-                        }
-                    }
-                ]
-            });
-        });
-    </script>
-    
-    <script>
-        /* header script */
-        document.addEventListener('DOMContentLoaded', function() {
-            const accountToggle = document.getElementById('accountDropdown');
-            const accountMenu = document.querySelector('.account-menu');
+        window.tyAddToCart = function (productId, quantity, orderForDate, mealType) {
+            quantity = quantity || 1;
+            orderForDate = orderForDate || new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+            mealType = mealType || 'regular';
 
-            if (accountToggle && accountMenu) {
-                document.addEventListener('click', function(event) {
-                    if (!accountToggle.contains(event.target) && !accountMenu.contains(event.target)) {
-                        accountMenu.classList.remove('show');
-                    }
-                });
-            }
-        });
-    </script>
-    
-    <script>
-        /* product search input */
-        $(document).ready(function () {
-            $('#search-input').on('keyup', function () {
-                let query = $(this).val();
-                if (query.length > 2) {
-                    $.ajax({
-                        url: '{{ url('/search-suggestions') }}',
-                        type: 'GET',
-                        data: { q: query },
-                        success: function (data) {
-                            let suggestions = $('#search-suggestions');
-                            suggestions.html('');
-                            if (data.length > 0) {
-                                data.forEach(product => {
-                                    suggestions.append(`
-                                        <a href="/product/${product.slug}" class="dropdown-item d-flex align-items-center">
-                                            <img src="${product.thumbnail}" alt="${product.name}" class="me-2" width="40" height="40" style="object-fit: cover; border-radius: 5px;">
-                                            <span class="search-product-title">${product.name}</span>
-                                        </a>
-                                    `);
-                                });
-                                suggestions.removeClass('d-none');
-                            } else {
-                                suggestions.addClass('d-none');
-                            }
-                        }
-                    });
+            return $.ajax({
+                url: "{{ route('cart.add') }}",
+                method: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    product_id: productId,
+                    quantity: quantity,
+                    order_for_date: orderForDate,
+                    meal_type: mealType
+                }
+            }).done(function (res) {
+                if (res.cart_count !== undefined) {
+                    $('#cart-count').text(res.cart_count);
+                }
+                if (typeof toastr !== 'undefined') {
+                    toastr.success(res.message || 'Added to cart');
                 } else {
-                    $('#search-suggestions').addClass('d-none');
+                    alert(res.message || 'Added to cart');
+                }
+            }).fail(function (xhr) {
+                const msg = (xhr.responseJSON && (xhr.responseJSON.message || Object.values(xhr.responseJSON.errors || {}).flat().join(', '))) || 'Could not add to cart';
+                if (typeof toastr !== 'undefined') {
+                    toastr.error(msg);
+                } else {
+                    alert(msg);
                 }
             });
+        };
 
-            $(document).on('click', function (event) {
-                if (!$(event.target).closest('#search-input, #search-suggestions').length) {
-                    $('#search-suggestions').addClass('d-none');
-                }
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[data-reveal]').forEach(function (el, i) {
+                el.style.setProperty('--reveal-delay', (i % 6) * 80 + 'ms');
+                requestAnimationFrame(function () { el.classList.add('is-visible'); });
             });
         });
     </script>
+    @yield('js')
 </body>
 </html>

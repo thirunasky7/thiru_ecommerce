@@ -1,32 +1,23 @@
 @extends('admin.layouts.admin')
 
-@section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">Edit Weekly Menu</h2>
-              <!-- Success/Error Messages -->
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
+@section('title', 'Edit Weekly Menu')
 
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-@php 
-$menu =$weeklymenu;
+@section('content')
+<div class="ad-page-head">
+    <div>
+        <a href="{{ route('admin.weeklymenu.index') }}" class="ad-muted small d-inline-block mb-2">&larr; Back</a>
+        <h1>Edit weekly menu</h1>
+        <p class="ad-muted">Update day, meal type, and products</p>
+    </div>
+</div>
+@php
+$menu = $weeklymenu;
 @endphp
             <form action="{{ route('admin.weeklymenu.update', $menu->id) }}" method="POST">
                 @csrf
               
                
-                <div class="card shadow-sm">
+                <div class="card">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -43,7 +34,7 @@ $menu =$weeklymenu;
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Meal Type</label>
                                 <select name="meal_type" class="form-select form-select-lg">
-                                    @foreach(['breakfast','lunch','dinner','snacks'] as $m)
+                                    @foreach(['breakfast','lunch','dinner','snack'] as $m)
                                         <option value="{{ $m }}" {{ $menu->meal_type == $m ? 'selected' : '' }}>
                                             {{ $m }} 
                                         </option>
@@ -120,19 +111,16 @@ $menu =$weeklymenu;
                         </div>
 
                         <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-warning btn-lg px-4">
+                            <button type="submit" class="btn btn-dark px-4">
                                 <i class="fa fa-save me-2"></i>Update Menu
                             </button>
-                            <a href="{{ route('admin.weeklymenu.index') }}" class="btn btn-secondary btn-lg px-4">
+                            <a href="{{ route('admin.weeklymenu.index') }}" class="btn btn-outline-dark px-4">
                                 <i class="fa fa-arrow-left me-2"></i>Cancel
                             </a>
                         </div>
                     </div>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
 
 <style>
 .hover-bg:hover {

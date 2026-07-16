@@ -36,11 +36,13 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
 
-            Route::middleware('web')
-                ->group(base_path('routes/store.php'));
-            
+            // Vendor auth/panel must load before storefront so /vendor/login
+            // is not swallowed by /vendor/{id}.
             Route::middleware('web')
                 ->group(base_path('routes/vendor.php'));
+
+            Route::middleware('web')
+                ->group(base_path('routes/store.php'));
         });
     }
 }

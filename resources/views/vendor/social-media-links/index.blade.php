@@ -1,6 +1,6 @@
 
 
-@extends('admin.vendor-views.layouts.master')
+@extends('vendor.layouts.master')
 
 @section('css')
     <!-- DataTables CSS -->

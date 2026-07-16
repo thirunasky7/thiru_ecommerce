@@ -1,6 +1,6 @@
 
 
-@extends('admin.vendor-views.layouts.master')
+@extends('vendor.layouts.master')
 
 @section('title', 'Edit Social Media Link')
 

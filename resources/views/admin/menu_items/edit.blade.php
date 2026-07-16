@@ -2,17 +2,17 @@
 
 @extends('admin.layouts.admin')
 
-@section('content')
-<div class="container">
-    <!-- Card Heading -->
-    <div class="card mt-4">
-        <div class="card-header card-header-bg text-white">
-            <h6>{{ __('cms.menu_items.edit') }}</h6>
-        </div>
-    </div>
+@section('title', 'Edit Menu Item')
 
-    <!-- Menu Item Form -->
-    <div class="card mt-4">
+@section('content')
+<div class="ad-page-head">
+    <div>
+        <h1>Edit menu item</h1>
+        <p class="ad-muted">Update navigation link details</p>
+    </div>
+</div>
+
+<div class="card">
         <div class="card-body">
             @if(session('error'))
                 <div id="errorBar" class="alert alert-danger">{{ session('error') }}</div>
@@ -78,9 +78,8 @@
                 </div>
             
                 <!-- Submit Button -->
-                <button type="submit" class="mt-3 btn btn-success">{{ __('cms.menu_items.update_button') }}</button>
+                <button type="submit" class="mt-3 btn btn-dark">{{ __('cms.menu_items.update_button') }}</button>
             </form>            
         </div>
-    </div>
 </div>
 @endsection

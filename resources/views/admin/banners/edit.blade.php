@@ -1,11 +1,17 @@
 
 @extends('admin.layouts.admin')
 
+@section('title', 'Edit Banner')
+
 @section('content')
-    <div class="card mt-4">
-        <div class="card-header card-header-bg text-white">
-            <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.banners.edit_banner') }}</h6>
+    <div class="ad-page-head">
+        <div>
+            <a href="{{ route('admin.banners.index') }}" class="ad-muted small d-inline-block mb-2">&larr; Back</a>
+            <h1>Edit banner</h1>
+            <p class="ad-muted">Update promotional imagery</p>
         </div>
+    </div>
+    <div class="card">
         <div class="card-body">
             <form action="{{ route('admin.banners.update', $banner->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf

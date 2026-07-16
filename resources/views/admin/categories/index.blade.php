@@ -6,13 +6,22 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 @endsection
 
+@section('title', 'Categories')
+
 @section('content')
-    <div class="card mt-4">
-        <div class="card-header  card-header-bg text-white">
-            <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.categories.heading') }}</h6>
+    <div class="ad-page-head">
+        <div>
+            <h1>Categories</h1>
+            <p class="ad-muted">Organize food, grocery, and marketplace catalogs</p>
         </div>
+        <a href="{{ route('admin.categories.create') }}" class="btn btn-dark btn-sm">
+            <i class="fas fa-plus me-1"></i> Add category
+        </a>
+    </div>
+
+    <div class="card">
         <div class="card-body">
-            <table id="categories-table" class="table table-bordered mt-4 dt-style">
+            <table id="categories-table" class="table table-hover dt-style">
                 <thead>
                     <tr>
                         <th>{{ __('cms.categories.id') }}</th>

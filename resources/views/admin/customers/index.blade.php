@@ -10,37 +10,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 @endsection
 
+@section('title', 'Customers')
+
 @section('content')
-<div class="container">
-    <!-- Title Card -->
-    <div class="card mt-4">
-        <div class="card-header card-header-bg text-white d-flex justify-content-between align-items-center">
-            <h6>Customer List</h6>
-        </div>
+<div class="ad-page-head">
+    <div>
+        <h1>Customers</h1>
+        <p class="ad-muted">Registered shoppers and delivery contacts</p>
     </div>
+</div>
 
-    <!-- Customer List Card -->
-    <div class="card mt-4">
-        <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-
-            <table id="customers-table" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+<div class="card">
+    <div class="card-body">
+        <table id="customers-table" class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 </div>
 

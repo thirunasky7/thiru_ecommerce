@@ -29,17 +29,22 @@ class ProductController extends Controller
             'attributeValues.attribute',
             'attributeValues.translations',
             'translations',
+            'translation',
             'reviews',
             'primaryVariant',
             'variants.attributeValues',
-            'images'
+            'images',
+            'thumbnail',
+            'shop',
+            'serviceType',
+            'category.translation',
         ])->withAvg('reviews', 'rating')
           ->withCount('reviews')
           ->where('slug', $slug)
           ->firstOrFail();
 
         $primaryVariant = $product->variants()->where('is_primary', true)->first();
-        $inStock = $primaryVariant && $primaryVariant->stock > 0;
+        $inStock = $primaryVariant ? $primaryVariant->stock > 0 : (($product->stock ?? 0) > 0 || true);
 
         $variantMap = $product->variants->map(function ($variant) {
             return [

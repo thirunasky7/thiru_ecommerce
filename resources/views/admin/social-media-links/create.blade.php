@@ -4,12 +4,14 @@
 @section('title', 'Create Social Media Link')
 
 @section('content')
-    <div class="container mt-4">
-        <!-- Card Structure -->
+    <div class="ad-page-head">
+        <div>
+            <a href="{{ route('admin.social-media-links.index') }}" class="ad-muted small d-inline-block mb-2">&larr; Back</a>
+            <h1>Add social link</h1>
+            <p class="ad-muted">Connect a storefront social profile</p>
+        </div>
+    </div>
         <div class="card">
-            <div class="card-header card-header-bg text-white">
-                <h6>{{ __('cms.social_media_links.create') }}</h6>
-            </div>
             <div class="card-body">
 
                 <!-- Success/Error Messages -->
@@ -77,9 +79,8 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="btn btn-success mt-3">{{ __('cms.social_media_links.save') }}</button>
+                    <button type="submit" class="btn btn-dark mt-3">{{ __('cms.social_media_links.save') }}</button>
                 </form>
             </div>
         </div>
-    </div>
 @endsection

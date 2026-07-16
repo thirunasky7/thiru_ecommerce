@@ -55,6 +55,9 @@ class Order extends Model
         'user_agent',
         'device_type',
         'app_version',
+        'vendor_id',
+        'shop_id',
+        'service_type_id',
     ];
 
     protected $casts = [
@@ -89,7 +92,28 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
-  
+
+    /** Alias used by API checkout / my-orders */
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class);
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
 
     // Scopes
     public function scopePending($query)

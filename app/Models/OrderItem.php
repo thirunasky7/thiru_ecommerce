@@ -11,7 +11,9 @@ class OrderItem extends Model
 
     protected $fillable = [
         'order_id',
+        'item_type',
         'product_id',
+        'food_package_id',
         'product_name',
         'product_description',
         'product_image',
@@ -25,6 +27,8 @@ class OrderItem extends Model
         'tax_amount',
         'final_price',
         'order_for_date',
+        'package_start_date',
+        'package_end_date',
         'meal_type',
         'expected_delivery_date',
         'actual_delivery_date',
@@ -79,6 +83,8 @@ class OrderItem extends Model
         'final_price' => 'decimal:2',
         'refund_amount' => 'decimal:2',
         'order_for_date' => 'date',
+        'package_start_date' => 'date',
+        'package_end_date' => 'date',
         'expected_delivery_date' => 'date',
         'actual_delivery_date' => 'date',
         'expiry_date' => 'date',
@@ -105,9 +111,14 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
-     public function product()
+    public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function foodPackage()
+    {
+        return $this->belongsTo(FoodPackage::class);
     }
 
     /**

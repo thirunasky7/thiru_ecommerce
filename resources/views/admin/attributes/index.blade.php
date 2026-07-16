@@ -8,14 +8,22 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @endsection
 
-@section('content')
+@section('title', 'Attributes')
 
-<div class="card mt-4">
-    <div class="card-header card-header-bg text-white">
-        <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.attributes.title_manage') }}</h6>
+@section('content')
+<div class="ad-page-head">
+    <div>
+        <h1>Attributes</h1>
+        <p class="ad-muted">Product options like size, weight, and spice level</p>
     </div>
+    <a href="{{ route('admin.attributes.create') }}" class="btn btn-dark btn-sm">
+        <i class="fas fa-plus me-1"></i> Add attribute
+    </a>
+</div>
+
+<div class="card">
     <div class="card-body">
-        <table id="attributes-table" class="table table-bordered mt-4">
+        <table id="attributes-table" class="table table-hover">
             <thead>
                 <tr>
                     <th>{{ __('cms.attributes.id') }}</th>

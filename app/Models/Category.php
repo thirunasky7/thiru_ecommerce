@@ -13,6 +13,7 @@ class Category extends Model
     protected $fillable = [
         'slug',
         'parent_category_id',
+        'service_type_id',
         'status',
     ];
 
@@ -27,6 +28,11 @@ class Category extends Model
                     ->where('language_code', App::getLocale());
     }
 
+    public function serviceType()
+    {
+        return $this->belongsTo(ServiceType::class);
+    }
+
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_category_id');
@@ -36,8 +42,14 @@ class Category extends Model
     {
         return $this->hasMany(Category::class, 'parent_category_id');
     }
+
     public function products()
     {
         return $this->hasMany(Product::class, 'category_id')->where('status', 1);
+    }
+
+    public function scopeOfService($query, $serviceTypeId)
+    {
+        return $query->where('service_type_id', $serviceTypeId);
     }
 }

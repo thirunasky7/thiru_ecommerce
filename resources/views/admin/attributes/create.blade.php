@@ -3,11 +3,14 @@
 @section('title', 'Create Attribute')
 
 @section('content')
-    <div class="container mt-4">
-        <div class="card">
-            <div class="card-header card-header-bg text-white">
-                <h6>{{ __('cms.attributes.title_create') }}</h6>
-            </div>
+    <div class="ad-page-head">
+        <div>
+            <a href="{{ route('admin.attributes.index') }}" class="ad-muted small d-inline-block mb-2">&larr; Back</a>
+            <h1>Create attribute</h1>
+            <p class="ad-muted">Define product option names and values</p>
+        </div>
+    </div>
+    <div class="card">
             <div class="card-body">
                 @if ($errors->any())
                     <div id="errorBar" class="alert alert-danger">
@@ -67,10 +70,9 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="btn btn-success mt-3">{{ __('cms.attributes.save_attribute') }}</button>
+                    <button type="submit" class="btn btn-dark mt-3">{{ __('cms.attributes.save_attribute') }}</button>
                 </form>
             </div>
-        </div>
     </div>
 
     <script>

@@ -1,10 +1,16 @@
 @extends('admin.layouts.admin')
+@section('title', 'Edit Product')
 @section('content')
 
-<div class="card mt-4">
-    <div class="card-header card-header-bg text-white">
-        <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.products.title_edit') }}</h6>
+<div class="ad-page-head">
+    <div>
+        <a href="{{ route('admin.products.index') }}" class="ad-muted small d-inline-block mb-2">&larr; Back to products</a>
+        <h1>Edit product</h1>
+        <p class="ad-muted">Update catalog details</p>
     </div>
+</div>
+
+<div class="card">
     <div class="card-body">
         <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data" id="productForm" novalidate>
             @csrf

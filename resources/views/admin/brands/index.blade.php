@@ -7,15 +7,22 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">  
 @endsection
 
-@section('content')
-    <div class="card mt-4">
-        <div class="card-header card-header-bg text-white">
-            <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.brands.heading') }}
-            </h6>
-        </div>
+@section('title', 'Brands')
 
+@section('content')
+    <div class="ad-page-head">
+        <div>
+            <h1>Brands</h1>
+            <p class="ad-muted">Manage brand partners and logos</p>
+        </div>
+        <a href="{{ route('admin.brands.create') }}" class="btn btn-dark btn-sm">
+            <i class="fas fa-plus me-1"></i> Add brand
+        </a>
+    </div>
+
+    <div class="card">
         <div class="card-body">
-            <table id="brands-table" class="table table-bordered mt-4 dt-style">
+            <table id="brands-table" class="table table-hover dt-style">
                 <thead>
                     <tr>
                         <th>{{ __('cms.brands.id') }}</th>

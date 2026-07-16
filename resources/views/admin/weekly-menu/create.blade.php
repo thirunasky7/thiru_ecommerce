@@ -1,15 +1,18 @@
 @extends('admin.layouts.admin')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">Create Weekly Menu</h2>
+<div class="ad-page-head">
+    <div>
+        <a href="{{ route('admin.weeklymenu.index') }}" class="ad-muted small d-inline-block mb-2">&larr; Back</a>
+        <h1>Create weekly menu</h1>
+        <p class="ad-muted">Schedule products for a day and meal type</p>
+    </div>
+</div>
 
             <form action="{{ route('admin.weeklymenu.store') }}" method="POST">
                 @csrf
 
-                <div class="card shadow-sm">
+                <div class="card">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -31,7 +34,7 @@
                                     <option value="breakfast">Breakfast</option>
                                     <option value="lunch">Lunch</option>
                                     <option value="dinner">Dinner</option>
-                                    <option value="snacks">Snacks</option>
+                                    <option value="snack">Snack</option>
                                 </select>
                             </div>
                         </div>
@@ -104,19 +107,16 @@
                         </div>
 
                         <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-success btn-lg px-4">
+                            <button type="submit" class="btn btn-dark px-4">
                                 <i class="fa fa-plus me-2"></i>Create Menu
                             </button>
-                            <a href="{{ route('admin.weeklymenu.index') }}" class="btn btn-secondary btn-lg px-4">
+                            <a href="{{ route('admin.weeklymenu.index') }}" class="btn btn-outline-dark px-4">
                                 <i class="fa fa-arrow-left me-2"></i>Cancel
                             </a>
                         </div>
                     </div>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
 
 <style>
 .hover-bg:hover {

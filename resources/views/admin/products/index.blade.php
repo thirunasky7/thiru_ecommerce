@@ -7,19 +7,27 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 @endsection
 
-@section('content')
+@section('title', 'Products')
 
-<div class="card mt-4">
-    <div class="card-header card-header-bg text-white">
-        <h6 class="d-flex align-items-center mb-0 dt-heading">{{ __('cms.products.title_manage') }}</h6>
+@section('content')
+<div class="ad-page-head">
+    <div>
+        <h1>Products</h1>
+        <p class="ad-muted">Manage catalog items across food, grocery, and marketplace</p>
     </div>
+    <a href="{{ route('admin.products.create') }}" class="btn btn-dark btn-sm">
+        <i class="fas fa-plus me-1"></i> Add product
+    </a>
+</div>
+
+<div class="card">
     <div class="card-body">
-        <table id="products-table" class="table table-bordered mt-4">
+        <table id="products-table" class="table table-hover">
             <thead>
                 <tr>
                     <th>{{ __('cms.products.id') }}</th>
-                    <th>{{ __('cms.products.name') }}</th>                    
-                    <th>{{ __('cms.products.price') }}</th>                   
+                    <th>{{ __('cms.products.name') }}</th>
+                    <th>{{ __('cms.products.price') }}</th>
                     <th>{{ __('cms.products.status') }}</th>
                     <th>{{ __('cms.products.action') }}</th>
                 </tr>

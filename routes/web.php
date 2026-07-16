@@ -17,30 +17,32 @@ use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\HomeController;
 
 
-Route::get('/admin/login', function () {
-    return view('admin.auth.login');
-});
-Route::post('admin/login', [LoginController::class, 'login'])->name('admin.login');
+Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('admin.login.form');
+Route::post('/admin/login', [LoginController::class, 'login'])->name('admin.login');
+Route::post('/admin/logout', [LoginController::class, 'logout'])->name('admin.logout');
 Route::get('/test', function () {
     return view('tests');
 });
-Auth::routes();
+Auth::routes(['login' => false, 'register' => false]);
+
+// Keep named logout for admin layout forms
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::prefix('admin')->middleware('auth')->group(function () {
 
     Route::get('/weekly-menu', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'index'])->name('admin.weeklymenu.index');
-
     Route::get('/weekly-menu/create', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'create'])->name('admin.weeklymenu.create');
-
     Route::post('/weekly-menu/store', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'store'])->name('admin.weeklymenu.store');
-
     Route::get('/weekly-menu/{id}/edit', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'edit'])->name('admin.weeklymenu.edit');
-
     Route::post('/weekly-menu/{id}/update', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'update'])->name('admin.weeklymenu.update');
-
     Route::delete('/weekly-menu/{id}', [App\Http\Controllers\Admin\WeeklyMenuController::class, 'destroy'])->name('admin.weeklymenu.delete');
+
+    Route::resource('food-packages', \App\Http\Controllers\Admin\FoodPackageController::class)
+        ->names('admin.food-packages')
+        ->except(['show']);
 
 });
 
@@ -132,7 +134,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 });
 
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    Route::post('sellers/{seller}/approve', [SellerController::class, 'approve'])->name('sellers.approve');
+    Route::post('sellers/{seller}/reject', [SellerController::class, 'reject'])->name('sellers.reject');
     Route::resource('sellers', SellerController::class);
 });
 
