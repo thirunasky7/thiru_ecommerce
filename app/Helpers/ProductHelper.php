@@ -12,30 +12,57 @@ class ProductHelper
      */
     public static function getProductImage($product, $default = null)
     {
-        $defaultImage = $default ?? 'https://via.placeholder.com/300x300?text=No+Image';
-        
-        // Check thumbnail first
-        if ($product->thumbnail && $product->thumbnail->image_url) {
-            return asset('/public/storage/' . $product->thumbnail->image_url);
+        $defaultImage = $default ?? 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=60';
+
+        $candidates = [];
+
+        if ($product->relationLoaded('thumbnail') || method_exists($product, 'thumbnail')) {
+            if ($product->thumbnail && $product->thumbnail->image_url) {
+                $candidates[] = $product->thumbnail->image_url;
+            }
         }
-        
-        // Check primary variant images
-        $primaryVariant = $product->primaryVariant;
-        if ($primaryVariant && $primaryVariant->images->isNotEmpty()) {
-            return asset('/public/storage/' . $primaryVariant->images->first()->image_url);
+
+        if ($product->relationLoaded('images') || method_exists($product, 'images')) {
+            if ($product->images && $product->images->isNotEmpty()) {
+                $candidates[] = $product->images->first()->image_url;
+            }
         }
-        
-        // Check product images
-        if ($product->images->isNotEmpty()) {
-            return asset('/public/storage/' . $product->images->first()->image_url);
+
+        $primaryVariant = $product->primaryVariant ?? null;
+        if ($primaryVariant && $primaryVariant->relationLoaded('images') && $primaryVariant->images->isNotEmpty()) {
+            $candidates[] = $primaryVariant->images->first()->image_url;
         }
-        
-        // Check if image_url exists directly on product
-        if ($product->image_url) {
-            return asset('/public/storage/' . $product->image_url);
+
+        if (!empty($product->image_url)) {
+            $candidates[] = $product->image_url;
         }
-        
+
+        foreach ($candidates as $path) {
+            if ($path) {
+                return self::mediaUrl($path, $defaultImage);
+            }
+        }
+
         return $defaultImage;
+    }
+
+    /**
+     * Resolve storage path or absolute URL for public display.
+     */
+    public static function mediaUrl(?string $path, ?string $fallback = null): string
+    {
+        if (!$path) {
+            return $fallback ?? '';
+        }
+
+        if (preg_match('#^(https?:)?//#i', $path)) {
+            return $path;
+        }
+
+        $path = ltrim($path, '/');
+        $path = preg_replace('#^(public/)?storage/#', '', $path);
+
+        return asset('storage/' . $path);
     }
 
     /**

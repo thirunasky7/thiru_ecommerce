@@ -52,7 +52,8 @@
             @foreach($featuredShops as $shop)
                 <div class="col-md-4 col-lg-4" data-reveal>
                     <a href="{{ route('store.show', $shop->slug) }}" class="ty-shop-card">
-                        <div class="ty-shop-card__media" style="background: linear-gradient(135deg, {{ optional($shop->serviceType)->color ?? '#0F766E' }}33, #0b1c18);">
+                        <div class="ty-shop-card__media">
+                            <img src="{{ shop_image($shop, 'cover') }}" alt="{{ $shop->name }}" loading="lazy">
                             <span class="ty-chip">{{ optional($shop->serviceType)->name ?? 'Shop' }}</span>
                         </div>
                         <div class="ty-shop-card__body">

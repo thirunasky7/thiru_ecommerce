@@ -4,14 +4,16 @@
     $discount = optional($product->primaryVariant)->discount_price ?? $product->discount_price;
     $display = ($discount && $discount < $price) ? $discount : $price;
     $serviceName = optional($product->serviceType)->name ?? null;
+    $image = product_image($product);
 @endphp
 <div class="ty-product-card" data-reveal>
     <a href="{{ route('product.show', $product->slug) }}" class="ty-product-card__link">
         <div class="ty-product-card__media">
+            <img src="{{ $image }}" alt="{{ $name }}" loading="lazy"
+                 onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=60';">
             @if($serviceName)
                 <span class="ty-chip ty-chip--sm">{{ $serviceName }}</span>
             @endif
-            <div class="ty-product-card__placeholder"><i class="fas fa-box-open"></i></div>
         </div>
     </a>
     <div class="ty-product-card__body">

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Vendor\Auth\AuthController;
 use App\Http\Controllers\Vendor\DashboardController;
 use App\Http\Controllers\Vendor\ProductController;
+use App\Http\Controllers\Vendor\ProfileController;
 use App\Http\Controllers\Vendor\SocialMediaLinkController;
 
 
@@ -16,7 +17,9 @@ Route::prefix('vendor')->group(function () {
 
     Route::middleware('auth.vendor')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('vendor.dashboard');
-        Route::resource('products', ProductController::class)->names('vendor.products');  
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('vendor.profile.edit');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('vendor.profile.update');
+        Route::resource('products', ProductController::class)->names('vendor.products');
         Route::post('products/data', [ProductController::class, 'getProducts'])->name('products.data');
         Route::post('vendor/products/updateStatus', [ProductController::class, 'updateStatus'])->name('vendor.products.updateStatus');
         Route::resource('social-media-links', SocialMediaLinkController::class)->names('vendor.social-media-links');

@@ -11,7 +11,7 @@
     </div>
 </div>
 
-<form action="{{ route('admin.sellers.update', $seller->id) }}" method="POST" class="card">
+<form action="{{ route('admin.sellers.update', $seller->id) }}" method="POST" class="card" enctype="multipart/form-data">
     <div class="card-body">
         @csrf
         @method('PUT')
@@ -53,6 +53,20 @@
                     <option value="rejected" {{ $seller->status == 'rejected' ? 'selected' : '' }}>Rejected</option>
                     <option value="banned" {{ $seller->status == 'banned' ? 'selected' : '' }}>Banned</option>
                 </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Logo</label>
+                @if($seller->logo)
+                    <div class="mb-2"><img src="{{ media_url($seller->logo) }}" alt="" style="height:56px;border-radius:10px;object-fit:cover;"></div>
+                @endif
+                <input type="file" name="logo" class="form-control" accept="image/*">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Cover image</label>
+                @if($seller->cover_image)
+                    <div class="mb-2"><img src="{{ media_url($seller->cover_image) }}" alt="" style="height:56px;width:110px;border-radius:10px;object-fit:cover;"></div>
+                @endif
+                <input type="file" name="cover_image" class="form-control" accept="image/*">
             </div>
         </div>
 

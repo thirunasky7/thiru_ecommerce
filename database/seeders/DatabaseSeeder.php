@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             CurrencySeeder::class,
             SiteSettingsSeeder::class,
             MarketplaceSeeder::class,
+            MarketplaceImagesSeeder::class,
         ]);
     }
 }

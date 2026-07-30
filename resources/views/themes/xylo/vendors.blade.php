@@ -17,7 +17,9 @@
             @foreach($vendors as $vendor)
                 <div class="col-md-6 col-lg-4" data-reveal>
                     <a href="{{ route('vendor.show', $vendor->id) }}" class="ty-shop-card">
-                        <div class="ty-shop-card__media" style="background: linear-gradient(135deg, #1a3a32, #0b1c18);"></div>
+                        <div class="ty-shop-card__media">
+                            <img src="{{ vendor_image($vendor, 'cover') }}" alt="{{ $vendor->business_name ?? $vendor->name }}" loading="lazy">
+                        </div>
                         <div class="ty-shop-card__body">
                             <h3>{{ $vendor->business_name ?? $vendor->name }}</h3>
                             <p>{{ \Illuminate\Support\Str::limit($vendor->description, 90) }}</p>

@@ -29,20 +29,20 @@
             <div class="col-lg-6">
                 <div class="ty-surface-panel ty-product-gallery">
                     @if($images->count())
-                        <img src="{{ asset('storage/' . ltrim($images->first()->image_url, '/')) }}" alt="{{ $name }}" class="ty-product-gallery__main" id="mainProductImage"
+                        <img src="{{ media_url($images->first()->image_url) }}" alt="{{ $name }}" class="ty-product-gallery__main" id="mainProductImage"
                              onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=60'">
                         <div class="ty-product-gallery__thumbs">
                             @foreach($images->take(5) as $image)
-                                <button type="button" class="ty-thumb-btn" data-src="{{ asset('storage/' . ltrim($image->image_url, '/')) }}">
-                                    <img src="{{ asset('storage/' . ltrim($image->image_url, '/')) }}" alt=""
+                                <button type="button" class="ty-thumb-btn" data-src="{{ media_url($image->image_url) }}">
+                                    <img src="{{ media_url($image->image_url) }}" alt=""
                                          onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=60'">
                                 </button>
                             @endforeach
                         </div>
                     @elseif($thumb)
-                        <img src="{{ asset('storage/' . ltrim($thumb, '/')) }}" alt="{{ $name }}" class="ty-product-gallery__main">
+                        <img src="{{ media_url($thumb) }}" alt="{{ $name }}" class="ty-product-gallery__main">
                     @else
-                        <div class="ty-product-gallery__placeholder"><i class="fas fa-box-open"></i></div>
+                        <img src="{{ product_image($product) }}" alt="{{ $name }}" class="ty-product-gallery__main">
                     @endif
                 </div>
             </div>

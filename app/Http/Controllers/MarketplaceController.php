@@ -19,7 +19,7 @@ class MarketplaceController extends Controller
             ->featured()
             ->take(6)
             ->get();
-        $featuredProducts = Product::with(['translation', 'thumbnail', 'shop', 'serviceType', 'primaryVariant'])
+        $featuredProducts = Product::with(['translation', 'thumbnail', 'images', 'shop', 'serviceType', 'primaryVariant'])
             ->active()
             ->featured()
             ->latest()
@@ -56,20 +56,48 @@ class MarketplaceController extends Controller
             })
             ->orderByDesc('is_featured')
             ->orderByDesc('rating')
-            ->paginate(12);
+            ->paginate(12, ['*'], 'shops_page');
 
         $categories = Category::with('translation')
             ->where('service_type_id', $service->id)
             ->where('status', 1)
             ->get();
 
-        $products = Product::with(['translation', 'thumbnail', 'primaryVariant', 'shop'])
+        $productsQuery = Product::with(['translation', 'thumbnail', 'images', 'primaryVariant', 'shop'])
             ->active()
             ->where('service_type_id', $service->id)
             ->when($request->category, fn ($q) => $q->where('category_id', $request->category))
             ->when($request->shop, fn ($q) => $q->where('shop_id', $request->shop))
-            ->latest()
-            ->paginate(12);
+            ->when($request->filled('q'), function ($q) use ($request) {
+                $term = $request->q;
+                $q->where(function ($inner) use ($term) {
+                    $inner->where('slug', 'like', "%{$term}%")
+                        ->orWhereHas('translation', fn ($t) => $t->where('name', 'like', "%{$term}%"));
+                });
+            })
+            ->when($request->filled('price_min'), fn ($q) => $q->where('price', '>=', (float) $request->price_min))
+            ->when($request->filled('price_max'), fn ($q) => $q->where('price', '<=', (float) $request->price_max));
+
+        $sort = $request->get('sort', 'newest');
+        match ($sort) {
+            'price_low' => $productsQuery->orderBy('price', 'asc'),
+            'price_high' => $productsQuery->orderBy('price', 'desc'),
+            default => $productsQuery->latest(),
+        };
+
+        $products = $productsQuery->paginate(12)->withQueryString();
+
+        if ($request->ajax() || $request->boolean('partial')) {
+            return response()->json([
+                'html' => view('themes.xylo.partials.product-grid-items', [
+                    'products' => $products,
+                    'cols' => 4,
+                ])->render(),
+                'hasMore' => $products->hasMorePages(),
+                'nextPage' => $products->currentPage() + 1,
+                'total' => $products->total(),
+            ]);
+        }
 
         return view('themes.xylo.service-browse', compact('service', 'shops', 'categories', 'products'));
     }
@@ -85,24 +113,56 @@ class MarketplaceController extends Controller
         return view('themes.xylo.vendors', compact('vendors'));
     }
 
-    public function vendorShow(string $id)
+    public function vendorShow(Request $request, string $id)
     {
         $vendor = Vendor::with(['shops.serviceType'])->active()->findOrFail($id);
-        $products = Product::with(['translation', 'thumbnail', 'primaryVariant'])
+        $products = Product::with(['translation', 'thumbnail', 'images', 'primaryVariant', 'shop'])
             ->active()
             ->where('vendor_id', $vendor->id)
-            ->paginate(12);
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
+        if ($request->ajax() || $request->boolean('partial')) {
+            return response()->json([
+                'html' => view('themes.xylo.partials.product-grid-items', [
+                    'products' => $products,
+                    'cols' => 3,
+                ])->render(),
+                'hasMore' => $products->hasMorePages(),
+                'nextPage' => $products->currentPage() + 1,
+            ]);
+        }
 
         return view('themes.xylo.vendor-detail', compact('vendor', 'products'));
     }
 
-    public function shopShow(string $slug)
+    public function shopShow(Request $request, string $slug)
     {
         $shop = Shop::with(['vendor', 'serviceType'])->where('slug', $slug)->active()->firstOrFail();
-        $products = Product::with(['translation', 'thumbnail', 'primaryVariant'])
+        $products = Product::with(['translation', 'thumbnail', 'images', 'primaryVariant'])
             ->active()
             ->where('shop_id', $shop->id)
-            ->paginate(12);
+            ->when($request->filled('q'), function ($q) use ($request) {
+                $term = $request->q;
+                $q->whereHas('translation', fn ($t) => $t->where('name', 'like', "%{$term}%"));
+            })
+            ->when($request->get('sort') === 'price_low', fn ($q) => $q->orderBy('price', 'asc'))
+            ->when($request->get('sort') === 'price_high', fn ($q) => $q->orderBy('price', 'desc'))
+            ->when(!in_array($request->get('sort'), ['price_low', 'price_high'], true), fn ($q) => $q->latest())
+            ->paginate(12)
+            ->withQueryString();
+
+        if ($request->ajax() || $request->boolean('partial')) {
+            return response()->json([
+                'html' => view('themes.xylo.partials.product-grid-items', [
+                    'products' => $products,
+                    'cols' => 3,
+                ])->render(),
+                'hasMore' => $products->hasMorePages(),
+                'nextPage' => $products->currentPage() + 1,
+            ]);
+        }
 
         return view('themes.xylo.shop-detail', compact('shop', 'products'));
     }

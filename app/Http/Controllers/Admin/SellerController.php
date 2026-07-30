@@ -68,6 +68,8 @@ class SellerController extends Controller
             'password' => 'nullable|min:6|confirmed',
             'phone' => 'nullable|string|max:20',
             'status' => ['required', Rule::in(['pending', 'active', 'inactive', 'banned', 'rejected'])],
+            'logo' => 'nullable|image|max:4096',
+            'cover_image' => 'nullable|image|max:6144',
         ]);
 
         $data = [
@@ -80,6 +82,14 @@ class SellerController extends Controller
 
         if ($request->filled('password')) {
             $data['password'] = $request->password;
+        }
+
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('vendors/logos', 'public');
+        }
+
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = $request->file('cover_image')->store('vendors/covers', 'public');
         }
 
         $seller->update($data);
