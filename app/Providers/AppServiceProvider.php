@@ -20,6 +20,8 @@ use App\Repositories\Admin\MenuItem\MenuItemRepositoryInterface;
 use App\Repositories\Admin\MenuItem\MenuItemRepository;
 use App\Repositories\Admin\Attribute\AttributeRepository;
 use App\Repositories\Admin\Attribute\AttributeRepositoryInterface;
+use App\Repositories\Vendor\ProductRepository as VendorProductRepository;
+use App\Repositories\Vendor\ProductRepositoryInterface as VendorProductRepositoryInterface;
 
 
 
@@ -41,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
+        $this->app->bind(VendorProductRepositoryInterface::class, VendorProductRepository::class);
         
         $this->app->bind(BrandRepositoryInterface::class, BrandRepository::class);
         

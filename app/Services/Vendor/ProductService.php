@@ -5,7 +5,8 @@ namespace App\Services\Vendor;
 use App\Models\Product;
 use App\Models\ProductTranslation;
 use Yajra\DataTables\DataTables;
-use App\Repositories\Vendor\Product\ProductRepository;
+use App\Repositories\Vendor\ProductRepository;
+use App\Repositories\Vendor\ProductRepositoryInterface;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 
@@ -13,7 +14,7 @@ class ProductService
 {
     protected $productRepository;
 
-    public function __construct(ProductRepository $productRepository)
+    public function __construct(ProductRepositoryInterface $productRepository)
     {
         $this->productRepository = $productRepository;
     }
